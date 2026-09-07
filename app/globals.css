@@ -73,7 +73,11 @@
 @keyframes lb-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes lb-pop { from { opacity: 0; transform: scale(.965) translateY(12px); } to { opacity: 1; transform: none; } }
 
-html { background: #040506; }
+/* color-scheme: dark hace que el navegador dibuje los controles nativos
+   en oscuro. Sin esto, la lista desplegable de un <select> la pinta el
+   sistema con fondo blanco, y como el select hereda color:#fff quedan
+   letras blancas sobre blanco. */
+html { background: #040506; color-scheme: dark; }
 
 body {
   background: var(--color-canvas);
@@ -243,6 +247,8 @@ body {
 }
 .field-input::placeholder { color: var(--color-smoke); }
 .field-input:focus { border-color: #5c5d5f; background: rgba(255,255,255,.08); }
+/* Refuerzo para los navegadores que sí pintan las opciones. */
+.field-input option { background-color: var(--color-recessed); color: #fff; }
 .has-error .field-input { border-color: #8a4a63; }
 
 /* etiquetas flotantes */
