@@ -74,6 +74,8 @@ function Shot({ src, alt }: { src: string; alt: string }) {
 
 function PlainCard({ service }: { service: Service }) {
   const ref = useCardMotion<HTMLElement>(service.image ? 4 : 5);
+  // el <article> lleva .rv: hay que registrarlo aunque el ref sea del tilt
+  useReveal<HTMLElement>(ref);
   return (
     <article ref={ref} className={`card group rv ${service.image ? "" : "gap-4 p-6"} ${service.span}`}>
       {service.image && <Shot src={service.image.src} alt={service.image.alt} />}

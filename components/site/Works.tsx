@@ -56,6 +56,8 @@ function useTilt<T extends HTMLElement>(strength = 7) {
 
 function WorkCard({ work, hidden, onOpen }: { work: Work; hidden: boolean; onOpen: (w: Work) => void }) {
   const host = useTilt<HTMLElement>();
+  // el <article> lleva .rv: hay que registrarlo aunque el ref sea del tilt
+  useReveal<HTMLElement>(host);
   const wipe = useReveal<HTMLDivElement>();
 
   return (

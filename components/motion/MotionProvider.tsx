@@ -121,6 +121,19 @@ export function MotionProvider() {
     return () => window.removeEventListener("pointermove", onMove);
   }, [ready, fine]);
 
+  /* ---- red de seguridad del revelado ----
+     .rv arranca en opacity:0 y depende de que alguien lo registre en el
+     observador. Si un elemento lleva la clase pero se olvidó el registro,
+     queda invisible para siempre. Esta barrida se asegura de que eso no
+     pueda pasar: pasados 2,5s, todo lo que siga sin .in se muestra. */
+  useEffect(() => {
+    if (!ready) return;
+    const t = window.setTimeout(() => {
+      document.querySelectorAll(".rv:not(.in)").forEach((el) => el.classList.add("in"));
+    }, 2500);
+    return () => window.clearTimeout(t);
+  }, [ready]);
+
   /* ---- el bucle maestro vuelve al mostrar la pestaña ---- */
   useEffect(() => {
     const onVis = () => {

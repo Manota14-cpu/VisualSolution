@@ -27,9 +27,14 @@ function observer() {
   return io;
 }
 
-/** Marca un elemento para que entre al aparecer en pantalla. */
-export function useReveal<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
+/* Marca un elemento para que entre al aparecer en pantalla.
+   Acepta un ref externo: hay elementos que ya usan su ref para otra cosa
+   (la inclinación de las tarjetas, por ejemplo) y aun así llevan la clase
+   .rv, que arranca en opacity:0. Si no se registran acá, quedan invisibles
+   para siempre. */
+export function useReveal<T extends HTMLElement>(external?: React.RefObject<T | null>) {
+  const own = useRef<T>(null);
+  const ref = external ?? own;
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -45,7 +50,7 @@ export function useReveal<T extends HTMLElement>() {
       ob.unobserve(el);
       window.clearTimeout(t);
     };
-  }, []);
+  }, [ref]);
   return ref;
 }
 
