@@ -91,7 +91,6 @@
   /* ==========================================================
      COMPONENTES
      ========================================================== */
-  @layer components {
 
     /* Botones. La acción primaria es neutra: el sistema no tiene CTA
        cromática, el contraste lo pone el canvas casi negro. */
@@ -229,7 +228,7 @@
     .field-input::placeholder { color: var(--color-smoke); }
     .field-input:focus { border-color: #5c5d5f; background: rgba(255,255,255,.08); }
     .has-error .field-input { border-color: #8a4a63; }
-  }
+    
 
   @layer utilities {
     /* revelado al entrar en viewport */
@@ -641,7 +640,7 @@ header[data-nav].is-stuck {
 
 <div class="grain pointer-events-none fixed inset-0 z-50 opacity-[.035]" aria-hidden="true"></div>
 
-<a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-btn focus:border focus:border-hairline focus:bg-recessed focus:px-4 focus:py-2 focus:text-[13px] focus:text-white" href="#main">Ir al contenido</a>
+  <a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-btn focus:border focus:border-hairline focus:bg-recessed focus:px-4 focus:py-2 focus:text-[13px] focus:text-white" href="#main">Ir al contenido</a>
 
 <header data-nav class="fixed inset-x-0 top-4 z-40 mx-auto flex w-[calc(100%-2rem)] max-w-[1200px] items-center justify-between gap-6 rounded-btn border border-hairline bg-card/60 py-2 pl-4 pr-2 backdrop-blur-[48px] backdrop-saturate-150">
   <a class="inline-flex items-center gap-2" href="#top" aria-label="Visual Solution, inicio">
@@ -669,7 +668,7 @@ header[data-nav].is-stuck {
   </div>
 </header>
 
-<div class="fixed inset-0 z-40 hidden flex-col bg-canvas/95 px-4 pb-10 pt-24 backdrop-blur-xl" id="menu">
+  <div class="fixed inset-0 z-40 hidden flex-col bg-canvas/95 px-4 pb-10 pt-24 backdrop-blur-xl" id="menu">
   <a class="border-b border-hairline py-4 text-2xl text-white" href="#servicios">Servicios</a>
   <a class="border-b border-hairline py-4 text-2xl text-white" href="#trabajos">Trabajos</a>
   <a class="border-b border-hairline py-4 text-2xl text-white" href="#proceso">Proceso</a>
