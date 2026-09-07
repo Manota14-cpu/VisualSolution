@@ -120,6 +120,9 @@ export type Work = {
   thumb: string;
   full: string;
   alt: string;
+  /* Opcional. Si esta, aparece en el visor junto a un boton para
+     consultar por el proyecto. Los que no la tienen se muestran igual. */
+  description?: string;
 };
 
 /* TODO: reemplazar por proyectos reales. Los nombres, rubros y fotos
@@ -136,6 +139,10 @@ export const works: Work[] = [
     thumb: "https://picsum.photos/seed/visualsolution-work-restaurant/1100/690",
     full: "https://picsum.photos/seed/visualsolution-work-restaurant/1600/1000",
     alt: "Sitio web del restaurante Casa Ferrán",
+    /* TODO: reemplazar por la descripcion real de la aplicacion.
+       Conviene contar que resuelve, para quien es y en que estado esta. */
+    description:
+      "PLACEHOLDER: acá va la descripción de la aplicación que estás desarrollando. Contá qué resuelve, para quién es y en qué estado está. Quien la lea puede consultarte desde el botón de abajo.",
   },
   {
     id: "talleres-bravo",

@@ -4,7 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { flushSync } from "react-dom";
 import { Reveal, SplitHeading, useReveal } from "@/components/motion/Reveal";
-import { lockScroll } from "@/components/motion/MotionProvider";
+import { lockScroll, scrollToId } from "@/components/motion/MotionProvider";
+import { askAbout } from "@/lib/consult";
 import { useMotionEnv, withTransition } from "@/lib/motion";
 import { workFilters, works, type Work } from "@/lib/content";
 
@@ -89,6 +90,9 @@ function WorkCard({ work, hidden, onOpen }: { work: Work; hidden: boolean; onOpe
         </div>
         <span className="badge">{work.year}</span>
       </div>
+      {work.description && (
+        <p className="mt-2 font-mono text-[11px] uppercase tracking-[.8px] text-smoke">Ver detalle</p>
+      )}
     </article>
   );
 }
@@ -151,14 +155,36 @@ function Lightbox({ work, onClose }: { work: Work; onClose: () => void }) {
           height={1000}
           className="h-auto w-full rounded-[20px]"
         />
-        <figcaption className="mt-5 flex items-baseline justify-between gap-4">
-          <div>
-            <h3 className="text-lg font-medium text-white" id="lb-title">
-              {work.title}
-            </h3>
-            <p className="mt-1 text-sm text-smoke">{work.kind}</p>
+        <figcaption className="mt-5">
+          <div className="flex items-baseline justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-medium text-white" id="lb-title">
+                {work.title}
+              </h3>
+              <p className="mt-1 text-sm text-smoke">{work.kind}</p>
+            </div>
+            <span className="badge">{work.year}</span>
           </div>
-          <span className="badge">{work.year}</span>
+
+          {/* Solo los proyectos con descripción muestran el detalle y la
+              puerta de salida hacia el contacto. */}
+          {work.description && (
+            <>
+              <p className="mt-4 max-w-[62ch] text-base leading-relaxed text-ash">{work.description}</p>
+              <button
+                className="btn btn-solid mt-5"
+                type="button"
+                onClick={() => {
+                  askAbout(work.title);
+                  onClose();
+                  window.setTimeout(() => scrollToId("contacto"), 60);
+                }}
+              >
+                <i className="diamond" aria-hidden="true" />
+                Consultar por este proyecto
+              </button>
+            </>
+          )}
         </figcaption>
       </figure>
     </div>

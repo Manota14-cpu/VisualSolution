@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Reveal, SplitHeading } from "@/components/motion/Reveal";
 import { useMotionEnv } from "@/lib/motion";
+import { onAskAbout } from "@/lib/consult";
 import { serviceOptions, site } from "@/lib/content";
 
 type Fields = { nombre: string; email: string; servicio: string; mensaje: string };
@@ -28,6 +29,29 @@ export function Contact() {
   const [sent, setSent] = useState<string | null>(null);
   const [failed, setFailed] = useState("");
   const { reduce } = useMotionEnv();
+  const mensajeRef = useRef<HTMLTextAreaElement>(null);
+
+  /* Si alguien pidió consultar por un proyecto del catálogo, el mensaje
+     llega precargado y el foco va al final del texto para que siga
+     escribiendo sin borrar nada. No pisa lo que ya haya escrito. */
+  useEffect(
+    () =>
+      onAskAbout((proyecto) => {
+        setSent(null);
+        setValues((v) => ({
+          ...v,
+          servicio: v.servicio || "Sitio web",
+          mensaje: v.mensaje || `Quiero consultar por ${proyecto}. `,
+        }));
+        window.setTimeout(() => {
+          const el = mensajeRef.current;
+          if (!el) return;
+          el.focus({ preventScroll: true });
+          el.setSelectionRange(el.value.length, el.value.length);
+        }, 900);
+      }),
+    []
+  );
 
   const set = (k: keyof Fields) => (e: { target: { value: string } }) => {
     setValues((v) => ({ ...v, [k]: e.target.value }));
@@ -209,6 +233,7 @@ export function Contact() {
               <div className={`grid gap-2 ${errors.mensaje ? "has-error" : ""}`}>
                 <div className="fl">
                   <textarea
+                    ref={mensajeRef}
                     className="field-input resize-y leading-relaxed"
                     id="mensaje"
                     name="mensaje"

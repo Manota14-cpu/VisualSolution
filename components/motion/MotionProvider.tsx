@@ -31,6 +31,14 @@ export function scrollToTop() {
   else window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+/** Viaje suave hacia una sección, respetando el alto del header. */
+export function scrollToId(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (lenisRef) lenisRef.scrollTo(el, { offset: -90 });
+  else el.scrollIntoView({ behavior: "smooth" });
+}
+
 export function MotionProvider() {
   const { reduce, fine, lite, ready } = useMotionEnv();
 
