@@ -1,0 +1,2201 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Visual Solution es un estudio de desarrollo web y producción de contenido. Sitios, tiendas online, video e identidad visual para marcas que quieren vender mejor.">
+<meta name="theme-color" content="#040506">
+<meta property="og:title" content="Visual Solution">
+<meta property="og:description" content="Estudio de desarrollo web y producción de contenido.">
+<meta property="og:type" content="website">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<!--PAGE-START-->
+<title>Visual Solution</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+
+<!-- Casco crítico: si Tailwind tarda en compilar, la página arranca
+     negra y legible en vez de blanca. -->
+<style>
+  html{ background:#040506; }
+  body{
+    margin:0; background:#040506; color:#fff;
+    font-family:"Inter", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+</style>
+
+<!-- Tailwind v4, build de navegador.
+     Para producción conviene compilar:
+       npx @tailwindcss/cli -i src/input.css -o dist/app.css --minify
+     y cambiar este script por <link rel="stylesheet" href="dist/app.css">. -->
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+<!-- Lenis: scroll con inercia. Maneja el scroll real del documento, asi que
+     position:sticky y la barra de progreso por animation-timeline siguen andando. -->
+<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+
+<style type="text/tailwindcss">
+  /* ==========================================================
+     TOKENS
+     Cockpit oscuro. Un solo acento: el par violeta -> rosa de la
+     marca, racionado al logo, la escenografía del hero, una
+     superficie teñida y los estados de foco.
+     ========================================================== */
+  @theme {
+    --color-canvas:   #040506;
+    --color-card:     #07080a;
+    --color-recessed: #111214;
+    --color-badge:    #1b1c1e;
+    --color-hairline: #363739;
+    --color-edge:     #4b4c4e;
+
+    --color-ash:   #9c9c9d;
+    --color-smoke: #6a6b6c;
+    --color-mist:  #e6e6e6;
+    --color-iron:  #454647;
+    --color-slate: #2f3031;
+
+    --color-pink:   #EC4899;
+    --color-violet: #8B5CF6;
+    --color-tint:   #432333;
+
+    --font-ui: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+    --radius-badge: 6px;
+    --radius-btn: 8px;
+    --radius-card: 16px;
+    --radius-cardlg: 20px;
+
+    --shadow-key: 0 1px 0 0 rgba(255,255,255,.05) inset,
+                  0 0 0 1px rgba(255,255,255,.25),
+                  0 -1px 0 0 rgba(0,0,0,.2) inset;
+    --shadow-keysoft: 0 1px 0 0 rgba(255,255,255,.05) inset,
+                      0 0 0 1px rgba(255,255,255,.12),
+                      0 -1px 0 0 rgba(0,0,0,.2) inset;
+    --shadow-lift: 0 7px 3px 0 rgba(0,0,0,.03), 0 4px 4px 0 rgba(0,0,0,.25);
+
+    --animate-marquee: marquee 42s linear infinite;
+    --animate-spin-slow: spin-slow 7s linear infinite;
+    --animate-drift-a: drift-a 22s ease-in-out infinite;
+    --animate-drift-b: drift-b 27s ease-in-out infinite;
+    --animate-rise: rise .9s cubic-bezier(.16,1,.3,1) both;
+    --animate-load: load 1.1s cubic-bezier(.16,1,.3,1) infinite;
+  }
+
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes drift-a {
+    0%,100% { transform: rotate(-14deg) translate3d(0,0,0) scaleX(1); }
+    50%     { transform: rotate(-11deg) translate3d(4%,3%,0) scaleX(1.08); }
+  }
+  @keyframes drift-b {
+    0%,100% { transform: rotate(9deg) translate3d(0,0,0) scaleX(1); }
+    50%     { transform: rotate(6deg) translate3d(-5%,-3%,0) scaleX(1.12); }
+  }
+  @keyframes rise { from { opacity:0; transform: translateY(22px); } to { opacity:1; transform:none; } }
+  @keyframes load { from { transform: translateX(-100%); } to { transform: translateX(300%); } }
+  @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+  /* ==========================================================
+     COMPONENTES
+     ========================================================== */
+    .btn-solid::after {
+      content: "";
+      position: absolute; top: 0; bottom: 0; left: -45%;
+      width: 40%;
+      background: linear-gradient(100deg, transparent, rgba(255,255,255,.9), transparent);
+      transform: skewX(-18deg);
+      transition: left .6s cubic-bezier(.16,1,.3,1);
+      pointer-events: none;
+    }
+    .btn-solid:hover::after { left: 135%; }
+
+    .btn-ghost { background: transparent; color: var(--color-ash); border-color: var(--color-hairline); }
+    .btn-ghost:hover { color: #fff; border-color: var(--color-edge); background: rgba(255,255,255,.03); }
+
+    .diamond {
+      display: block; width: 8px; height: 8px;
+      border-radius: 2px; transform: rotate(45deg);
+      background: linear-gradient(102deg, #8B5CF6, #EC4899);
+    }
+
+    .link {
+      display: inline-block;
+      border-bottom: 1px solid var(--color-hairline);
+      padding-bottom: 2px;
+      font-size: 14px; font-weight: 500;
+      color: var(--color-ash);
+      transition: color .2s, border-color .2s;
+    }
+    .link:hover { color: #fff; border-color: var(--color-ash); }
+
+    .badge {
+      display: inline-flex; align-items: center;
+      border-radius: var(--radius-badge);
+      background: var(--color-badge);
+      padding: 0 6px;
+      font-size: 12px; line-height: 1.6; color: #fff;
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px; line-height: 1;
+      letter-spacing: .8px; text-transform: uppercase;
+      color: var(--color-smoke);
+    }
+
+    /* monograma circular */
+    .token {
+      display: grid; place-items: center;
+      width: 44px; height: 44px; flex: none;
+      border-radius: 9999px;
+      background: var(--color-recessed);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 1px 0 0 rgba(255,255,255,.05) inset;
+      font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+      letter-spacing: .5px; color: var(--color-ash);
+      transition: color .3s, box-shadow .3s;
+    }
+
+    /* Tarjeta: sombra de tecla y foco de luz que sigue al cursor. */
+    .card {
+      position: relative;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      border-radius: var(--radius-card);
+      background: var(--color-card);
+      box-shadow: var(--shadow-keysoft);
+      transition: box-shadow .3s, transform .3s;
+    }
+    .card::before {
+      content: "";
+      position: absolute; inset: 0; z-index: 0;
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity .4s cubic-bezier(.16,1,.3,1);
+      background: radial-gradient(320px circle at var(--mx,50%) var(--my,50%),
+                  rgba(236,72,153,.16), rgba(139,92,246,.10) 42%, transparent 68%);
+      pointer-events: none;
+    }
+    .card:hover::before { opacity: 1; }
+    .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-key); }
+    .card > * { position: relative; z-index: 1; }
+
+    /* superficie de foto */
+    .shot { overflow: hidden; background: var(--color-recessed); }
+    .shot img {
+      width: 100%; height: 100%; object-fit: cover;
+      filter: grayscale(1) brightness(.55) contrast(1.05);
+      transition: filter .5s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
+    }
+    .group:hover .shot img { filter: grayscale(0) brightness(.9); transform: scale(1.04); }
+
+    /* inclinación 3D de las fichas de trabajo */
+    .tilt {
+      transform: perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+      transition: transform .4s cubic-bezier(.16,1,.3,1);
+      transform-style: preserve-3d;
+    }
+
+    .field-input {
+      width: 100%;
+      border: 1px solid var(--color-hairline);
+      border-radius: var(--radius-btn);
+      background: rgba(255,255,255,.05);
+      padding: 12px;
+      font-family: var(--font-ui); font-size: 16px; color: #fff;
+      outline: none;
+      transition: border-color .2s, background-color .2s;
+    }
+    .field-input::placeholder { color: var(--color-smoke); }
+    .field-input:focus { border-color: #5c5d5f; background: rgba(255,255,255,.08); }
+    .has-error .field-input { border-color: #8a4a63; }
+    
+
+  @layer utilities {
+    /* revelado al entrar en viewport */
+    .rv { opacity: 0; transform: translateY(14px); }
+    .rv.in {
+      opacity: 1; transform: none;
+      transition: opacity .65s cubic-bezier(.16,1,.3,1), transform .65s cubic-bezier(.16,1,.3,1);
+      transition-delay: calc(var(--i, 0) * 60ms);
+    }
+
+    /* titulares que suben palabra por palabra */
+    .w { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: .1em; }
+    .w > i {
+      display: inline-block; font-style: normal;
+      transform: translateY(115%);
+      transition: transform .75s cubic-bezier(.16,1,.3,1);
+      transition-delay: var(--d, 0ms);
+    }
+    .in .w > i { transform: none; }
+
+    /* marquesina con bordes difuminados */
+    .fade-x {
+      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    }
+
+    /* barra de progreso de lectura, solo donde el navegador la soporta */
+    .progress-wrap { display: none; }
+    @supports (animation-timeline: scroll()) {
+      .progress-wrap { display: block; }
+      .progress {
+        transform-origin: 0 50%;
+        animation: grow linear both;
+        animation-timeline: scroll(root block);
+      }
+    }
+
+    /* textura de grano, fija y sin capturar el puntero */
+    .grain {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='0.55'/></svg>");
+    }
+
+    /* rejilla tenue de fondo */
+    .grid-faint {
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(70% 60% at 50% 40%, #000, transparent 78%);
+      -webkit-mask-image: radial-gradient(70% 60% at 50% 40%, #000, transparent 78%);
+    }
+
+    /* panel de respuesta del acordeón */
+    .answer { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s cubic-bezier(.16,1,.3,1); }
+    .answer > div { overflow: hidden; }
+    .is-open .answer { grid-template-rows: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+    }
+    .rv { opacity: 1 !important; transform: none !important; }
+    .w > i { transform: none !important; }
+    .tilt { transform: none !important; }
+  }
+</style>
+
+
+<!-- ============================================================
+     CAPA DE MOVIMIENTO
+     CSS plano, después de Tailwind, para que gane la cascada sin
+     pelear especificidades. Todo lo de acá se apaga entero con
+     prefers-reduced-motion (bloque al final del archivo) y los
+     efectos de puntero solo se activan con la clase .fine que
+     escribe el script cuando matchMedia("(pointer:fine)") da true.
+     ============================================================ -->
+<style>
+/* ---------- Lenis: hoja mínima requerida ---------- */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* ---------- entrada del titular con foco ----------
+   El desenfoque se resuelve junto al desplazamiento vertical que ya
+   existía: misma duración, misma curva, sin tocar el escalonado. */
+.w > i { filter: blur(6px); transition: transform .75s cubic-bezier(.16,1,.3,1), filter .75s cubic-bezier(.16,1,.3,1); transition-delay: var(--d, 0ms); }
+.in .w > i { filter: blur(0); }
+
+/* ---------- fondo vivo ---------- */
+#bg-field {
+  position: fixed; inset: 0; z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+#bg-field.on { opacity: 1; }
+
+/* ---------- preloader ---------- */
+#boot {
+  position: fixed; inset: 0; z-index: 90;
+  display: grid; place-items: center;
+  background: #040506;
+  transition: opacity .5s cubic-bezier(.16,1,.3,1), visibility .5s;
+}
+#boot.done { opacity: 0; visibility: hidden; }
+#boot svg { width: min(190px, 42vw); height: auto; overflow: visible; }
+/* pathLength="1" normaliza el largo real del trazo, así el dibujado
+   funciona sin medir la ruta a mano. Primero se dibuja el contorno,
+   después entra el relleno. */
+#boot path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  fill-opacity: 0;
+  animation: draw .8s cubic-bezier(.6,0,.2,1) forwards,
+             fill-in .45s ease .42s forwards;
+}
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes fill-in { to { fill-opacity: 1; } }
+
+/* ---------- cursor propio ---------- */
+#cur-dot, #cur-ring {
+  position: fixed; top: 0; left: 0; z-index: 80;
+  pointer-events: none;
+  border-radius: 9999px;
+  opacity: 0;
+  transition: opacity .25s, width .22s cubic-bezier(.16,1,.3,1), height .22s cubic-bezier(.16,1,.3,1), background-color .22s, border-color .22s;
+  will-change: transform;
+}
+#cur-dot { width: 5px; height: 5px; background: #fff; margin: -2.5px 0 0 -2.5px; }
+#cur-ring { width: 30px; height: 30px; border: 1px solid rgba(255,255,255,.35); margin: -15px 0 0 -15px; }
+.fine.cursor-on #cur-dot, .fine.cursor-on #cur-ring { opacity: 1; }
+.fine.cursor-on { cursor: none; }
+.fine.cursor-on a, .fine.cursor-on button, .fine.cursor-on .card, .fine.cursor-on summary { cursor: none; }
+/* en campos de texto vuelve el cursor del sistema */
+.fine.cursor-on input, .fine.cursor-on textarea { cursor: text; }
+.fine.cursor-on select { cursor: pointer; }
+.fine.cursor-on.on-field #cur-dot { opacity: 0; }
+.fine.cursor-on.on-field #cur-ring { opacity: .35; }
+/* sobre algo interactivo el anillo crece y se tiñe de marca */
+.fine.cursor-on.on-hit #cur-ring {
+  width: 52px; height: 52px; margin: -26px 0 0 -26px;
+  border-color: rgba(236,72,153,.55);
+  background: rgba(139,92,246,.08);
+}
+.fine.cursor-on.on-hit #cur-dot { width: 3px; height: 3px; margin: -1.5px 0 0 -1.5px; }
+
+/* ---------- header condensado ---------- */
+header[data-nav] {
+  transition: padding .35s cubic-bezier(.16,1,.3,1), background-color .35s, border-color .35s, backdrop-filter .35s;
+}
+header[data-nav].is-stuck {
+  padding-top: 5px; padding-bottom: 5px;
+  background: rgba(7,8,10,.82);
+  border-color: #45464a;
+  backdrop-filter: blur(64px) saturate(180%);
+  -webkit-backdrop-filter: blur(64px) saturate(180%);
+}
+@keyframes nav-pop { 0% { transform: scale(1); } 45% { transform: scale(1.18) rotate(-6deg); } 100% { transform: scale(1); } }
+.nav-pop { animation: nav-pop .5s cubic-bezier(.16,1,.3,1); }
+
+/* ---------- botones magnéticos ---------- */
+.mag { will-change: transform; }
+.fine .mag { transform: translate3d(var(--mgx, 0px), var(--mgy, 0px), 0); }
+
+/* ---------- marquesina: recompensa al pasar por una palabra ---------- */
+.mq-word {
+  display: inline-block;
+  transition: transform .3s cubic-bezier(.16,1,.3,1), color .3s;
+  transform-origin: center;
+}
+.fine .mq-word:hover {
+  transform: scale(1.14);
+  background: linear-gradient(102deg, #8B5CF6, #EC4899);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- tarjetas: inclinación real ----------
+   Se combina el giro con el levantamiento del hover en una sola
+   propiedad transform para que no se pisen entre sí. */
+.card {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translate3d(0, var(--ty, 0px), 0);
+  transition: box-shadow .3s, transform .4s cubic-bezier(.16,1,.3,1);
+  will-change: transform;
+}
+.card:hover { --ty: -2px; transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translate3d(0, var(--ty), 0); }
+
+/* brillo diagonal de la tarjeta destacada */
+.glare { position: relative; overflow: hidden; }
+.glare > .glare-sheen {
+  content: ""; position: absolute; top: -60%; bottom: -60%; left: -35%;
+  width: 28%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.16), transparent);
+  transform: skewX(-16deg) translateX(-40%);
+  opacity: 0;
+  transition: transform .85s cubic-bezier(.16,1,.3,1), opacity .35s;
+  pointer-events: none;
+  z-index: 2;
+}
+.glare:hover > .glare-sheen { opacity: 1; transform: skewX(-16deg) translateX(520%); }
+
+/* pulso único de los monogramas al entrar en pantalla */
+@keyframes token-pulse {
+  0%   { box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 1px 0 0 rgba(255,255,255,.05) inset, 0 0 0 0 rgba(236,72,153,.4); }
+  55%  { box-shadow: 0 0 0 1px rgba(255,255,255,.14), 0 1px 0 0 rgba(255,255,255,.05) inset, 0 0 0 12px rgba(236,72,153,0); }
+  100% { box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 1px 0 0 rgba(255,255,255,.05) inset, 0 0 0 0 rgba(236,72,153,0); }
+}
+.token.pulsed { animation: token-pulse 1.1s cubic-bezier(.16,1,.3,1); }
+
+/* ---------- trabajos ---------- */
+/* barrido de revelado la primera vez que la imagen entra en pantalla */
+.wipe { clip-path: inset(0 100% 0 0); transition: clip-path 1s cubic-bezier(.16,1,.3,1); }
+.wipe.in { clip-path: inset(0 0 0 0); }
+
+.work-open { display: block; width: 100%; text-align: left; border-radius: var(--radius-card, 16px); }
+.work-open:focus-visible { outline: 2px solid #EC4899; outline-offset: 4px; }
+
+/* filtros */
+.pill {
+  border: 1px solid #363739; border-radius: 9999px;
+  padding: 6px 14px; font-size: 13px; font-weight: 500; color: #9c9c9d;
+  background: transparent; cursor: pointer;
+  transition: color .2s, border-color .2s, background-color .2s;
+}
+.pill:hover { color: #fff; border-color: #4b4c4e; }
+.pill[aria-pressed="true"] { color: #454647; background: #e6e6e6; border-color: #e6e6e6; }
+.work.is-out { opacity: 0; transform: scale(.96); pointer-events: none; }
+.work { transition: opacity .28s cubic-bezier(.16,1,.3,1), transform .28s cubic-bezier(.16,1,.3,1); }
+
+/* visor de caso */
+#lightbox[hidden] { display: none; }
+#lightbox {
+  position: fixed; inset: 0; z-index: 70;
+  display: grid; place-items: center;
+  padding: 24px;
+  background: rgba(4,5,6,.86);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  animation: lb-in .3s cubic-bezier(.16,1,.3,1);
+}
+@keyframes lb-in { from { opacity: 0; } to { opacity: 1; } }
+#lightbox figure {
+  margin: 0; width: min(1000px, 100%);
+  animation: lb-pop .45s cubic-bezier(.16,1,.3,1);
+}
+@keyframes lb-pop { from { opacity: 0; transform: scale(.965) translateY(12px); } to { opacity: 1; transform: none; } }
+#lightbox img {
+  width: 100%; height: auto; display: block;
+  border-radius: 20px;
+  box-shadow: 0 1px 0 0 rgba(255,255,255,.05) inset, 0 0 0 1px rgba(255,255,255,.14), 0 40px 80px -20px rgba(0,0,0,.8);
+}
+.lb-close {
+  position: absolute; top: 20px; right: 20px;
+  display: grid; place-items: center;
+  width: 40px; height: 40px; border-radius: 9999px;
+  border: 1px solid #363739; background: rgba(7,8,10,.7); color: #e6e6e6;
+  cursor: pointer; transition: border-color .2s, background-color .2s;
+}
+.lb-close:hover { border-color: #4b4c4e; background: rgba(17,18,20,.9); }
+
+/* ---------- proceso: línea que se dibuja ---------- */
+.steps { position: relative; }
+.steps-rail {
+  position: absolute; left: 21px; top: 22px; bottom: 22px;
+  width: 2px; border-radius: 2px;
+  background: #1b1c1e;
+  pointer-events: none;
+}
+.steps-rail > i {
+  display: block; width: 100%; height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(180deg, #8B5CF6, #EC4899);
+  transform: scaleY(var(--p, 0));
+  transform-origin: 0 0;
+}
+.step-token.on {
+  color: #fff;
+  background: linear-gradient(102deg, #8B5CF6, #EC4899);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.18), 0 0 22px -4px rgba(236,72,153,.6);
+}
+
+/* ---------- preguntas ---------- */
+[data-chev] { transition: transform .42s cubic-bezier(.34,1.56,.64,1), border-color .3s, color .3s; }
+.is-open [data-chev] { border-color: #4b4c4e; color: #fff; }
+.faq-row { transition: background-color .3s; border-radius: 12px; }
+.faq-row.is-open { background: rgba(255,255,255,.022); }
+.faq-row > h3 > button { padding-inline: 12px; margin-inline: -12px; }
+
+/* ---------- contacto: etiquetas flotantes ---------- */
+.fl { position: relative; }
+.fl > label {
+  position: absolute; left: 13px; top: 14px;
+  font-size: 15px; font-weight: 400; color: #6a6b6c;
+  pointer-events: none; transform-origin: 0 0;
+  transition: transform .24s cubic-bezier(.16,1,.3,1), color .24s;
+}
+.fl > .field-input { padding-top: 24px; padding-bottom: 8px; }
+.fl > textarea.field-input { padding-top: 26px; min-height: 128px; }
+.fl:focus-within > label,
+.fl > .field-input:not(:placeholder-shown) + label { transform: translateY(-9px) scale(.72); color: #fff; }
+.fl.is-select > label { transform: translateY(-9px) scale(.72); }
+.fl.is-select:focus-within > label { color: #fff; }
+.fl > .field-input::placeholder { color: transparent; }
+.fl:focus-within > .field-input::placeholder { color: #6a6b6c; }
+
+/* botón de envío que muta a tilde */
+#send .send-ok { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transition: opacity .2s; }
+#send.ok { background: #e6e6e6; color: transparent; }
+#send.ok .send-label { opacity: 0; }
+#send.ok .send-ok { opacity: 1; }
+#send .send-label { transition: opacity .2s; }
+#send .send-ok path { stroke-dasharray: 26; stroke-dashoffset: 26; }
+#send.ok .send-ok path { animation: draw .42s cubic-bezier(.6,0,.2,1) .06s forwards; }
+
+/* ---------- volver arriba ---------- */
+#btt {
+  position: fixed; right: 20px; bottom: 20px; z-index: 45;
+  display: grid; place-items: center;
+  width: 46px; height: 46px; border-radius: 9999px;
+  border: 1px solid #363739; background: rgba(7,8,10,.72);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  cursor: pointer;
+  opacity: 0; transform: translateY(12px) scale(.9); pointer-events: none;
+  transition: opacity .35s cubic-bezier(.16,1,.3,1), transform .35s cubic-bezier(.16,1,.3,1), border-color .2s;
+}
+#btt.on { opacity: 1; transform: none; pointer-events: auto; }
+#btt:hover { border-color: #4b4c4e; }
+#btt svg { width: 22px; transition: transform .7s cubic-bezier(.16,1,.3,1); }
+#btt.spin svg { transform: rotate(360deg); }
+
+/* ---------- degradado de potencia ----------
+   En equipos modestos o pantallas chicas se apagan las capas caras
+   sin tocar el resto de la composición. */
+.lite #bg-field { display: none; }
+
+/* ============================================================
+   MOVIMIENTO REDUCIDO: todo lo de esta hoja se apaga entero.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .w > i { filter: none !important; }
+  #bg-field, #cur-dot, #cur-ring, #boot { display: none !important; }
+  .fine.cursor-on, .fine.cursor-on a, .fine.cursor-on button, .fine.cursor-on .card { cursor: auto !important; }
+  .mag { transform: none !important; }
+  .card, .tilt { transform: none !important; }
+  .wipe { clip-path: none !important; transition: none !important; }
+  .glare > .glare-sheen { display: none !important; }
+  .token.pulsed { animation: none !important; }
+  .steps-rail > i { transform: scaleY(1) !important; }
+  #btt { transition: none !important; }
+  #btt svg { transition: none !important; }
+  #lightbox, #lightbox figure { animation: none !important; }
+  #boot path { animation: none !important; stroke-dashoffset: 0 !important; }
+  .mq-word:hover { transform: none !important; }
+}
+</style>
+
+<noscript><style>
+  .rv{opacity:1!important;transform:none!important}
+  .w>i{transform:none!important;filter:none!important}
+  .wipe{clip-path:none!important}
+  #boot{display:none!important}
+</style></noscript>
+
+<!-- ============================================================
+     MARCA. El símbolo VS va inline como SVG para que herede el
+     degradado. Para usar el archivo original: reemplazar el
+     <symbol> por un <img src="assets/logo.svg"> del mismo ancho.
+     ============================================================ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="vsGrad" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+    <symbol id="vs-mark" viewBox="0 0 143.5 76">
+      <path fill="url(#vsGrad)" fill-rule="nonzero" d="M 0.0,0.0 L 34.48,58.27 L 47.35,40.55 L 23.31,0.0 Z M 143.5,5.34 L 76.24,7.16 L 35.57,61.19 L 45.16,76.0 L 85.71,22.1 L 128.45,21.73 Z M 133.18,43.34 L 123.47,32.29 L 86.81,32.05 L 76.0,46.13 L 114.24,47.35 L 104.29,58.4 L 67.14,58.76 L 53.78,75.15 L 112.3,73.94 L 131.24,52.45 Z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- preloader: el símbolo se dibuja trazo por trazo y se funde al hero -->
+<div id="boot" aria-hidden="true">
+  <svg viewBox="0 0 143.5 76">
+    <path pathLength="1" fill="url(#vsGrad)" fill-rule="nonzero" stroke="url(#vsGrad)" stroke-width="1.4"
+          d="M 0.0,0.0 L 34.48,58.27 L 47.35,40.55 L 23.31,0.0 Z M 143.5,5.34 L 76.24,7.16 L 35.57,61.19 L 45.16,76.0 L 85.71,22.1 L 128.45,21.73 Z M 133.18,43.34 L 123.47,32.29 L 86.81,32.05 L 76.0,46.13 L 114.24,47.35 L 104.29,58.4 L 67.14,58.76 L 53.78,75.15 L 112.3,73.94 L 131.24,52.45 Z"/>
+  </svg>
+</div>
+
+<!-- fondo vivo: campo de partículas con parallax de profundidad -->
+<canvas id="bg-field" aria-hidden="true"></canvas>
+
+<!-- cursor propio -->
+<div id="cur-ring" aria-hidden="true"></div>
+<div id="cur-dot" aria-hidden="true"></div>
+
+<!-- centinela para el estado condensado del header -->
+<div id="top-sentinel" style="position:absolute;top:0;left:0;width:1px;height:1px;pointer-events:none" aria-hidden="true"></div>
+
+<!-- barra de progreso de lectura -->
+<div class="progress-wrap fixed inset-x-0 top-0 z-50 h-0.5" aria-hidden="true">
+  <div class="progress h-full w-full" style="background:linear-gradient(102deg,#8B5CF6,#EC4899)"></div>
+</div>
+
+<div class="grain pointer-events-none fixed inset-0 z-50 opacity-[.035]" aria-hidden="true"></div>
+
+  <a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-btn focus:border focus:border-hairline focus:bg-recessed focus:px-4 focus:py-2 focus:text-[13px] focus:text-white" href="#main">Ir al contenido</a>
+
+<header data-nav class="fixed inset-x-0 top-4 z-40 mx-auto flex w-[calc(100%-2rem)] max-w-[1200px] items-center justify-between gap-6 rounded-btn border border-hairline bg-card/60 py-2 pl-4 pr-2 backdrop-blur-[48px] backdrop-saturate-150">
+  <a class="inline-flex items-center gap-2" href="#top" aria-label="Visual Solution, inicio">
+    <svg id="nav-mark" class="block h-auto w-[26px]" viewBox="0 0 143.5 76" aria-hidden="true"><use href="#vs-mark"/></svg>
+    <span class="text-[13px] font-medium text-white">Visual <span class="text-smoke">Solution</span></span>
+  </a>
+
+  <nav class="hidden items-center gap-6 md:flex" aria-label="Principal">
+    <a class="text-[13px] font-medium text-ash transition-colors duration-200 hover:text-white" href="#servicios">Servicios</a>
+    <a class="text-[13px] font-medium text-ash transition-colors duration-200 hover:text-white" href="#trabajos">Trabajos</a>
+    <a class="text-[13px] font-medium text-ash transition-colors duration-200 hover:text-white" href="#proceso">Proceso</a>
+    <a class="text-[13px] font-medium text-ash transition-colors duration-200 hover:text-white" href="#preguntas">Preguntas</a>
+    <a class="text-[13px] font-medium text-ash transition-colors duration-200 hover:text-white" href="#contacto">Contacto</a>
+  </nav>
+
+  <div class="flex items-center gap-2">
+    <a class="btn btn-solid btn-sm mag hidden md:inline-flex" href="#contacto"><i class="diamond" aria-hidden="true"></i>Empezar proyecto</a>
+    <button class="grid size-9 place-items-center rounded-btn border border-hairline md:hidden" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <svg width="15" height="12" viewBox="0 0 15 12" fill="none" aria-hidden="true">
+        <path id="burger-top" d="M1 1.5h13" stroke="#e6e6e6" stroke-width="1.2" stroke-linecap="round"/>
+        <path id="burger-mid" d="M1 6h13" stroke="#e6e6e6" stroke-width="1.2" stroke-linecap="round"/>
+        <path id="burger-bot" d="M1 10.5h13" stroke="#e6e6e6" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+  <div class="fixed inset-0 z-40 hidden flex-col bg-canvas/95 px-4 pb-10 pt-24 backdrop-blur-xl" id="menu">
+  <a class="border-b border-hairline py-4 text-2xl text-white" href="#servicios">Servicios</a>
+  <a class="border-b border-hairline py-4 text-2xl text-white" href="#trabajos">Trabajos</a>
+  <a class="border-b border-hairline py-4 text-2xl text-white" href="#proceso">Proceso</a>
+  <a class="border-b border-hairline py-4 text-2xl text-white" href="#preguntas">Preguntas</a>
+  <a class="border-b border-hairline py-4 text-2xl text-white" href="#contacto">Contacto</a>
+  <a class="btn btn-solid mt-6 self-start" href="#contacto"><i class="diamond" aria-hidden="true"></i>Empezar proyecto</a>
+</div>
+
+<main id="main">
+
+  <!-- ============================ HERO ============================
+       El único lugar donde el sistema se rompe: color, desenfoque y
+       escala al máximo. Debajo, la página vuelve a la superficie austera.
+       ================================================================ -->
+  <section class="relative overflow-hidden pb-16 pt-28 text-center md:pb-24 md:pt-32" id="top">
+    <div class="pointer-events-none absolute inset-0" id="hero-atmos" aria-hidden="true">
+      <div class="absolute inset-0" style="background:radial-gradient(58% 46% at 50% 24%, rgba(139,92,246,.42), rgba(26,11,51,.22) 58%, transparent 78%)"></div>
+      <span class="animate-drift-a absolute left-[-8vw] top-[16%] h-28 w-[74vw] rounded-full opacity-55 blur-[46px]"
+            style="background:linear-gradient(90deg,transparent,rgba(236,72,153,.85),transparent)"></span>
+      <span class="animate-drift-b absolute right-[-10vw] top-[34%] h-24 w-[62vw] rounded-full opacity-55 blur-[46px]"
+            style="background:linear-gradient(90deg,transparent,rgba(139,92,246,.8),transparent)"></span>
+      <div class="grid-faint absolute inset-0 opacity-70"></div>
+      <div class="absolute inset-0" style="background:linear-gradient(to bottom,transparent 52%,#040506 100%)"></div>
+    </div>
+
+    <div class="relative mx-auto w-full max-w-[1200px] px-4 md:px-10">
+      <div class="animate-rise relative mx-auto mb-4 grid aspect-video w-[min(340px,66vw)] place-items-center md:mb-6 md:w-[min(470px,74vw)]"
+           id="stage" role="img" aria-label="Símbolo de Visual Solution en tres dimensiones, girando lentamente"
+           style="touch-action:pan-y">
+        <svg class="absolute w-[44%] max-w-[230px]" id="stage-fallback" viewBox="0 0 143.5 76" aria-hidden="true"><use href="#vs-mark"/></svg>
+      </div>
+
+      <h1 class="animate-rise mx-auto max-w-[22ch] text-balance text-[clamp(34px,5.2vw,56px)] font-normal leading-[1.17] tracking-[.22px] text-white"
+          style="animation-delay:.12s">
+        Programamos tu sitio. Producimos tu contenido.
+      </h1>
+
+      <p class="animate-rise mx-auto mt-6 max-w-[52ch] text-base leading-relaxed text-ash" style="animation-delay:.22s">
+        Estudio de desarrollo web y producción audiovisual. Un solo equipo para toda tu presencia digital.
+      </p>
+
+      <div class="animate-rise mt-8 flex flex-wrap justify-center gap-2" style="animation-delay:.32s">
+        <a class="btn btn-solid mag" href="#contacto"><i class="diamond" aria-hidden="true"></i>Empezar proyecto</a>
+        <a class="btn btn-ghost mag" href="#trabajos">Ver trabajos</a>
+      </div>
+
+      <p class="animate-rise mt-4 font-mono text-xs tracking-[.17px] text-smoke" style="animation-delay:.42s">
+        <span class="px-2">Sitios y tiendas</span><span class="text-slate">|</span><span class="px-2">Video y fotografía</span><span class="text-slate">|</span><span class="px-2">Identidad y automatización</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ========================= MARQUESINA ========================= -->
+  <div class="border-y border-hairline bg-card py-5">
+    <div class="fade-x overflow-hidden" id="marquee">
+      <div class="animate-marquee flex w-max" id="marquee-track">
+        <div class="flex shrink-0 items-center gap-8 pr-8 font-mono text-[13px] text-ash">
+          <span class="mq-word">Sitios a medida</span><span class="text-violet" aria-hidden="true">/</span>
+          <span class="mq-word">Tiendas online</span><span class="text-pink" aria-hidden="true">/</span>
+          <span class="mq-word">Landing pages</span><span class="text-violet" aria-hidden="true">/</span>
+          <span class="mq-word">Video vertical</span><span class="text-pink" aria-hidden="true">/</span>
+          <span class="mq-word">Fotografía de producto</span><span class="text-violet" aria-hidden="true">/</span>
+          <span class="mq-word">Motion graphics</span><span class="text-pink" aria-hidden="true">/</span>
+          <span class="mq-word">Identidad visual</span><span class="text-violet" aria-hidden="true">/</span>
+          <span class="mq-word">SEO técnico</span><span class="text-pink" aria-hidden="true">/</span>
+          <span class="mq-word">Automatizaciones</span><span class="text-violet" aria-hidden="true">/</span>
+        </div>
+        <div class="flex shrink-0 items-center gap-8 pr-8 font-mono text-[13px] text-ash" aria-hidden="true">
+          <span class="mq-word">Sitios a medida</span><span class="text-violet">/</span>
+          <span class="mq-word">Tiendas online</span><span class="text-pink">/</span>
+          <span class="mq-word">Landing pages</span><span class="text-violet">/</span>
+          <span class="mq-word">Video vertical</span><span class="text-pink">/</span>
+          <span class="mq-word">Fotografía de producto</span><span class="text-violet">/</span>
+          <span class="mq-word">Motion graphics</span><span class="text-pink">/</span>
+          <span class="mq-word">Identidad visual</span><span class="text-violet">/</span>
+          <span class="mq-word">SEO técnico</span><span class="text-pink">/</span>
+          <span class="mq-word">Automatizaciones</span><span class="text-violet">/</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================== SERVICIOS ========================== -->
+  <section class="py-20 md:py-28" id="servicios">
+    <div class="mx-auto w-full max-w-[1200px] px-4 md:px-10">
+      <div class="rv mb-10 max-w-[44ch] md:mb-14">
+        <h2 class="text-[clamp(26px,3.4vw,32px)] font-normal leading-tight tracking-[.2px] text-white" data-split>Todo lo que tu marca necesita para verse y funcionar bien.</h2>
+        <p class="mt-4 max-w-[62ch] text-base leading-relaxed text-ash">
+          Trabajamos las dos mitades del mismo problema: la pieza técnica que sostiene el
+          negocio y el contenido que lo hace visible.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-12">
+        <article class="card group rv rounded-cardlg xl:col-span-6" data-spot data-tilt data-tilt-strength="4">
+          <div class="shot wipe aspect-video border-b border-hairline">
+            <img src="https://picsum.photos/seed/visualsolution-code-editor/1000/560" alt="" loading="lazy" decoding="async">
+          </div>
+          <div class="flex flex-1 flex-col gap-2 p-6">
+            <h3 class="text-xl font-medium leading-snug tracking-[.2px] text-white">Desarrollo web a medida</h3>
+            <p class="text-base leading-relaxed text-ash">Sitios institucionales, landings y aplicaciones. Código propio, rápido, indexable y fácil de editar sin depender de nosotros.</p>
+            <ul class="mt-auto flex flex-wrap gap-2 pt-4">
+              <li class="badge">Next.js</li><li class="badge">React</li><li class="badge">WordPress</li><li class="badge">Integraciones</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- única superficie teñida: borde cónico giratorio + brillo diagonal -->
+        <div class="rv relative overflow-hidden rounded-cardlg p-px xl:col-span-6">
+          <span class="animate-spin-slow absolute inset-[-140%]" aria-hidden="true"
+                style="background:conic-gradient(from 0deg, transparent 0 58%, #8B5CF6 70%, #EC4899 82%, transparent 90% 100%)"></span>
+          <article class="glare relative flex h-full flex-col gap-4 overflow-hidden rounded-[19px] bg-tint p-6">
+            <span class="glare-sheen" aria-hidden="true"></span>
+            <div class="pointer-events-none absolute inset-0" aria-hidden="true"
+                 style="background:radial-gradient(120% 90% at 88% 4%, rgba(236,72,153,.28), transparent 62%),radial-gradient(110% 90% at 4% 100%, rgba(139,92,246,.24), transparent 60%)"></div>
+            <span class="token relative bg-black/30 text-[#f0d6e1]" data-pulse>SHP</span>
+            <div class="relative flex flex-col gap-2">
+              <h3 class="text-xl font-medium leading-snug tracking-[.2px] text-white">Tiendas online</h3>
+              <p class="text-base leading-relaxed text-[#e5d0d9]">Catálogo, medios de pago, envíos y stock. Montamos la tienda y dejamos el flujo de venta funcionando de punta a punta.</p>
+            </div>
+            <ul class="relative mt-auto flex flex-wrap gap-2 pt-4">
+              <li class="badge bg-black/30">Shopify</li><li class="badge bg-black/30">WooCommerce</li><li class="badge bg-black/30">Mercado Pago</li>
+            </ul>
+          </article>
+        </div>
+
+        <article class="card group rv xl:col-span-5" data-spot data-tilt data-tilt-strength="4">
+          <div class="shot wipe aspect-video border-b border-hairline">
+            <img src="https://picsum.photos/seed/visualsolution-camera-rig/800/450" alt="" loading="lazy" decoding="async">
+          </div>
+          <div class="flex flex-col gap-2 p-6">
+            <h3 class="text-xl font-medium leading-snug tracking-[.2px] text-white">Producción audiovisual</h3>
+            <p class="text-base leading-relaxed text-ash">Guion, rodaje y edición. Piezas cortas para redes, videos de producto y material institucional.</p>
+          </div>
+        </article>
+
+        <article class="card rv gap-4 p-6 xl:col-span-4" data-spot data-tilt data-tilt-strength="5">
+          <span class="token" data-pulse>IDV</span>
+          <div class="flex flex-col gap-2">
+            <h3 class="text-xl font-medium leading-snug tracking-[.2px] text-white">Identidad visual</h3>
+            <p class="text-base leading-relaxed text-ash">Logo, paleta, tipografía y las plantillas para que todo el equipo publique parejo.</p>
+          </div>
+        </article>
+
+        <article class="card rv gap-4 p-6 xl:col-span-3" data-spot data-tilt data-tilt-strength="5">
+          <span class="token" data-pulse>AUT</span>
+          <div class="flex flex-col gap-2">
+            <h3 class="text-xl font-medium leading-snug tracking-[.2px] text-white">Automatización</h3>
+            <p class="text-base leading-relaxed text-ash">Formularios, chatbots y reportes conectados a las herramientas que ya usás.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ TRABAJOS ============================
+       TODO: reemplazar por proyectos reales. Los nombres, rubros y
+       fotos son de relleno para mostrar la estructura.
+       Cada tarjeta lleva data-cat para el filtro y data-* para el visor.
+       ================================================================ -->
+  <section class="border-t border-hairline py-20 md:py-28" id="trabajos">
+    <div class="mx-auto w-full max-w-[1200px] px-4 md:px-10">
+      <div class="mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+        <div class="rv">
+          <p class="eyebrow mb-6 block">Trabajos</p>
+          <h2 class="text-[clamp(26px,3.4vw,32px)] font-normal leading-tight tracking-[.2px] text-white" data-split>Catálogo</h2>
+        </div>
+        <a class="link rv" style="--i:1" href="#contacto">Pedir el catálogo completo</a>
+      </div>
+
+      <div class="rv mb-10 flex flex-wrap gap-2" id="filters" role="group" aria-label="Filtrar trabajos por tipo">
+        <button class="pill" type="button" data-filter="todos" aria-pressed="true">Todos</button>
+        <button class="pill" type="button" data-filter="sitios" aria-pressed="false">Sitios</button>
+        <button class="pill" type="button" data-filter="tiendas" aria-pressed="false">Tiendas</button>
+        <button class="pill" type="button" data-filter="contenido" aria-pressed="false">Contenido</button>
+        <button class="pill" type="button" data-filter="identidad" aria-pressed="false">Identidad</button>
+      </div>
+
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-12" id="works">
+        <article class="work group rv xl:col-span-6" data-cat="sitios" data-tilt>
+          <button type="button" class="work-open" aria-label="Ampliar Casa Ferrán"
+                  data-title="Casa Ferrán" data-kind="Sitio web y reservas" data-year="2025"
+                  data-src="https://picsum.photos/seed/visualsolution-work-restaurant/1600/1000">
+            <div class="tilt shot wipe aspect-[16/10] rounded-card shadow-keysoft">
+              <img src="https://picsum.photos/seed/visualsolution-work-restaurant/1100/690" alt="Sitio web del restaurante Casa Ferrán" loading="lazy" decoding="async">
+            </div>
+          </button>
+          <div class="mt-4 flex items-baseline justify-between gap-4">
+            <div><h3 class="text-sm font-medium text-white">Casa Ferrán</h3><p class="mt-1 text-xs text-smoke">Sitio web y reservas</p></div>
+            <span class="badge">2025</span>
+          </div>
+        </article>
+
+        <article class="work group rv xl:col-span-6" style="--i:1" data-cat="tiendas" data-tilt>
+          <button type="button" class="work-open" aria-label="Ampliar Talleres Bravo"
+                  data-title="Talleres Bravo" data-kind="Tienda online" data-year="2025"
+                  data-src="https://picsum.photos/seed/visualsolution-work-store/1600/1000">
+            <div class="tilt shot wipe aspect-[16/10] rounded-card shadow-keysoft">
+              <img src="https://picsum.photos/seed/visualsolution-work-store/1100/690" alt="Tienda online de indumentaria" loading="lazy" decoding="async">
+            </div>
+          </button>
+          <div class="mt-4 flex items-baseline justify-between gap-4">
+            <div><h3 class="text-sm font-medium text-white">Talleres Bravo</h3><p class="mt-1 text-xs text-smoke">Tienda online</p></div>
+            <span class="badge">2025</span>
+          </div>
+        </article>
+
+        <article class="work group rv xl:col-span-4" data-cat="contenido" data-tilt>
+          <button type="button" class="work-open" aria-label="Ampliar Lumen Café"
+                  data-title="Lumen Café" data-kind="Contenido mensual" data-year="2024"
+                  data-src="https://picsum.photos/seed/visualsolution-work-coffee/1400/1050">
+            <div class="tilt shot wipe aspect-[4/3] rounded-card shadow-keysoft">
+              <img src="https://picsum.photos/seed/visualsolution-work-coffee/800/600" alt="Contenido vertical para una cafetería" loading="lazy" decoding="async">
+            </div>
+          </button>
+          <div class="mt-4 flex items-baseline justify-between gap-4">
+            <div><h3 class="text-sm font-medium text-white">Lumen Café</h3><p class="mt-1 text-xs text-smoke">Contenido mensual</p></div>
+            <span class="badge">2024</span>
+          </div>
+        </article>
+
+        <article class="work group rv xl:col-span-4" style="--i:1" data-cat="sitios" data-tilt>
+          <button type="button" class="work-open" aria-label="Ampliar Nordelta Padel"
+                  data-title="Nordelta Padel" data-kind="App de reservas" data-year="2024"
+                  data-src="https://picsum.photos/seed/visualsolution-work-padel/1400/1050">
+            <div class="tilt shot wipe aspect-[4/3] rounded-card shadow-keysoft">
+              <img src="https://picsum.photos/seed/visualsolution-work-padel/800/600" alt="Aplicación de reservas de canchas" loading="lazy" decoding="async">
+            </div>
+          </button>
+          <div class="mt-4 flex items-baseline justify-between gap-4">
+            <div><h3 class="text-sm font-medium text-white">Nordelta Padel</h3><p class="mt-1 text-xs text-smoke">App de reservas</p></div>
+            <span class="badge">2024</span>
+          </div>
+        </article>
+
+        <article class="work group rv xl:col-span-4" style="--i:2" data-cat="identidad" data-tilt>
+          <button type="button" class="work-open" aria-label="Ampliar Estudio Mirasol"
+                  data-title="Estudio Mirasol" data-kind="Identidad visual" data-year="2024"
+                  data-src="https://picsum.photos/seed/visualsolution-work-studio-brand/1400/1050">
+            <div class="tilt shot wipe aspect-[4/3] rounded-card shadow-keysoft">
+              <img src="https://picsum.photos/seed/visualsolution-work-studio-brand/800/600" alt="Sistema de identidad visual aplicado a papelería" loading="lazy" decoding="async">
+            </div>
+          </button>
+          <div class="mt-4 flex items-baseline justify-between gap-4">
+            <div><h3 class="text-sm font-medium text-white">Estudio Mirasol</h3><p class="mt-1 text-xs text-smoke">Identidad visual</p></div>
+            <span class="badge">2024</span>
+          </div>
+        </article>
+      </div>
+
+      <p class="mt-8 hidden font-mono text-xs text-smoke" id="works-empty">No hay trabajos de ese tipo todavía.</p>
+    </div>
+  </section>
+
+  <!-- ============================ PROCESO ============================ -->
+  <section class="border-y border-hairline bg-card py-20 md:py-28" id="proceso">
+    <div class="mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-10 px-4 md:px-10 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
+      <div class="rv self-start lg:sticky lg:top-28">
+        <h2 class="text-[clamp(26px,3.4vw,32px)] font-normal leading-tight tracking-[.2px] text-white" data-split>Cómo trabajamos</h2>
+        <p class="mt-4 max-w-[34ch] text-base leading-relaxed text-ash">
+          Cuatro instancias, fechas cerradas y una sola persona a cargo de la
+          comunicación durante todo el proyecto.
+        </p>
+      </div>
+
+      <div class="steps" id="steps">
+        <span class="steps-rail" aria-hidden="true"><i></i></span>
+
+        <article class="rv flex gap-4 pb-6" data-step>
+          <span class="token step-token">01</span>
+          <div>
+            <h3 class="text-lg font-medium leading-snug text-white">Entendemos el negocio</h3>
+            <p class="mt-2 max-w-[52ch] text-base leading-relaxed text-ash">Una reunión para saber qué vendés, a quién y contra quién competís. De ahí sale el alcance, el presupuesto cerrado y la fecha de entrega.</p>
+          </div>
+        </article>
+        <article class="rv flex gap-4 border-t border-hairline py-6" style="--i:1" data-step>
+          <span class="token step-token">02</span>
+          <div>
+            <h3 class="text-lg font-medium leading-snug text-white">Diseñamos la pieza</h3>
+            <p class="mt-2 max-w-[52ch] text-base leading-relaxed text-ash">Mostramos el diseño completo antes de escribir código. Lo revisamos juntos hasta que esté aprobado, sin sorpresas después.</p>
+          </div>
+        </article>
+        <article class="rv flex gap-4 border-t border-hairline py-6" style="--i:2" data-step>
+          <span class="token step-token">03</span>
+          <div>
+            <h3 class="text-lg font-medium leading-snug text-white">Programamos y producimos</h3>
+            <p class="mt-2 max-w-[52ch] text-base leading-relaxed text-ash">Desarrollo, rodaje y edición en paralelo. Vas viendo avances reales en un enlace privado, no capturas sueltas.</p>
+          </div>
+        </article>
+        <article class="rv flex gap-4 border-t border-hairline pt-6" style="--i:3" data-step>
+          <span class="token step-token">04</span>
+          <div>
+            <h3 class="text-lg font-medium leading-snug text-white">Lanzamos y medimos</h3>
+            <p class="mt-2 max-w-[52ch] text-base leading-relaxed text-ash">Publicación, analítica configurada y una capacitación grabada para que tu equipo cargue contenido solo. Después seguimos con soporte.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ PREGUNTAS ============================
+       TODO: ajustar plazos y forma de pago a como trabajás realmente.
+       ================================================================ -->
+  <section class="py-20 md:py-28" id="preguntas">
+    <div class="mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-10 px-4 md:px-10 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
+      <div class="rv self-start">
+        <p class="eyebrow mb-6 block">Preguntas</p>
+        <h2 class="text-[clamp(26px,3.4vw,32px)] font-normal leading-tight tracking-[.2px] text-white" data-split>Lo que siempre nos preguntan</h2>
+      </div>
+
+      <div class="rv" id="faq">
+        <div class="faq-row border-t border-hairline">
+          <h3>
+            <button class="flex w-full items-center justify-between gap-4 py-5 text-left text-base font-medium text-white" type="button" aria-expanded="false">
+              <span>¿Cuánto tarda un proyecto?</span>
+              <span class="grid size-6 shrink-0 place-items-center rounded-full border border-hairline text-ash" data-chev aria-hidden="true">+</span>
+            </button>
+          </h3>
+          <div class="answer"><div><p class="max-w-[58ch] pb-5 text-base leading-relaxed text-ash">Una landing sale en dos semanas. Un sitio institucional, entre cuatro y seis. Una tienda depende del tamaño del catálogo. La fecha queda cerrada antes de empezar, no sobre la marcha.</p></div></div>
+        </div>
+
+        <div class="faq-row border-t border-hairline">
+          <h3>
+            <button class="flex w-full items-center justify-between gap-4 py-5 text-left text-base font-medium text-white" type="button" aria-expanded="false">
+              <span>¿Cómo cobran?</span>
+              <span class="grid size-6 shrink-0 place-items-center rounded-full border border-hairline text-ash" data-chev aria-hidden="true">+</span>
+            </button>
+          </h3>
+          <div class="answer"><div><p class="max-w-[58ch] pb-5 text-base leading-relaxed text-ash">Presupuesto cerrado por proyecto, en dos pagos: uno al aprobar el diseño y otro al publicar. Sin horas sueltas ni adicionales que aparecen al final.</p></div></div>
+        </div>
+
+        <div class="faq-row border-t border-hairline">
+          <h3>
+            <button class="flex w-full items-center justify-between gap-4 py-5 text-left text-base font-medium text-white" type="button" aria-expanded="false">
+              <span>¿El código y las cuentas quedan a mi nombre?</span>
+              <span class="grid size-6 shrink-0 place-items-center rounded-full border border-hairline text-ash" data-chev aria-hidden="true">+</span>
+            </button>
+          </h3>
+          <div class="answer"><div><p class="max-w-[58ch] pb-5 text-base leading-relaxed text-ash">Sí. El dominio, el hosting y el repositorio se abren a tu nombre desde el primer día. Si algún día seguís sin nosotros, no perdés nada.</p></div></div>
+        </div>
+
+        <div class="faq-row border-t border-hairline">
+          <h3>
+            <button class="flex w-full items-center justify-between gap-4 py-5 text-left text-base font-medium text-white" type="button" aria-expanded="false">
+              <span>¿Puedo editar el contenido después?</span>
+              <span class="grid size-6 shrink-0 place-items-center rounded-full border border-hairline text-ash" data-chev aria-hidden="true">+</span>
+            </button>
+          </h3>
+          <div class="answer"><div><p class="max-w-[58ch] pb-5 text-base leading-relaxed text-ash">Sí. Dejamos un panel de carga y una capacitación grabada para que tu equipo publique novedades, productos o fotos sin tocar código.</p></div></div>
+        </div>
+
+        <div class="faq-row border-y border-hairline">
+          <h3>
+            <button class="flex w-full items-center justify-between gap-4 py-5 text-left text-base font-medium text-white" type="button" aria-expanded="false">
+              <span>¿Trabajan a distancia?</span>
+              <span class="grid size-6 shrink-0 place-items-center rounded-full border border-hairline text-ash" data-chev aria-hidden="true">+</span>
+            </button>
+          </h3>
+          <div class="answer"><div><p class="max-w-[58ch] pb-5 text-base leading-relaxed text-ash">Sí. Todo el proceso va por videollamada y un enlace privado donde seguís los avances. Para rodajes y fotos coordinamos la locación.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ CONTACTO ============================ -->
+  <section class="border-t border-hairline py-20 md:py-28" id="contacto">
+    <div class="mx-auto grid w-full max-w-[1200px] grid-cols-1 items-start gap-10 px-4 md:px-10 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
+      <div class="rv">
+        <p class="eyebrow mb-6 block">Contacto</p>
+        <h2 class="text-[clamp(26px,3.4vw,32px)] font-normal leading-tight tracking-[.2px] text-white" data-split>Hablemos de tu proyecto.</h2>
+        <p class="mt-4 max-w-[62ch] text-base leading-relaxed text-ash">
+          Contanos qué necesitás y te respondemos con una propuesta concreta:
+          alcance, plazo y precio.
+        </p>
+
+        <!-- TODO: reemplazar por los datos reales de contacto -->
+        <dl class="mt-10 grid gap-6">
+          <div>
+            <dt class="eyebrow mb-2 block">Correo</dt>
+            <dd class="m-0"><a class="link" href="mailto:hola@visualsolution.com">hola@visualsolution.com</a></dd>
+          </div>
+          <div>
+            <dt class="eyebrow mb-2 block">Instagram</dt>
+            <dd class="m-0"><a class="link" href="https://instagram.com/" target="_blank" rel="noopener">@visualsolution</a></dd>
+          </div>
+          <div>
+            <dt class="eyebrow mb-2 block">Respuesta</dt>
+            <dd class="m-0 text-base text-smoke">Contestamos todos los mensajes.</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="rv" style="--i:1">
+        <form class="grid gap-4 rounded-cardlg bg-card p-6 shadow-keysoft" id="form" novalidate>
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="grid gap-2" data-field>
+              <div class="fl">
+                <input class="field-input" id="nombre" name="nombre" type="text" autocomplete="name" placeholder="Cómo te llamás" required>
+                <label for="nombre">Nombre</label>
+              </div>
+              <p class="text-xs text-[#f0a6c2] empty:hidden" data-err></p>
+            </div>
+            <div class="grid gap-2" data-field>
+              <div class="fl">
+                <input class="field-input" id="email" name="email" type="email" autocomplete="email" placeholder="nombre@empresa.com" required>
+                <label for="email">Correo</label>
+              </div>
+              <p class="text-xs text-[#f0a6c2] empty:hidden" data-err></p>
+            </div>
+          </div>
+
+          <div class="grid gap-2" data-field>
+            <div class="fl is-select">
+              <select class="field-input cursor-pointer appearance-none" id="servicio" name="servicio" required
+                      style="background-image:linear-gradient(45deg,transparent 50%,#9c9c9d 50%),linear-gradient(135deg,#9c9c9d 50%,transparent 50%);background-position:calc(100% - 18px) calc(50% + 5px),calc(100% - 13px) calc(50% + 5px);background-size:5px 5px,5px 5px;background-repeat:no-repeat">
+                <option value="">Elegí una opción</option>
+                <option>Sitio web</option>
+                <option>Tienda online</option>
+                <option>Contenido audiovisual</option>
+                <option>Identidad visual</option>
+                <option>Varias cosas a la vez</option>
+              </select>
+              <label for="servicio">Qué necesitás</label>
+            </div>
+            <p class="text-xs text-[#f0a6c2] empty:hidden" data-err></p>
+          </div>
+
+          <div class="grid gap-2" data-field>
+            <div class="fl">
+              <textarea class="field-input resize-y leading-relaxed" id="mensaje" name="mensaje" placeholder="Qué hace tu negocio, qué tenés hoy y para cuándo lo necesitás." required></textarea>
+              <label for="mensaje">Sobre el proyecto</label>
+            </div>
+            <p class="text-xs text-smoke">Con dos o tres líneas alcanza para armar una primera propuesta.</p>
+            <p class="text-xs text-[#f0a6c2] empty:hidden" data-err></p>
+          </div>
+
+          <div class="hidden h-0.5 overflow-hidden rounded-sm bg-white/10" id="bar" aria-hidden="true">
+            <i class="animate-load block h-full w-[36%]" style="background:linear-gradient(102deg,#8B5CF6,#EC4899)"></i>
+          </div>
+
+          <div class="mt-2 flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-center">
+            <p class="font-mono text-xs text-smoke">Usamos estos datos solo para responderte.</p>
+            <button class="btn btn-solid mag" id="send" type="submit">
+              <span class="send-label">Enviar mensaje</span>
+              <span class="send-ok" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4.5 12.5l5 5 10-11" stroke="#1f7a4d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </button>
+          </div>
+          <p class="text-xs text-[#f0a6c2] empty:hidden" id="formErr" role="alert"></p>
+        </form>
+
+        <div class="hidden rounded-cardlg bg-card p-8 shadow-keysoft" id="panel" role="status">
+          <h3 class="text-2xl font-normal leading-tight text-white">Mensaje listo para enviar</h3>
+          <p class="mt-2 max-w-[44ch] text-base leading-relaxed text-ash" id="panelText">Abrimos tu cliente de correo con el mensaje cargado. Si no se abrió solo, escribinos a hola@visualsolution.com.</p>
+          <button class="btn btn-ghost mag mt-6" id="again" type="button">Escribir otro mensaje</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ CIERRE ============================ -->
+  <section class="relative overflow-hidden py-20 text-center md:py-28">
+    <div class="pointer-events-none absolute inset-0" aria-hidden="true"
+         style="background:radial-gradient(50% 60% at 50% 118%, rgba(139,92,246,.3), transparent 66%),radial-gradient(40% 50% at 74% 108%, rgba(236,72,153,.24), transparent 62%)"></div>
+    <div class="relative mx-auto w-full max-w-[1200px] px-4 md:px-10">
+      <h2 class="rv mx-auto max-w-[18ch] text-[clamp(26px,3.4vw,32px)] font-normal leading-tight tracking-[.2px] text-white" data-split>Tu marca merece verse tan bien como funciona.</h2>
+      <p class="rv mx-auto mt-4 max-w-[52ch] text-base leading-relaxed text-ash" style="--i:1">Contanos la idea. La primera propuesta no se cobra.</p>
+      <a class="btn btn-solid mag rv mt-8" style="--i:2" href="#contacto"><i class="diamond" aria-hidden="true"></i>Empezar proyecto</a>
+    </div>
+  </section>
+</main>
+
+<!-- visor de caso -->
+<div id="lightbox" hidden role="dialog" aria-modal="true" aria-labelledby="lb-title">
+  <button class="lb-close" id="lb-close" type="button" aria-label="Cerrar">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <figure>
+    <img id="lb-img" src="" alt="">
+    <figcaption class="mt-5 flex items-baseline justify-between gap-4">
+      <div>
+        <h3 class="text-lg font-medium text-white" id="lb-title"></h3>
+        <p class="mt-1 text-sm text-smoke" id="lb-kind"></p>
+      </div>
+      <span class="badge" id="lb-year"></span>
+    </figcaption>
+  </figure>
+</div>
+
+<!-- volver arriba -->
+<button id="btt" type="button" aria-label="Volver arriba">
+  <svg viewBox="0 0 143.5 76" aria-hidden="true"><use href="#vs-mark"/></svg>
+</button>
+
+<footer class="border-t border-hairline pb-8 pt-12">
+  <div class="mx-auto w-full max-w-[1200px] px-4 md:px-10">
+    <div class="flex flex-wrap justify-between gap-10">
+      <div class="grid max-w-[34ch] content-start gap-4">
+        <a class="inline-flex items-center gap-2" href="#top" aria-label="Visual Solution, inicio">
+          <svg class="block h-auto w-[26px]" viewBox="0 0 143.5 76" aria-hidden="true"><use href="#vs-mark"/></svg>
+          <span class="text-[13px] font-medium text-white">Visual <span class="text-smoke">Solution</span></span>
+        </a>
+        <p class="text-sm leading-relaxed text-ash">Desarrollo web y producción de contenido para marcas que quieren vender mejor.</p>
+      </div>
+
+      <div class="flex flex-wrap gap-12">
+        <div class="grid content-start gap-2">
+          <h4 class="eyebrow mb-2 block font-normal">Estudio</h4>
+          <a class="text-sm text-ash transition-colors duration-200 hover:text-white" href="#servicios">Servicios</a>
+          <a class="text-sm text-ash transition-colors duration-200 hover:text-white" href="#trabajos">Trabajos</a>
+          <a class="text-sm text-ash transition-colors duration-200 hover:text-white" href="#proceso">Proceso</a>
+          <a class="text-sm text-ash transition-colors duration-200 hover:text-white" href="#preguntas">Preguntas</a>
+        </div>
+        <div class="grid content-start gap-2">
+          <h4 class="eyebrow mb-2 block font-normal">Contacto</h4>
+          <a class="text-sm text-ash transition-colors duration-200 hover:text-white" href="#contacto">Empezar proyecto</a>
+          <a class="text-sm text-ash transition-colors duration-200 hover:text-white" href="mailto:hola@visualsolution.com">hola@visualsolution.com</a>
+        </div>
+        <div class="grid content-start gap-2">
+          <h4 class="eyebrow mb-2 block font-normal">Redes</h4>
+          <a class="text-sm text-ash transition-colors duration-200 hover:text-white" href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a>
+          <a class="text-sm text-ash transition-colors duration-200 hover:text-white" href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+          <a class="text-sm text-ash transition-colors duration-200 hover:text-white" href="https://www.youtube.com/" target="_blank" rel="noopener">YouTube</a>
+        </div>
+      </div>
+    </div>
+
+    <p class="mt-10 flex flex-wrap justify-center gap-2 border-t border-hairline pt-6 font-mono text-xs text-smoke">
+      <span>Visual Solution</span><span class="text-slate">|</span><span>Estudio de web y contenido</span><span class="text-slate">|</span><span id="year"></span>
+    </p>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  /* ============================================================
+     BASE COMPARTIDA
+     Un solo detector de preferencias, un solo valor de scroll y un
+     solo bucle de rAF para todo lo continuo (cursor, magnetismo,
+     partículas). Todo lo nuevo se cuelga de acá en vez de abrir su
+     propio listener.
+     ============================================================ */
+  var root = document.documentElement;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var fine = window.matchMedia("(pointer: fine)").matches;
+  var cores = navigator.hardwareConcurrency || 4;
+  var lite = reduce || cores <= 4 || window.innerWidth < 768;
+
+  if (fine) { root.classList.add("fine"); }
+  if (lite) { root.classList.add("lite"); }
+
+  var scrollY = window.pageYOffset || 0;
+  var mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2, seen: false };
+  var tasks = [];          // funciones llamadas en cada cuadro
+  var scrollTasks = [];    // funciones llamadas cuando cambia el scroll
+  var running = false;
+
+  function addTask(fn) { tasks.push(fn); startLoop(); }
+  function addScrollTask(fn) { scrollTasks.push(fn); fn(scrollY); }
+
+  function loop() {
+    if (document.hidden || !tasks.length) { running = false; return; }
+    for (var i = 0; i < tasks.length; i++) { tasks[i](); }
+    window.requestAnimationFrame(loop);
+  }
+  function startLoop() {
+    if (running || reduce || document.hidden) { return; }
+    running = true;
+    window.requestAnimationFrame(loop);
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) { startLoop(); }
+  });
+
+  function onScroll(v) {
+    scrollY = v;
+    for (var i = 0; i < scrollTasks.length; i++) { scrollTasks[i](v); }
+  }
+
+  if (fine) {
+    window.addEventListener("pointermove", function (e) {
+      mouse.x = e.clientX; mouse.y = e.clientY; mouse.seen = true;
+    }, { passive: true });
+  }
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function clamp01(v) { return v < 0 ? 0 : (v > 1 ? 1 : v); }
+
+  /* View Transitions: si ya hay una corriendo, la nueva se aborta y sus
+     promesas rechazan. Se silencian acá para no ensuciar la consola, y
+     donde la API no existe el cambio se aplica igual, sin transición. */
+  function withTransition(fn) {
+    if (reduce || !document.startViewTransition) { fn(); return; }
+    var t;
+    try { t = document.startViewTransition(fn); }
+    catch (e) { fn(); return; }
+    ["finished", "ready", "updateCallbackDone"].forEach(function (k) {
+      if (t && t[k] && t[k].catch) { t[k].catch(function () {}); }
+    });
+  }
+
+  var y = document.getElementById("year");
+  if (y) { y.textContent = String(new Date().getFullYear()); }
+
+  /* ---- respaldo de Tailwind ----
+     Si el build de navegador no llegó a cargar, se pide el Play CDN
+     para que al menos el layout quede en pie. ---- */
+  window.addEventListener("load", function () {
+    var probe = document.createElement("div");
+    probe.className = "hidden";
+    document.body.appendChild(probe);
+    var compiled = window.getComputedStyle(probe).display === "none";
+    probe.remove();
+    if (!compiled && !document.getElementById("tw-fallback")) {
+      var s = document.createElement("script");
+      s.id = "tw-fallback";
+      s.src = "https://cdn.tailwindcss.com";
+      document.head.appendChild(s);
+    }
+  });
+
+  /* ============================================================
+     2.1 SCROLL CON INERCIA
+     Lenis mueve el scroll real del documento, así que position:sticky,
+     los anclas y la barra de progreso por animation-timeline siguen
+     funcionando igual. Con movimiento reducido no se instancia.
+     ============================================================ */
+  var lenis = null;
+  if (!reduce && window.Lenis) {
+    lenis = new window.Lenis({
+      duration: 0.9,
+      easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
+      smoothWheel: true,
+      touchMultiplier: 1.6
+    });
+    lenis.on("scroll", function (e) { onScroll(e.scroll); });
+    var raf = function (time) { lenis.raf(time); window.requestAnimationFrame(raf); };
+    window.requestAnimationFrame(raf);
+    root.style.scrollBehavior = "auto";
+
+    // los anclas internos pasan por Lenis para que el viaje sea suave
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest && e.target.closest('a[href^="#"]');
+      if (!a) { return; }
+      var id = a.getAttribute("href");
+      if (!id || id === "#") { return; }
+      var target = document.querySelector(id);
+      if (!target) { return; }
+      e.preventDefault();
+      lenis.scrollTo(target, { offset: -90 });
+      if (history.replaceState) { history.replaceState(null, "", id); }
+    });
+  } else {
+    window.addEventListener("scroll", function () {
+      onScroll(window.pageYOffset || 0);
+    }, { passive: true });
+  }
+
+  function scrollToTop() {
+    if (lenis) { lenis.scrollTo(0, { duration: 1.1 }); }
+    else { window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); }
+  }
+
+  /* ============================================================
+     2.5 SECUENCIA DE CARGA
+     El símbolo se dibuja trazo por trazo y se funde. Se saltea con
+     movimiento reducido y en visitas posteriores de la misma sesión.
+     ============================================================ */
+  (function boot() {
+    var el = document.getElementById("boot");
+    if (!el) { return; }
+    var seen = false;
+    try { seen = window.sessionStorage.getItem("vs-boot") === "1"; } catch (e) { seen = false; }
+    if (reduce || seen) { el.remove(); return; }
+    try { window.sessionStorage.setItem("vs-boot", "1"); } catch (e) {}
+    if (lenis) { lenis.stop(); }
+    window.setTimeout(function () {
+      el.classList.add("done");
+      if (lenis) { lenis.start(); }
+      window.setTimeout(function () { el.remove(); }, 600);
+    }, 900);
+  })();
+
+  /* ============================================================
+     2.2 FONDO VIVO
+     Campo de puntos en canvas 2D con parallax de profundidad: cada
+     punto se desplaza según su capa, no 1:1 con el scroll. Se apaga
+     entero en equipos modestos y con movimiento reducido.
+     ============================================================ */
+  (function background() {
+    var cv = document.getElementById("bg-field");
+    if (!cv) { return; }
+    if (lite) { cv.remove(); return; }
+
+    var ctx = cv.getContext("2d");
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var pts = [];
+    var W = 0, H = 0;
+
+    function size() {
+      W = cv.clientWidth; H = cv.clientHeight;
+      cv.width = Math.round(W * dpr);
+      cv.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function seed() {
+      pts.length = 0;
+      var n = Math.min(70, Math.round((W * H) / 26000));
+      for (var i = 0; i < n; i++) {
+        pts.push({
+          x: Math.random() * W,
+          y: Math.random() * H * 1.4,
+          z: 0.25 + Math.random() * 0.75,
+          r: 0.6 + Math.random() * 1.5,
+          vx: (Math.random() - 0.5) * 0.08,
+          vy: -0.04 - Math.random() * 0.09,
+          pink: Math.random() > 0.5
+        });
+      }
+    }
+
+    size(); seed();
+    window.addEventListener("resize", function () { size(); seed(); });
+    window.setTimeout(function () { cv.classList.add("on"); }, 400);
+
+    addTask(function () {
+      ctx.clearRect(0, 0, W, H);
+      for (var i = 0; i < pts.length; i++) {
+        var p = pts[i];
+        p.x += p.vx; p.y += p.vy;
+        if (p.y < -20) { p.y = H + 20; p.x = Math.random() * W; }
+        if (p.x < -20) { p.x = W + 20; } else if (p.x > W + 20) { p.x = -20; }
+
+        // parallax: las capas del fondo se mueven menos que el contenido
+        var oy = (scrollY * p.z * 0.06) % (H + 40);
+        var yy = p.y - oy;
+        if (yy < -20) { yy += H + 40; }
+
+        ctx.beginPath();
+        ctx.arc(p.x, yy, p.r * p.z, 0, Math.PI * 2);
+        ctx.fillStyle = p.pink
+          ? "rgba(236,72,153," + (0.05 + p.z * 0.09).toFixed(3) + ")"
+          : "rgba(139,92,246," + (0.05 + p.z * 0.10).toFixed(3) + ")";
+        ctx.fill();
+      }
+    });
+  })();
+
+  /* ============================================================
+     2.3 CURSOR PROPIO (solo puntero fino)
+     Punto sólido + anillo que lo persigue con retraso. Sobre campos
+     de texto vuelve el cursor del sistema.
+     ============================================================ */
+  (function cursor() {
+    if (!fine || reduce) { return; }
+    var dot = document.getElementById("cur-dot");
+    var ring = document.getElementById("cur-ring");
+    if (!dot || !ring) { return; }
+    root.classList.add("cursor-on");
+
+    var rx = mouse.x, ry = mouse.y;
+    addTask(function () {
+      rx = lerp(rx, mouse.x, 0.16);
+      ry = lerp(ry, mouse.y, 0.16);
+      dot.style.transform = "translate3d(" + mouse.x + "px," + mouse.y + "px,0)";
+      ring.style.transform = "translate3d(" + rx + "px," + ry + "px,0)";
+    });
+
+    var HIT = "a, button, .card, [role='button'], summary, .pill, .mq-word";
+    document.addEventListener("pointerover", function (e) {
+      var t = e.target;
+      if (!t.closest) { return; }
+      root.classList.toggle("on-hit", !!t.closest(HIT));
+      root.classList.toggle("on-field", !!t.closest("input, textarea"));
+    }, { passive: true });
+    document.addEventListener("pointerleave", function () {
+      root.classList.remove("on-hit", "on-field");
+    });
+  })();
+
+  /* ============================================================
+     2.4 BOTONES MAGNÉTICOS
+     Se estiran hacia el cursor dentro de un radio corto y vuelven
+     con amortiguación al salir. Solo puntero fino.
+     ============================================================ */
+  (function magnetic() {
+    if (!fine || reduce) { return; }
+    var items = [].slice.call(document.querySelectorAll(".mag"));
+    if (!items.length) { return; }
+    var RADIUS = 90, PULL = 0.32;
+    var state = items.map(function () { return { x: 0, y: 0, tx: 0, ty: 0 }; });
+
+    addTask(function () {
+      for (var i = 0; i < items.length; i++) {
+        var el = items[i], s = state[i];
+        var r = el.getBoundingClientRect();
+        if (r.bottom < -100 || r.top > window.innerHeight + 100) {
+          s.tx = 0; s.ty = 0;
+        } else {
+          var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+          var dx = mouse.x - cx, dy = mouse.y - cy;
+          var d = Math.sqrt(dx * dx + dy * dy);
+          var reach = RADIUS + Math.max(r.width, r.height) / 2;
+          if (mouse.seen && d < reach) {
+            var f = (1 - d / reach) * PULL;
+            s.tx = dx * f; s.ty = dy * f;
+          } else { s.tx = 0; s.ty = 0; }
+        }
+        s.x = lerp(s.x, s.tx, 0.14);
+        s.y = lerp(s.y, s.ty, 0.14);
+        if (Math.abs(s.x) < 0.01 && Math.abs(s.y) < 0.01) { s.x = 0; s.y = 0; }
+        el.style.setProperty("--mgx", s.x.toFixed(2) + "px");
+        el.style.setProperty("--mgy", s.y.toFixed(2) + "px");
+      }
+    });
+  })();
+
+  /* ============================================================
+     2.6 HEADER AL SCROLLEAR
+     Centinela + IntersectionObserver, sin listener de scroll.
+     ============================================================ */
+  (function header() {
+    var nav = document.querySelector("header[data-nav]");
+    var sentinel = document.getElementById("top-sentinel");
+    var mark = document.getElementById("nav-mark");
+    if (!nav || !sentinel || !("IntersectionObserver" in window)) { return; }
+    var popped = false;
+    new IntersectionObserver(function (entries) {
+      var stuck = !entries[0].isIntersecting;
+      nav.classList.toggle("is-stuck", stuck);
+      if (stuck && !popped && mark && !reduce) {
+        popped = true;
+        mark.classList.add("nav-pop");
+        window.setTimeout(function () { mark.classList.remove("nav-pop"); }, 600);
+      }
+    }, { threshold: 0 }).observe(sentinel);
+  })();
+
+  /* ---- menú móvil ---- */
+  var burger = document.getElementById("burger");
+  var menu = document.getElementById("menu");
+  var bTop = document.getElementById("burger-top");
+  var bMid = document.getElementById("burger-mid");
+  var bBot = document.getElementById("burger-bot");
+
+  function setMenu(open) {
+    menu.classList.toggle("hidden", !open);
+    menu.classList.toggle("flex", open);
+    burger.setAttribute("aria-expanded", open ? "true" : "false");
+    document.body.style.overflow = open ? "hidden" : "";
+    if (lenis) { open ? lenis.stop() : lenis.start(); }
+    if (bTop && bMid && bBot) {
+      bTop.style.transition = bMid.style.transition = bBot.style.transition = "transform .3s cubic-bezier(.16,1,.3,1), opacity .2s";
+      bTop.style.transformOrigin = bBot.style.transformOrigin = "center";
+      bTop.style.transform = open ? "translateY(4.5px) rotate(45deg)" : "";
+      bBot.style.transform = open ? "translateY(-4.5px) rotate(-45deg)" : "";
+      bMid.style.opacity = open ? "0" : "1";
+    }
+  }
+  burger.addEventListener("click", function () {
+    setMenu(menu.classList.contains("hidden"));
+  });
+  menu.addEventListener("click", function (e) {
+    if (e.target.tagName === "A") { setMenu(false); }
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !menu.classList.contains("hidden")) { setMenu(false); }
+  });
+
+  /* ---- titulares que suben palabra por palabra ---- */
+  if (!reduce) {
+    document.querySelectorAll("[data-split]").forEach(function (el) {
+      var words = el.textContent.trim().split(/\s+/);
+      el.textContent = "";
+      words.forEach(function (word, i) {
+        var mask = document.createElement("span");
+        mask.className = "w";
+        var inner = document.createElement("i");
+        inner.style.setProperty("--d", (i * 45) + "ms");
+        inner.textContent = word;
+        mask.appendChild(inner);
+        el.appendChild(mask);
+        if (i < words.length - 1) { el.appendChild(document.createTextNode(" ")); }
+      });
+      el.classList.add("rv-split");
+    });
+  }
+
+  /* ---- revelado al entrar en viewport ----
+     Un solo observador para .rv, .rv-split, .wipe y los monogramas
+     que pulsan una vez. ---- */
+  var reveals = document.querySelectorAll(".rv, .rv-split, .wipe, [data-pulse]");
+  function revealAll() {
+    reveals.forEach(function (el) {
+      el.classList.add("in");
+      if (el.hasAttribute("data-pulse")) { el.classList.add("pulsed"); }
+    });
+  }
+  if (reduce || !("IntersectionObserver" in window)) {
+    revealAll();
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) { return; }
+        var el = entry.target;
+        el.classList.add("in");
+        if (el.hasAttribute("data-pulse")) { el.classList.add("pulsed"); }
+        io.unobserve(el);
+      });
+    }, { threshold: 0.15, rootMargin: "0px 0px -6% 0px" });
+    reveals.forEach(function (el) { io.observe(el); });
+    // red de seguridad: nada queda invisible si el observer no dispara
+    window.setTimeout(revealAll, 1800);
+  }
+
+  /* ============================================================
+     TARJETAS: foco de luz e inclinación
+     Una sola pasada por movimiento del puntero, con las lecturas de
+     geometría cacheadas por entrada para no forzar layout por cuadro.
+     ============================================================ */
+  if (fine && !reduce) {
+    document.querySelectorAll("[data-spot]").forEach(function (card) {
+      card.addEventListener("pointermove", function (e) {
+        var r = card.getBoundingClientRect();
+        card.style.setProperty("--mx", (e.clientX - r.left) + "px");
+        card.style.setProperty("--my", (e.clientY - r.top) + "px");
+      });
+    });
+
+    /* inclinación: el origen sigue al cursor, no el centro fijo */
+    document.querySelectorAll("[data-tilt]").forEach(function (item) {
+      var plate = item.querySelector(".tilt") || item;
+      var strength = parseFloat(item.getAttribute("data-tilt-strength")) || 7;
+      var queued = false, px = 0, py = 0;
+
+      item.addEventListener("pointermove", function (e) {
+        var r = item.getBoundingClientRect();
+        px = (e.clientX - r.left) / r.width;
+        py = (e.clientY - r.top) / r.height;
+        if (queued) { return; }
+        queued = true;
+        window.requestAnimationFrame(function () {
+          queued = false;
+          plate.style.transformOrigin = (px * 100).toFixed(1) + "% " + (py * 100).toFixed(1) + "%";
+          plate.style.setProperty("--ry", ((px - 0.5) * strength).toFixed(2) + "deg");
+          plate.style.setProperty("--rx", ((py - 0.5) * -strength * 0.86).toFixed(2) + "deg");
+        });
+      });
+      item.addEventListener("pointerleave", function () {
+        plate.style.transformOrigin = "";
+        plate.style.setProperty("--ry", "0deg");
+        plate.style.setProperty("--rx", "0deg");
+      });
+    });
+  }
+
+  /* ============================================================
+     TRABAJOS: filtro y visor de caso
+     ============================================================ */
+  (function works() {
+    var grid = document.getElementById("works");
+    var filters = document.getElementById("filters");
+    var empty = document.getElementById("works-empty");
+    if (!grid) { return; }
+    var cards = [].slice.call(grid.querySelectorAll(".work"));
+
+    function apply(kind) {
+      var shown = 0;
+      cards.forEach(function (card) {
+        var match = kind === "todos" || card.getAttribute("data-cat") === kind;
+        if (match) { shown++; }
+        card.classList.toggle("is-out", !match);
+        card.hidden = !match;
+      });
+      if (empty) { empty.classList.toggle("hidden", shown > 0); }
+    }
+
+    if (filters) {
+      filters.addEventListener("click", function (e) {
+        var btn = e.target.closest("button[data-filter]");
+        if (!btn) { return; }
+        filters.querySelectorAll("button[data-filter]").forEach(function (b) {
+          b.setAttribute("aria-pressed", String(b === btn));
+        });
+        var kind = btn.getAttribute("data-filter");
+        withTransition(function () { apply(kind); });
+      });
+    }
+
+    /* ---- visor ---- */
+    var lb = document.getElementById("lightbox");
+    var lbImg = document.getElementById("lb-img");
+    var lbTitle = document.getElementById("lb-title");
+    var lbKind = document.getElementById("lb-kind");
+    var lbYear = document.getElementById("lb-year");
+    var lbClose = document.getElementById("lb-close");
+    if (!lb) { return; }
+    var opener = null;
+
+    function focusables() {
+      return [].slice.call(lb.querySelectorAll("button, [href], img[tabindex]"))
+        .filter(function (el) { return el.offsetParent !== null; });
+    }
+
+    function open(btn) {
+      opener = btn;
+      lbImg.src = btn.getAttribute("data-src");
+      lbImg.alt = btn.getAttribute("data-title") + ", vista ampliada";
+      lbTitle.textContent = btn.getAttribute("data-title");
+      lbKind.textContent = btn.getAttribute("data-kind");
+      lbYear.textContent = btn.getAttribute("data-year");
+      lb.hidden = false;
+      document.body.style.overflow = "hidden";
+      if (lenis) { lenis.stop(); }
+      lbClose.focus();
+    }
+
+    function close() {
+      lb.hidden = true;
+      document.body.style.overflow = "";
+      if (lenis) { lenis.start(); }
+      if (opener) { opener.focus(); opener = null; }
+    }
+
+    function show(btn) { withTransition(function () { open(btn); }); }
+    function hide() { withTransition(function () { close(); }); }
+
+    grid.addEventListener("click", function (e) {
+      var btn = e.target.closest(".work-open");
+      if (btn) { show(btn); }
+    });
+    lbClose.addEventListener("click", hide);
+    lb.addEventListener("click", function (e) {
+      if (e.target === lb) { hide(); }
+    });
+    document.addEventListener("keydown", function (e) {
+      if (lb.hidden) { return; }
+      if (e.key === "Escape") { hide(); return; }
+      if (e.key !== "Tab") { return; }
+      // foco atrapado mientras el visor está abierto
+      var f = focusables();
+      if (!f.length) { return; }
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+  })();
+
+  /* ============================================================
+     PROCESO: línea que se dibuja y paso activo
+     ============================================================ */
+  (function process() {
+    var steps = document.getElementById("steps");
+    if (!steps) { return; }
+    var rail = steps.querySelector(".steps-rail > i");
+    var tokens = [].slice.call(steps.querySelectorAll(".step-token"));
+
+    if (rail && !reduce) {
+      addScrollTask(function () {
+        var r = steps.getBoundingClientRect();
+        var vh = window.innerHeight;
+        // progreso: de que el bloque toca el 75% del viewport hasta que su base cruza el 45%
+        var p = clamp01((vh * 0.75 - r.top) / (r.height + vh * 0.3));
+        rail.style.setProperty("--p", p.toFixed(3));
+      });
+    } else if (rail) {
+      rail.style.setProperty("--p", "1");
+    }
+
+    if (!("IntersectionObserver" in window)) {
+      tokens.forEach(function (t) { t.classList.add("on"); });
+      return;
+    }
+    var stepIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var token = entry.target.querySelector(".step-token");
+        if (token) { token.classList.toggle("on", entry.isIntersecting); }
+      });
+    }, { rootMargin: "-45% 0px -45% 0px", threshold: 0 });
+    steps.querySelectorAll("[data-step]").forEach(function (s) { stepIo.observe(s); });
+  })();
+
+  /* ---- acordeón de preguntas: una respuesta abierta a la vez ---- */
+  var faq = document.getElementById("faq");
+  if (faq) {
+    faq.querySelectorAll("button[aria-expanded]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var row = btn.closest(".faq-row");
+        var chev = btn.querySelector("[data-chev]");
+        var open = btn.getAttribute("aria-expanded") === "true";
+
+        faq.querySelectorAll("button[aria-expanded='true']").forEach(function (other) {
+          if (other === btn) { return; }
+          other.setAttribute("aria-expanded", "false");
+          other.closest(".faq-row").classList.remove("is-open");
+          var c = other.querySelector("[data-chev]");
+          if (c) { c.style.transform = ""; }
+        });
+
+        btn.setAttribute("aria-expanded", open ? "false" : "true");
+        row.classList.toggle("is-open", !open);
+        if (chev) { chev.style.transform = open ? "" : "rotate(135deg)"; }
+      });
+    });
+  }
+
+  /* ============================================================
+     FORMULARIO
+     Sin backend configurado arma un correo con los datos.
+     Para conectar un servicio (Formspree, Getform, tu API):
+     poner la URL en ENDPOINT y el envío pasa a ser POST con JSON.
+     La capa visual nueva (tilde animado) no toca esta lógica.
+     ============================================================ */
+  var ENDPOINT = "";
+  var MAILTO = "hola@visualsolution.com";
+
+  var form = document.getElementById("form");
+  var panel = document.getElementById("panel");
+  var panelText = document.getElementById("panelText");
+  var bar = document.getElementById("bar");
+  var send = document.getElementById("send");
+  var sendLabel = send ? send.querySelector(".send-label") : null;
+  var formErr = document.getElementById("formErr");
+  var again = document.getElementById("again");
+
+  function setError(input, msg) {
+    var field = input.closest("[data-field]");
+    var slot = field.querySelector("[data-err]");
+    field.classList.toggle("has-error", Boolean(msg));
+    input.setAttribute("aria-invalid", msg ? "true" : "false");
+    slot.textContent = msg || "";
+  }
+
+  function validate() {
+    var ok = true;
+    var first = null;
+    var checks = [
+      { el: form.nombre, test: function (v) { return v.trim().length >= 2; }, msg: "Escribí tu nombre." },
+      { el: form.email, test: function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()); }, msg: "Revisá el correo, parece incompleto." },
+      { el: form.servicio, test: function (v) { return v !== ""; }, msg: "Elegí una opción." },
+      { el: form.mensaje, test: function (v) { return v.trim().length >= 12; }, msg: "Contanos un poco más, con una línea alcanza." }
+    ];
+    checks.forEach(function (c) {
+      var valid = c.test(c.el.value);
+      setError(c.el, valid ? "" : c.msg);
+      if (!valid) { ok = false; if (!first) { first = c.el; } }
+    });
+    if (first) { first.focus(); }
+    return ok;
+  }
+
+  form.addEventListener("input", function (e) {
+    if (e.target.closest("[data-field]") && e.target.getAttribute("aria-invalid") === "true") {
+      setError(e.target, "");
+    }
+  });
+
+  function showPanel(text) {
+    form.classList.add("hidden");
+    panel.classList.remove("hidden");
+    if (text) { panelText.textContent = text; }
+  }
+
+  // el botón muta a tilde antes de que aparezca el panel
+  function done(text) {
+    if (reduce) { showPanel(text); return; }
+    send.classList.add("ok");
+    window.setTimeout(function () {
+      send.classList.remove("ok");
+      showPanel(text);
+    }, 700);
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    formErr.textContent = "";
+    if (!validate()) { return; }
+
+    var data = {
+      nombre: form.nombre.value.trim(),
+      email: form.email.value.trim(),
+      servicio: form.servicio.value,
+      mensaje: form.mensaje.value.trim()
+    };
+
+    if (!ENDPOINT) {
+      var cuerpo = "Nombre: " + data.nombre + "\nCorreo: " + data.email +
+                   "\nServicio: " + data.servicio + "\n\n" + data.mensaje;
+      window.location.href = "mailto:" + MAILTO +
+        "?subject=" + encodeURIComponent("Consulta de " + data.nombre) +
+        "&body=" + encodeURIComponent(cuerpo);
+      done("Abrimos tu cliente de correo con el mensaje cargado. Si no se abrió solo, escribinos a " + MAILTO + ".");
+      return;
+    }
+
+    send.disabled = true;
+    if (sendLabel) { sendLabel.textContent = "Enviando"; }
+    bar.classList.remove("hidden");
+
+    fetch(ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(data)
+    }).then(function (res) {
+      if (!res.ok) { throw new Error("respuesta " + res.status); }
+      done("Recibimos tu mensaje. Te respondemos al correo que dejaste.");
+    }).catch(function () {
+      formErr.textContent = "No pudimos enviar el mensaje. Probá de nuevo o escribinos a " + MAILTO + ".";
+    }).then(function () {
+      send.disabled = false;
+      if (sendLabel) { sendLabel.textContent = "Enviar mensaje"; }
+      bar.classList.add("hidden");
+    });
+  });
+
+  again.addEventListener("click", function () {
+    form.reset();
+    form.classList.remove("hidden");
+    panel.classList.add("hidden");
+    form.nombre.focus();
+  });
+
+  /* ============================================================
+     VOLVER ARRIBA
+     ============================================================ */
+  (function backToTop() {
+    var btt = document.getElementById("btt");
+    if (!btt) { return; }
+    addScrollTask(function (v) {
+      btt.classList.toggle("on", v > window.innerHeight * 0.9);
+    });
+    btt.addEventListener("click", function () {
+      btt.classList.add("spin");
+      scrollToTop();
+      window.setTimeout(function () { btt.classList.remove("spin"); }, 800);
+    });
+  })();
+
+  /* ============================================================
+     MARCA EN 3D
+     La V y la S se dibujan como contornos cerrados, se extruyen con
+     bisel y se iluminan con una luz violeta y una rosa, más un mapa
+     de entorno procedural para que el metal tenga reflejo real.
+     Si no hay WebGL queda la marca plana del fallback.
+     ============================================================ */
+  /* Contornos del logo real, vectorizados y normalizados a una caja de
+     143.5 x 76 unidades (mismo viewBox que assets/logo.svg). El eje Y va
+     hacia arriba, al revés que en SVG, por eso las coordenadas están
+     espejadas respecto del archivo plano.
+     Son las tres piezas conectadas del trazado, y quedan como tres mallas:
+       a = trazo izquierdo de la V
+       b = trazo derecho de la V fundido con la barra superior de la S
+       c = gancho inferior de la S */
+  function markShapes(THREE) {
+    var a = new THREE.Shape();
+    a.moveTo(0.0, 76.0);
+    a.lineTo(34.48, 17.73);
+    a.lineTo(47.35, 35.45);
+    a.lineTo(23.31, 76.0);
+    a.closePath();
+
+    var b = new THREE.Shape();
+    b.moveTo(143.5, 70.66);
+    b.lineTo(76.24, 68.84);
+    b.lineTo(35.57, 14.81);
+    b.lineTo(45.16, 0.0);
+    b.lineTo(85.71, 53.9);
+    b.lineTo(128.45, 54.27);
+    b.closePath();
+
+    var c = new THREE.Shape();
+    c.moveTo(133.18, 32.66);
+    c.lineTo(123.47, 43.71);
+    c.lineTo(86.81, 43.95);
+    c.lineTo(76.0, 29.87);
+    c.lineTo(114.24, 28.65);
+    c.lineTo(104.29, 17.6);
+    c.lineTo(67.14, 17.24);
+    c.lineTo(53.78, 0.85);
+    c.lineTo(112.3, 2.06);
+    c.lineTo(131.24, 23.55);
+    c.closePath();
+
+    return { a: a, b: b, c: c };
+  }
+
+  // entorno procedural: un degradado equirectangular dibujado en canvas.
+  // Da reflejos reales sin bajar ningún HDR.
+  function envTexture(THREE) {
+    var c = document.createElement("canvas");
+    c.width = 256; c.height = 128;
+    var g = c.getContext("2d");
+    var grad = g.createLinearGradient(0, 0, 256, 128);
+    grad.addColorStop(0.00, "#160d2e");
+    grad.addColorStop(0.32, "#8B5CF6");
+    grad.addColorStop(0.55, "#2a1030");
+    grad.addColorStop(0.78, "#EC4899");
+    grad.addColorStop(1.00, "#0b0713");
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 256, 128);
+    // banda superior clara: hace de "cielo" y marca el filo del bisel
+    var top = g.createLinearGradient(0, 0, 0, 60);
+    top.addColorStop(0, "rgba(255,255,255,.55)");
+    top.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = top;
+    g.fillRect(0, 0, 256, 60);
+    var tex = new THREE.CanvasTexture(c);
+    tex.mapping = THREE.EquirectangularReflectionMapping;
+    return tex;
+  }
+
+  function build3DMark() {
+    var host = document.getElementById("stage");
+    if (!host || !window.THREE) { return; }
+
+    var THREE = window.THREE;
+    var renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+    } catch (e) {
+      return; // sin WebGL se queda la marca plana
+    }
+
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, lite ? 1.5 : 2));
+    renderer.setClearAlpha(0);
+    if (THREE.sRGBEncoding) { renderer.outputEncoding = THREE.sRGBEncoding; }
+    renderer.domElement.style.width = "100%";
+    renderer.domElement.style.height = "100%";
+    renderer.domElement.style.display = "block";
+    renderer.domElement.style.cursor = "grab";
+    host.appendChild(renderer.domElement);
+
+    var flat = document.getElementById("stage-fallback");
+    if (flat) { flat.style.display = "none"; }
+
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(30, 1, 1, 3000);
+
+    // mapa de entorno
+    var envMap = null;
+    try {
+      var pmrem = new THREE.PMREMGenerator(renderer);
+      pmrem.compileEquirectangularShader();
+      envMap = pmrem.fromEquirectangular(envTexture(THREE)).texture;
+      scene.environment = envMap;
+      pmrem.dispose();
+    } catch (e) { envMap = null; }
+
+    var extrude = {
+      depth: 22, bevelEnabled: true, bevelThickness: 2.6,
+      bevelSize: 2.2, bevelOffset: 0, bevelSegments: 3, curveSegments: 4
+    };
+
+    var material = new THREE.MeshStandardMaterial({
+      color: 0xF2EFF8,
+      metalness: envMap ? 0.72 : 0.32,
+      roughness: envMap ? 0.16 : 0.24,
+      envMap: envMap,
+      envMapIntensity: 1.15
+    });
+
+    var shapes = markShapes(THREE);
+    var group = new THREE.Group();
+
+    // El logo real ya trae su propia inclinación en el trazado, así que
+    // acá solo se centra la caja de 143.5 x 76 en el origen.
+    var solids = [];
+    [shapes.a, shapes.b, shapes.c].forEach(function (shape) {
+      var g = new THREE.ExtrudeGeometry(shape, extrude);
+      g.translate(-71.75, -38, -extrude.depth / 2);
+      var m = new THREE.Mesh(g, material);
+      solids.push(m);
+      group.add(m);
+    });
+
+    // halo: copia agrandada con material aditivo detrás del sólido.
+    // Es el equivalente barato de un bloom, sin cargar post-proceso.
+    if (!lite) {
+      var glowMat = new THREE.MeshBasicMaterial({
+        color: 0xEC4899, transparent: true, opacity: 0.13,
+        blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.BackSide
+      });
+      solids.forEach(function (m) {
+        var halo = new THREE.Mesh(m.geometry, glowMat);
+        halo.scale.set(1.05, 1.05, 1.05);
+        halo.position.z = -6;
+        group.add(halo);
+      });
+    }
+
+    scene.add(group);
+
+    // campo de puntos detrás del logo
+    var dots = null;
+    if (!lite) {
+      var N = 220;
+      var pos = new Float32Array(N * 3);
+      for (var i = 0; i < N; i++) {
+        pos[i * 3]     = (Math.random() - 0.5) * 460;
+        pos[i * 3 + 1] = (Math.random() - 0.5) * 300;
+        pos[i * 3 + 2] = -60 - Math.random() * 320;
+      }
+      var pg = new THREE.BufferGeometry();
+      pg.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      dots = new THREE.Points(pg, new THREE.PointsMaterial({
+        color: 0xA98BF0, size: 2.1, sizeAttenuation: true,
+        transparent: true, opacity: 0.5, depthWrite: false
+      }));
+      scene.add(dots);
+    }
+
+    scene.add(new THREE.AmbientLight(0x14101F, envMap ? 0.6 : 1.1));
+
+    var key = new THREE.DirectionalLight(0x8B5CF6, envMap ? 1.9 : 2.8);
+    key.position.set(-150, 120, 160);
+    scene.add(key);
+
+    var fill = new THREE.DirectionalLight(0xEC4899, envMap ? 1.8 : 2.5);
+    fill.position.set(170, -70, 120);
+    scene.add(fill);
+
+    var rim = new THREE.DirectionalLight(0xFFFFFF, 1.0);
+    rim.position.set(30, 140, -180);
+    scene.add(rim);
+
+    var spark = new THREE.PointLight(0xFFFFFF, 0.6, 900);
+    spark.position.set(-40, 60, 220);
+    scene.add(spark);
+
+    var HALF_W = 76, HALF_H = 42, baseZ = 300;
+
+    function resize() {
+      var w = host.clientWidth, h = host.clientHeight;
+      if (!w || !h) { return; }
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      var half = Math.tan((camera.fov * Math.PI) / 360);
+      baseZ = Math.max(HALF_H / half, HALF_W / (half * camera.aspect)) * 1.12;
+      camera.position.z = baseZ;
+      camera.updateProjectionMatrix();
+    }
+    resize();
+
+    if (window.ResizeObserver) {
+      new ResizeObserver(resize).observe(host);
+    } else {
+      window.addEventListener("resize", resize);
+    }
+
+    /* puntero: el objeto se orienta hacia el cursor y, al soltarlo,
+       sigue girando con decaimiento en vez de volver de golpe */
+    var aimX = 0, aimY = 0, curX = 0, curY = 0;
+    var velX = 0, velY = 0, free = false;
+
+    if (fine) {
+      host.addEventListener("pointermove", function (e) {
+        var r = host.getBoundingClientRect();
+        var ny = ((e.clientX - (r.left + r.width / 2)) / r.width) * 1.1;
+        var nx = ((e.clientY - (r.top + r.height / 2)) / r.height) * 0.65;
+        velX = nx - aimX; velY = ny - aimY;
+        aimX = nx; aimY = ny;
+        free = false;
+      });
+      host.addEventListener("pointerleave", function () {
+        free = true;                 // conserva el impulso y decae
+        velX *= 6; velY *= 6;
+      });
+    }
+
+    group.rotation.set(-0.1, -0.45, 0);
+
+    if (reduce) {
+      renderer.render(scene, camera);
+      return; // pose fija, sin animación
+    }
+
+    /* respuesta al scroll: al salir del hero gira más rápido,
+       se aleja y se desvanece en vez de cortar en seco */
+    var heroProgress = 0;
+    addScrollTask(function () {
+      var r = host.getBoundingClientRect();
+      heroProgress = clamp01((-r.top + 40) / (window.innerHeight * 0.85));
+    });
+
+    var rafId = 0, visible = true, t = 0;
+
+    function frame() {
+      t += 0.006;
+
+      if (free) {
+        // inercia: el objeto sigue solo y frena de a poco
+        aimX += velX * 0.02; aimY += velY * 0.02;
+        velX *= 0.94; velY *= 0.94;
+        if (Math.abs(velX) < 0.0004 && Math.abs(velY) < 0.0004) {
+          aimX = lerp(aimX, 0, 0.03);
+          aimY = lerp(aimY, 0, 0.03);
+        }
+      }
+      curX = lerp(curX, aimX, 0.06);
+      curY = lerp(curY, aimY, 0.06);
+
+      var spin = heroProgress * 2.6;                 // giro extra al scrollear
+      group.rotation.y = -0.45 + Math.sin(t) * 0.4 + curY + spin;
+      group.rotation.x = -0.1 + Math.cos(t * 0.75) * 0.1 + curX;
+      group.position.y = Math.sin(t * 1.15) * 2 - heroProgress * 26;
+      group.scale.setScalar(1 - heroProgress * 0.18);
+      material.opacity = 1;
+      camera.position.z = baseZ * (1 + heroProgress * 0.35);
+
+      if (dots) { dots.rotation.y += 0.0006; dots.rotation.x = curX * 0.15; }
+
+      renderer.render(scene, camera);
+      rafId = window.requestAnimationFrame(frame);
+    }
+    frame();
+
+    function pause() { if (visible) { visible = false; window.cancelAnimationFrame(rafId); } }
+    function resume() { if (!visible && !document.hidden) { visible = true; frame(); } }
+
+    // se detiene fuera de pantalla y con la pestaña oculta
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (entries) {
+        entries[0].isIntersecting ? resume() : pause();
+      }, { threshold: 0 }).observe(host);
+    }
+    document.addEventListener("visibilitychange", function () {
+      document.hidden ? pause() : resume();
+    });
+  }
+
+  build3DMark();
+})();
+</script>
+<!--PAGE-END-->
+</body>
+</html>
