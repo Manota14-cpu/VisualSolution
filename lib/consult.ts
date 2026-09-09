@@ -19,3 +19,23 @@ export function onAskAbout(fn: (projectTitle: string) => void) {
   window.addEventListener(EVENT, handler);
   return () => window.removeEventListener(EVENT, handler);
 }
+
+/* ------------------------------------------------------------
+   Lo que se armó en el hero viaja al formulario por el mismo
+   mecanismo: un evento, no un contexto que envuelva la página
+   entera para un dato que se usa una vez.
+   ------------------------------------------------------------ */
+
+const SERVICES = "vs:servicios";
+
+export type PickedService = { label: string; formValue: string };
+
+export function askForServices(services: PickedService[]) {
+  window.dispatchEvent(new CustomEvent<PickedService[]>(SERVICES, { detail: services }));
+}
+
+export function onAskForServices(fn: (services: PickedService[]) => void) {
+  const handler = (e: Event) => fn((e as CustomEvent<PickedService[]>).detail);
+  window.addEventListener(SERVICES, handler);
+  return () => window.removeEventListener(SERVICES, handler);
+}

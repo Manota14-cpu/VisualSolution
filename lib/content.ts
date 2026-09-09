@@ -36,6 +36,23 @@ export const hero = {
   meta: ["Sitios y tiendas", "Video y fotografía", "Identidad y automatización"],
 } as const;
 
+
+/* ============================================================
+   EL CONFIGURADOR DEL HERO
+   Las fichas que se arrastran dentro del logo. formValue es el
+   valor que recibe el <select> del formulario cuando se elige una
+   sola; con dos o mas pasa a 'Varias cosas a la vez'.
+   ============================================================ */
+export type HeroService = { id: string; code: string; label: string; formValue: string };
+
+export const heroServices: HeroService[] = [
+  { id: 'web', code: 'WEB', label: 'Sitio web', formValue: 'Sitio web' },
+  { id: 'shop', code: 'SHP', label: 'Tienda online', formValue: 'Tienda online' },
+  { id: 'video', code: 'VID', label: 'Video y foto', formValue: 'Contenido audiovisual' },
+  { id: 'brand', code: 'IDV', label: 'Identidad', formValue: 'Identidad visual' },
+  { id: 'auto', code: 'AUT', label: 'Automatización', formValue: 'Varias cosas a la vez' },
+];
+
 export const capabilities = [
   "Sitios a medida",
   "Tiendas online",

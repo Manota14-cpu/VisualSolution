@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Reveal, SplitHeading } from "@/components/motion/Reveal";
 import { useMotionEnv } from "@/lib/motion";
-import { onAskAbout } from "@/lib/consult";
+import { onAskAbout, onAskForServices } from "@/lib/consult";
 import { serviceOptions, site } from "@/lib/content";
 
 type Fields = { nombre: string; email: string; servicio: string; mensaje: string };
@@ -42,6 +42,30 @@ export function Contact() {
           ...v,
           servicio: v.servicio || "Sitio web",
           mensaje: v.mensaje || `Quiero consultar por ${proyecto}. `,
+        }));
+        window.setTimeout(() => {
+          const el = mensajeRef.current;
+          if (!el) return;
+          el.focus({ preventScroll: true });
+          el.setSelectionRange(el.value.length, el.value.length);
+        }, 900);
+      }),
+    []
+  );
+
+  /* Lo armado en el hero llega acá: si eligió uno solo, ese va al
+     desplegable; si eligió varios, la opción combinada. El mensaje se
+     escribe con la lista para que no tenga que repetirla. */
+  useEffect(
+    () =>
+      onAskForServices((servicios) => {
+        if (!servicios.length) return;
+        setSent(null);
+        const lista = servicios.map((s) => s.label).join(" + ");
+        setValues((v) => ({
+          ...v,
+          servicio: servicios.length === 1 ? servicios[0].formValue : "Varias cosas a la vez",
+          mensaje: v.mensaje || `Necesito: ${lista}. `,
         }));
         window.setTimeout(() => {
           const el = mensajeRef.current;
