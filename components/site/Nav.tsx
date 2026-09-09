@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Mark } from "@/components/brand/Mark";
 import { lockScroll } from "@/components/motion/MotionProvider";
 import { useMotionEnv } from "@/lib/motion";
@@ -12,7 +12,26 @@ export function Nav() {
   const [pop, setPop] = useState(false);
   const popped = useRef(false);
   const sentinel = useRef<HTMLDivElement>(null);
+  const links = useRef<HTMLElement>(null);
   const { reduce } = useMotionEnv();
+
+  /* Los seis enlaces comparten una sola luz, que se desliza hasta el
+     que tiene el cursor o el foco. Se escribe la posición y el ancho
+     como custom properties del contenedor: un render por hover para
+     mover una píldora no tiene sentido. */
+  const iluminar = useCallback((el: HTMLElement | null) => {
+    const nav = links.current;
+    if (!nav) return;
+    if (!el) {
+      nav.classList.remove("on");
+      return;
+    }
+    const base = nav.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    nav.style.setProperty("--nx", `${r.left - base.left}px`);
+    nav.style.setProperty("--nw", `${r.width}px`);
+    nav.classList.add("on");
+  }, []);
 
   /* Centinela más IntersectionObserver, sin listener de scroll. */
   useEffect(() => {
@@ -67,12 +86,23 @@ export function Nav() {
           </span>
         </a>
 
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Principal">
+        <nav
+          ref={links as React.RefObject<HTMLElement>}
+          className="nav-links hidden items-center gap-1 lg:flex"
+          aria-label="Principal"
+          onPointerLeave={() => iluminar(null)}
+          onBlur={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget as Node)) iluminar(null);
+          }}
+        >
+          <i className="nav-glow" aria-hidden="true" />
           {nav.map((item) => (
             <a
               key={item.href}
               className="nav-link"
               href={item.href}
+              onPointerEnter={(e) => iluminar(e.currentTarget)}
+              onFocus={(e) => iluminar(e.currentTarget)}
             >
               {item.label}
             </a>

@@ -199,20 +199,58 @@ El movimiento acompaña, no protagoniza: el sistema es plano y editorial.
   etiqueta del botón. El clic seco hace lo mismo que el arrastre.
 - Si nadie toca nada, el afiche se lee igual.
 
+**La tesis: la luz sube desde abajo del negro**
+
+`DESIGN.md` dice que cada elemento magenta o violeta se lee como luz que sube
+desde abajo de la superficie. Eso es todo el movimiento del sitio: **nada se
+desliza, las cosas se encienden**. Una sola idea material, con un momento
+protagonista y el resto en voz baja.
+
+- **El momento** es la llegada del hero. El bloque arranca negro y la luz sube
+  por debajo (`@keyframes subir`, un `clip-path` que se abre desde el borde de
+  abajo); cuando termina se encienden los puntos de la trama. Después cada
+  línea del reclamo entra desde abajo de su propia ventana, arrastrada por un
+  filo de magenta que sube con ella y se apaga arriba.
+- **La trama está viva.** Deriva un mosaico completo cada veintiséis segundos:
+  no se ve moverse, se ve viva. Se frena sola al salir de pantalla.
+- **La luz sigue al puntero.** Sobre la escena de las manos, un disco arrastra
+  más puntos y más brillo. La máscara viaja con el disco, así que moverlo es
+  una transformación y no repinta. Son dos custom properties, no estado.
+
 **Por sección**
 
-- Marquesina de carbón a sangre, cerrada por divisores punteados.
-- Servicios: una sola tarjeta violeta con la trama encima, el resto en carbón.
-- Trabajos: barrido de revelado, filtros por tipo con `View Transitions` y
-  visor de caso con foco atrapado y cierre con `Esc`.
-- Proceso: línea vertical que se dibuja en magenta con el scroll.
-- Preguntas: acordeón, con la fila abierta sobre carbón.
-- Contacto: etiquetas flotantes y botón que muta a un tilde dibujado.
+- Nav: los seis enlaces comparten una sola píldora de luz que se desliza hasta
+  el que tiene el cursor o el foco. Hace legible que son un grupo.
+- Cabeceras: una barra corta de magenta que se dibuja sola al entrar. El mismo
+  material que el filo del hero, en voz baja.
+- Marquesina: se frena si alguien quiere leerla, y cada capacidad se enciende.
+- Servicios: la tarjeta violeta respira su propia trama; las de carbón sangran
+  luz violeta desde el borde de abajo al pasar el cursor. Es luz, no sombra:
+  vive adentro de la tarjeta. El monograma suelta un anillo al entrar.
+- Trabajos: la trama del sistema florece sobre la foto en `mix-blend-mode:
+  screen`, el título se subraya solo y la foto se acerca apenas. Filtros por
+  tipo con `View Transitions` y visor de caso con foco atrapado y `Esc`.
+- Proceso: la línea se dibuja en magenta y termina siempre sobre un número; el
+  que alcanza suelta el mismo anillo que el monograma.
+- Preguntas: la pregunta se corre, el chevrón se enciende y la respuesta sube
+  apenas después de abrirse la fila.
+- Contacto: etiquetas flotantes, el campo enfocado se enciende desde abajo y el
+  botón muta a un tilde dibujado.
+- Botones: una luz cruza el relleno magenta; en el secundario el contorno se
+  enciende antes de que llegue el relleno.
+- Pie: los enlaces se subrayan desde el lado por el que entra el cursor.
 - Volver arriba: el símbolo gira 360° mientras la página sube.
+
+El sangrado de luz de una superficie se anima con `--luz`, declarada con
+`@property`: una custom property sin registrar no interpola.
 
 **Reglas que respeta todo lo anterior**
 
-- Con `prefers-reduced-motion: reduce` se apaga entero, no se hace más lento.
+- Con `prefers-reduced-motion: reduce` hay **menos movimiento y más suave**, no
+  la ausencia de movimiento: apagar todo también apaga la señal de que algo
+  pasó. Se van los bucles y los desplazamientos en el espacio; se quedan el
+  color, la opacidad y los cambios de estado, que son los que confirman una
+  acción.
 - Un solo bucle de `requestAnimationFrame` en `lib/motion.ts` para todo lo
   continuo, que se detiene con la pestaña oculta.
 - El hero es SVG y CSS: no hay WebGL, no hay canvas y no hay nada que pueda

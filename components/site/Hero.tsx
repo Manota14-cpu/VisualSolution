@@ -120,7 +120,7 @@ export function Hero() {
         <div className="relative mx-auto w-full max-w-[1040px]">
           <div ref={stage} className={`stage relative ${over ? "is-over" : ""}`}>
             <Hands
-              className="halftone animate-rise aspect-[6/5] w-full md:aspect-[15/7]"
+              className="halftone aspect-[6/5] w-full md:aspect-[15/7]"
               services={taken}
             />
           </div>
@@ -160,10 +160,17 @@ export function Hero() {
           <span className="md:hidden">Tocá lo que necesitás</span>
         </p>
 
-        <h1 className="display display-xl animate-rise mt-6 text-center" style={{ animationDelay: ".1s" }}>
+        {/* El momento del sitio: cada línea la descubre un filo de luz
+            que sube con ella. El texto está entero en el DOM desde el
+            servidor, así que se lee igual si el CSS no llega. */}
+        <h1 className="display display-xl mt-6 text-center">
           {hero.claim.map((linea, i) => (
-            <span key={linea} className="block">
-              {linea}
+            <span
+              key={linea}
+              className="claim-line"
+              style={{ ["--d" as string]: `${480 + i * 130}ms` } as React.CSSProperties}
+            >
+              <i>{linea}</i>
             </span>
           ))}
         </h1>
@@ -223,7 +230,7 @@ export function Marquee() {
     <div className="row" aria-hidden={hidden || undefined}>
       {capabilities.map((cap) => (
         <span key={cap}>
-          {cap}
+          <span className="mq-word">{cap}</span>
           <span className="sep" aria-hidden="true"> ✦ </span>
         </span>
       ))}

@@ -67,7 +67,7 @@ export function Footer() {
                   return (
                     <a
                       key={l.href}
-                      className="text-sm text-chalk/70 transition-colors duration-200 hover:text-chalk"
+                      className="foot-link text-sm text-chalk/70 transition-colors duration-200 hover:text-chalk"
                       href={l.href}
                       {...(external ? { target: "_blank", rel: "noopener" } : {})}
                     >

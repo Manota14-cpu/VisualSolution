@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/* El sangrado de luz de una superficie, de 0 a 1. Registrarlo es lo que
+   permite animarlo: una custom property sin @property no interpola. */
+@property --luz {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
 /* ==========================================================
    TOKENS — CALDERA
    Neón prensado contra obsidiana. El lienzo es negro total y
@@ -50,6 +58,11 @@
 @keyframes load { from { transform: translateX(-100%); } to { transform: translateX(300%); } }
 @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes draw { to { stroke-dashoffset: 0; } }
+/* un anillo que se abre y se apaga: la pieza se enciende, no aparece */
+@keyframes anillo {
+  from { outline-color: rgb(236 72 153 / .55); outline-offset: 0; }
+  to   { outline-color: rgb(236 72 153 / 0);   outline-offset: 15px; }
+}
 @keyframes fill-in { to { fill-opacity: 1; } }
 
 html { background: var(--color-onyx); color-scheme: dark; }
@@ -72,11 +85,45 @@ body {
    firma visual del sistema y va siempre a escala de hero.
    ========================================================== */
 .halftone {
-  background-color: var(--color-violet);
-  background-image:
-    radial-gradient(circle at center, var(--color-magenta) 1.7px, transparent 1.8px),
-    linear-gradient(42deg, var(--color-violet) 6%, var(--color-magenta) 94%);
-  background-size: 11px 11px, 100% 100%;
+  position: relative;
+  isolation: isolate;
+  background-color: var(--color-onyx);
+}
+
+/* La luz. Sube desde el borde de abajo al entrar: la superficie
+   arranca negra y se enciende, no aparece con un fundido. */
+.halftone::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image: linear-gradient(42deg, var(--color-violet) 6%, var(--color-magenta) 94%);
+  animation: subir 1.15s cubic-bezier(.16,1,.3,1) .1s both;
+}
+@keyframes subir {
+  from { clip-path: inset(100% 0 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
+/* Los puntos. Derivan un solo mosaico cada veintiséis segundos: no se
+   ve moverse, se ve vivo. Se frenan al salir de pantalla. */
+.halftone::after {
+  content: "";
+  position: absolute;
+  inset: -14px;
+  z-index: -1;
+  background-image: radial-gradient(circle at center, var(--color-magenta) 1.7px, transparent 1.8px);
+  background-size: 11px 11px;
+  animation: deriva 26s linear infinite;
+  animation-play-state: paused;
+  opacity: 0;
+  transition: opacity .7s ease .45s;
+}
+.halftone.is-live::after { animation-play-state: running; }
+.halftone.is-lit::after  { opacity: 1; }
+@keyframes deriva {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(11px, 11px, 0); }
 }
 
 /* ==========================================================
@@ -95,6 +142,51 @@ body {
   color: var(--color-chalk);
 }
 .display-xl { font-size: clamp(56px, 13.5vw, 189px); line-height: 0.94; }  /* la firma del hero */
+
+/* El momento del sitio. Cada línea del reclamo entra desde abajo de su
+   propia ventana, y la arrastra un filo de magenta que sube con ella y
+   se apaga arriba. No es un fundido: es la luz descubriendo el texto. */
+.claim-line { display: block; position: relative; overflow: hidden; }
+.claim-line > i {
+  display: block;
+  font-style: normal;
+  animation: linea-sube .95s cubic-bezier(.16,1,.3,1) var(--d, 0ms) both;
+}
+.claim-line::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 3px;
+  background: var(--color-magenta);
+  animation: linea-filo .95s cubic-bezier(.16,1,.3,1) var(--d, 0ms) both;
+}
+@keyframes linea-sube {
+  from { transform: translateY(104%); }
+  to   { transform: none; }
+}
+@keyframes linea-filo {
+  0%   { transform: translateY(0);     opacity: 1; }
+  72%  { transform: translateY(-100%); opacity: 1; }
+  100% { transform: translateY(-100%); opacity: 0; }
+}
+
+/* La cabecera de sección se marca con una barra corta que se dibuja
+   sola. Es el mismo material que el filo del hero, en voz baja: el
+   reclamo es el único que se lleva la escena completa. */
+.display-md { position: relative; }
+.display-md::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -.28em;
+  width: 72px;
+  height: 2px;
+  background: var(--color-magenta);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform .7s cubic-bezier(.16,1,.3,1) .2s;
+}
+.display-md.in::after { transform: scaleX(1); }
 .display-lg { font-size: clamp(44px, 7.5vw, 96px);  line-height: 0.95; }
 .display-md { font-size: clamp(32px, 3.6vw, 48px);  line-height: 1; }
 .display-sm { font-size: clamp(26px, 2.4vw, 32px);  line-height: 1; letter-spacing: 0.64px; }
@@ -143,8 +235,19 @@ body {
   .btn:active { transform: translateY(1px); }
   .btn-sm { padding: 9px 18px; font-size: 14px; }
 
-  .btn-solid { background: var(--color-magenta); color: var(--color-obsidian); }
+  .btn-solid { background: var(--color-magenta); color: var(--color-obsidian); overflow: hidden; }
   .btn-solid:hover { background: #f261a9; }
+  /* una luz cruza el relleno al pasar el cursor */
+  .btn-solid::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(100deg, transparent 34%, rgb(255 255 255 / .5) 50%, transparent 66%);
+    transform: translateX(-115%);
+    transition: transform .6s cubic-bezier(.16,1,.3,1);
+  }
+  .btn-solid:hover::after { transform: translateX(115%); }
 
   .btn-ghost {
     background: transparent;
@@ -153,7 +256,8 @@ body {
     border-radius: var(--radius-cards);
     padding: 16px 24px;
   }
-  .btn-ghost:hover { background: var(--color-chalk); color: var(--color-obsidian); }
+  .btn-ghost { transition: background-color .3s .1s, color .3s .1s, border-color .16s, transform .18s; }
+  .btn-ghost:hover { background: var(--color-chalk); color: var(--color-obsidian); border-color: var(--color-magenta); }
   .btn-ghost.btn-sm { padding: 11px 18px; }
 
   /* El rombo de marca. Sobre el relleno magenta va en obsidiana;
@@ -187,7 +291,9 @@ body {
     color: var(--color-obsidian);
   }
 
+  .token.pulsed { animation: anillo .85s cubic-bezier(.16,1,.3,1) .25s; }
   .token {
+    outline: 1.5px solid transparent;
     display: grid; place-items: center;
     width: 46px; height: 46px; flex: none;
     border-radius: var(--radius-pills);
@@ -203,17 +309,41 @@ body {
     display: flex; flex-direction: column;
     overflow: hidden;
     border-radius: var(--radius-cards);
-    background: var(--color-carbon);
-    transition: transform .25s cubic-bezier(.16,1,.3,1), background-color .25s;
+    background-color: var(--color-carbon);
+    /* la luz violeta sangra desde el borde de abajo al pasar el cursor.
+       Es luz, no sombra: vive adentro de la tarjeta, y el sistema
+       reserva el violeta justamente para esto. */
+    background-image: radial-gradient(124% 92% at 50% 122%, rgb(139 92 246 / var(--luz)), transparent 64%);
+    transition:
+      transform .25s cubic-bezier(.16,1,.3,1),
+      background-color .25s,
+      --luz .45s ease;
   }
-  .card:hover { transform: translateY(-4px); }
+  .card:hover,
+  .card:focus-within { transform: translateY(-4px); --luz: .55; }
 
   /* La única superficie violeta del sitio, con la trama encima. */
   .violet-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
     background-color: var(--color-violet);
+    color: var(--color-obsidian);
+    transition: transform .25s cubic-bezier(.16,1,.3,1);
+  }
+  .violet-card::before {
+    content: "";
+    position: absolute;
+    inset: -12px;
+    z-index: -1;
     background-image: radial-gradient(circle at center, rgb(255 255 255 / .32) 1.6px, transparent 1.7px);
     background-size: 10px 10px;
-    color: var(--color-obsidian);
+    animation: deriva-lenta 34s linear infinite;
+  }
+  .violet-card:hover { transform: translateY(-4px); }
+  @keyframes deriva-lenta {
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(10px, -10px, 0); }
   }
   .violet-card h3,
   .violet-card p,
@@ -238,7 +368,11 @@ body {
     transition: border-color .2s;
   }
   .field-input::placeholder { color: rgb(255 255 255 / .5); }
-  .field-input:focus { border-color: var(--color-magenta); }
+  .field-input {
+    background-image: radial-gradient(120% 150% at 50% 132%, rgb(139 92 246 / var(--luz)), transparent 66%);
+    transition: border-color .2s, --luz .4s ease;
+  }
+  .field-input:focus { border-color: var(--color-magenta); --luz: .3; }
   .has-error .field-input { border-color: var(--color-magenta); }
   /* el desplegable pinta su lista con los colores del sistema */
   select.field-input option { background: var(--color-carbon); color: var(--color-chalk); }
@@ -273,7 +407,7 @@ body {
     color: var(--color-chalk); background: transparent; cursor: pointer;
     transition: background-color .2s, color .2s, border-color .2s;
   }
-  .pill:hover { border-color: var(--color-chalk); }
+  .pill:hover { border-color: var(--color-chalk); color: var(--color-magenta); }
   .pill[aria-pressed="true"] {
     background: var(--color-magenta);
     border-color: var(--color-magenta);
@@ -297,6 +431,34 @@ body {
   border-radius: var(--radius-cards);
 }
 .hands svg { display: block; width: 100%; height: 100%; }
+
+/* El puntero arrastra un disco de luz por debajo de las manos, y donde
+   pasa la trama se abre y deja ver más puntos. La máscara viaja con el
+   disco, así que moverlo es una transformación y no repinta nada. */
+.hands .luz {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.hands .luz > i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 440px;
+  height: 440px;
+  margin: -220px 0 0 -220px;
+  background:
+    radial-gradient(circle at center, rgb(255 255 255 / .55) 2px, transparent 2.1px) 0 0 / 11px 11px,
+    radial-gradient(circle at center, rgb(255 255 255 / .16), transparent 68%);
+  -webkit-mask-image: radial-gradient(circle at center, #000 6%, transparent 66%);
+  mask-image: radial-gradient(circle at center, #000 6%, transparent 66%);
+  transform: translate3d(var(--lx, -400px), var(--ly, -400px), 0);
+  opacity: 0;
+  transition: opacity .4s ease, transform .14s linear;
+}
+.hands.is-near .luz > i { opacity: 1; }
 
 /* Primera pasada: relleno y trazo del mismo color, que al pisarse
    dejan una silueta sin costuras. Segunda pasada: el mismo dibujo
@@ -448,6 +610,27 @@ body {
   padding-inline: 20px;
 }
 .marquee-band .sep { color: var(--color-magenta); padding-inline: 0; }
+/* la cinta se frena si alguien quiere leerla */
+.marquee-band:hover .animate-marquee { animation-play-state: paused; }
+.mq-word { transition: color .2s ease; }
+.mq-word:hover { color: var(--color-magenta); }
+
+/* ==========================================================
+   EL PIE
+   ========================================================== */
+.foot-link { position: relative; display: inline-block; }
+.foot-link::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -3px;
+  height: 1.5px;
+  background: var(--color-magenta);
+  transform: scaleX(0);
+  transform-origin: 100% 50%;
+  transition: transform .35s cubic-bezier(.16,1,.3,1);
+}
+.foot-link:hover::after,
+.foot-link:focus-visible::after { transform: scaleX(1); transform-origin: 0 50%; }
 
 .fade-x {
   mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
@@ -463,14 +646,40 @@ body {
   border-radius: var(--radius-pills);
   background: var(--color-carbon);
 }
+/* Una sola luz para los seis enlaces: la píldora magenta se desliza
+   hasta el que tiene el cursor. Hace legible la relación entre ellos —
+   son un grupo, no seis botones sueltos. */
+.nav-links { position: relative; }
+.nav-glow {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  z-index: 0;
+  height: 34px;
+  margin-top: -17px;
+  width: var(--nw, 0px);
+  border-radius: var(--radius-pills);
+  background: var(--color-magenta);
+  transform: translateX(var(--nx, 0px));
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform .34s cubic-bezier(.16,1,.3,1),
+    width .34s cubic-bezier(.16,1,.3,1),
+    opacity .2s ease;
+}
+.nav-links.on .nav-glow { opacity: 1; }
 .nav-link {
+  position: relative;
+  z-index: 1;
   border-radius: var(--radius-pills);
   padding: 0 12px;
   font-size: 16px; font-weight: 500;
   color: var(--color-chalk);
-  transition: color .2s;
+  transition: color .22s ease;
 }
-.nav-link:hover { color: var(--color-magenta); }
+.nav-link:hover,
+.nav-link:focus-visible { color: var(--color-obsidian); }
 
 /* ==========================================================
    PROCESO Y PREGUNTAS
@@ -505,10 +714,23 @@ body {
   background: var(--color-magenta);
   border-color: var(--color-magenta);
   color: var(--color-obsidian);
+  outline: 1.5px solid transparent;
+  animation: anillo .85s cubic-bezier(.16,1,.3,1);
 }
 
 .faq-row { border-bottom: 1.5px dotted rgb(255 255 255 / .25); transition: background-color .25s; }
 .faq-row.is-open { background: var(--color-carbon); }
+.faq-row:hover { background: rgb(24 21 30 / .55); }
+.faq-row .q { display: inline-block; transition: transform .3s cubic-bezier(.16,1,.3,1); }
+.faq-row:hover .q { transform: translateX(6px); }
+.faq-row:hover .chev { border-color: var(--color-magenta); color: var(--color-magenta); }
+/* la respuesta no aparece de golpe con la fila: sube apenas después */
+.answer p {
+  transform: translateY(-10px);
+  opacity: 0;
+  transition: transform .42s cubic-bezier(.16,1,.3,1) .05s, opacity .3s ease .05s;
+}
+.faq-row.is-open .answer p { transform: none; opacity: 1; }
 .chev {
   border: 1.5px solid rgb(255 255 255 / .3);
   border-radius: var(--radius-pills);
@@ -552,7 +774,44 @@ body {
 .case-back:hover { background: var(--color-chalk); color: var(--color-obsidian); }
 .case-back svg { transition: transform .25s cubic-bezier(.16,1,.3,1); }
 .case-back:hover svg { transform: translateX(-2px); }
-.work-detail { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.work-detail {
+  font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+  transition: color .25s, transform .35s cubic-bezier(.16,1,.3,1);
+}
+
+/* Al pasar por una ficha, la trama del sistema florece sobre la foto y
+   el título se subraya solo. La foto se acerca apenas: es la única
+   pieza del sitio que tiene profundidad real, y se nota. */
+.work .shot img { transition: transform .7s cubic-bezier(.16,1,.3,1); }
+.work .shot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, var(--color-magenta) 2px, transparent 2.1px) 0 0 / 11px 11px;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity .45s ease;
+}
+.work h3 { position: relative; display: inline-block; }
+.work h3::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -5px;
+  height: 1.5px;
+  background: var(--color-magenta);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform .45s cubic-bezier(.16,1,.3,1);
+}
+.work:hover .shot img,
+.work:focus-within .shot img { transform: scale(1.05); }
+.work:hover .shot::after,
+.work:focus-within .shot::after { opacity: .8; }
+.work:hover h3::after,
+.work:focus-within h3::after { transform: scaleX(1); }
+.work:hover .work-detail,
+.work:focus-within .work-detail { color: var(--color-magenta); transform: translateX(5px); }
 .work-open { display: block; width: 100%; border-radius: var(--radius-cards); }
 .work-open:focus-visible { outline: 2px solid var(--color-magenta); outline-offset: 4px; }
 }
@@ -640,12 +899,46 @@ input, textarea, select { caret-color: var(--color-magenta); }
 ::selection { background: var(--color-magenta); color: var(--color-obsidian); }
 :focus-visible { outline: 2px solid var(--color-magenta); outline-offset: 3px; border-radius: 4px; }
 
+/* ==========================================================
+   MOVIMIENTO REDUCIDO
+   Menos movimiento y más suave, no la ausencia de movimiento: si se
+   apaga todo, también se apaga la señal de que algo pasó. Se van los
+   bucles y los desplazamientos en el espacio; se quedan el color, la
+   opacidad y los cambios de estado, que son los que confirman una
+   acción.
+   ========================================================== */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .hands.is-linked .chispa { animation: none; }
+
+  /* los bucles, apagados */
+  .halftone::after,
+  .violet-card::before,
+  .animate-marquee,
+  .hands.is-linked .chispa,
+  .step-token.on,
+  .token.pulsed { animation: none; }
+
+  /* las entradas siguen apareciendo, pero sin viajar */
+  .rv { transform: none; }
+  .w > i { transform: none; }
+  .wipe { clip-path: none; }
+  .halftone::before { animation: none; }
+  .claim-line > i { animation: none; }
+  .claim-line::after { animation: none; opacity: 0; }
+  .display-md::after { transform: scaleX(1); }
+
+  /* los hovers pierden el desplazamiento y conservan el color */
+  .card:hover, .card:focus-within,
+  .violet-card:hover,
+  .chip:hover,
+  .faq-row:hover .q,
+  .work:hover .shot img, .work:focus-within .shot img,
+  .work:hover .work-detail, .work:focus-within .work-detail { transform: none; }
+  .btn-solid::after { display: none; }
+
   *, *::before, *::after {
-    animation-duration: .001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .001ms !important;
+    animation-duration: .001ms;
+    animation-iteration-count: 1;
+    transition-duration: .14s;
   }
 }

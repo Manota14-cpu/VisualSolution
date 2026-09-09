@@ -131,6 +131,28 @@ export function Hands({ className, services = [] }: { className?: string; servic
   const box = useRef<HTMLDivElement>(null);
   const { reduce, fine } = useMotionEnv();
 
+  /* La deriva de la trama y la luz sólo corren mientras la escena está
+     en pantalla: un bucle que nadie ve es batería tirada. is-lit espera
+     a que la luz termine de subir para encender los puntos. */
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const t = window.setTimeout(() => el.classList.add("is-lit"), 900);
+    if (!("IntersectionObserver" in window)) {
+      el.classList.add("is-live");
+      return () => window.clearTimeout(t);
+    }
+    const io = new IntersectionObserver(
+      ([e]) => el.classList.toggle("is-live", e.isIntersecting),
+      { threshold: 0 }
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      window.clearTimeout(t);
+    };
+  }, []);
+
   /* Cuánto se acercan las manos. Lo lleva una custom property y no el
      estado de React: son decenas de eventos por segundo y ninguno
      tiene por qué provocar un render. */
@@ -153,8 +175,22 @@ export function Hands({ className, services = [] }: { className?: string; servic
       const cy = r.top + r.height * 0.38;
       const d = Math.hypot(e.clientX - cx, e.clientY - cy);
       acercar(Math.max(0, Math.min(1, 1 - d / (r.width * 0.62))));
+
+      /* El disco de luz sigue al puntero mientras esté sobre la escena.
+         Son dos custom properties, no estado: a treinta eventos por
+         segundo, un render de React por cada uno sería absurdo. */
+      const dentro =
+        e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      el.classList.toggle("is-near", dentro);
+      if (dentro) {
+        el.style.setProperty("--lx", `${(e.clientX - r.left).toFixed(1)}px`);
+        el.style.setProperty("--ly", `${(e.clientY - r.top).toFixed(1)}px`);
+      }
     };
-    const salir = () => acercar(0);
+    const salir = () => {
+      acercar(0);
+      el.classList.remove("is-near");
+    };
     window.addEventListener("pointermove", move, { passive: true });
     window.addEventListener("pointerleave", salir);
     return () => {
@@ -167,6 +203,9 @@ export function Hands({ className, services = [] }: { className?: string; servic
 
   return (
     <div ref={box} className={`hands ${tomados.length ? "is-linked" : ""} ${className ?? ""}`}>
+      <span className="luz" aria-hidden="true">
+        <i />
+      </span>
       <svg viewBox="0 58 1200 560" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
         {/* ---- la máquina ---- */}
         <g className="hand hand-robot">

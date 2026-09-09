@@ -36,7 +36,7 @@ export function Faq() {
                     aria-controls={`faq-${i}`}
                     onClick={() => setOpen(isOpen ? null : i)}
                   >
-                    <span>{item.q}</span>
+                    <span className="q">{item.q}</span>
                     <span
                       className="chev grid size-6 shrink-0 place-items-center rounded-pills border border-chalk/20 text-chalk/70"
                       aria-hidden="true"
