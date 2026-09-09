@@ -66,7 +66,7 @@ function Token({ text, className = "" }: { text: string; className?: string }) {
 function Shot({ src, alt }: { src: string; alt: string }) {
   const ref = useReveal<HTMLDivElement>();
   return (
-    <div ref={ref} className="shot wipe relative aspect-video border-b border-hairline">
+    <div ref={ref} className="shot wipe relative aspect-video border-b border-carbon">
       <Image src={src} alt={alt} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
     </div>
   );
@@ -81,7 +81,7 @@ function PlainCard({ service }: { service: Service }) {
       {service.image && <Shot src={service.image.src} alt={service.image.alt} />}
       {service.token && <Token text={service.token} />}
       <div className={`flex flex-col gap-2 ${service.image ? "flex-1 p-6" : ""}`}>
-        <h3 className="text-xl font-medium leading-snug tracking-[.2px] text-white">{service.title}</h3>
+        <h3 className="text-xl font-bold leading-snug text-carbon">{service.title}</h3>
         <p className="text-base leading-relaxed text-ash">{service.body}</p>
         {service.tags && (
           <ul className="mt-auto flex flex-wrap gap-2 pt-4">
@@ -97,38 +97,23 @@ function PlainCard({ service }: { service: Service }) {
   );
 }
 
-/* La tarjeta destacada: única superficie teñida, con borde cónico
-   giratorio y un brillo diagonal al pasar el cursor. */
+/* La tarjeta destacada: no se distingue por brillar sino por estar
+   apoyada torcida sobre las demas, tenida y con el sello amarillo.
+   El borde conico giratorio, el brillo diagonal y los degradados de
+   esquina se fueron: pertenecian al mundo oscuro. */
 function FeaturedCard({ service }: { service: Service }) {
   return (
-    <Reveal className={`relative overflow-hidden rounded-cardlg p-px ${service.span}`}>
-      <span
-        className="animate-spin-slow absolute inset-[-140%]"
-        aria-hidden="true"
-        style={{
-          background:
-            "conic-gradient(from 0deg, transparent 0 58%, #8B5CF6 70%, #EC4899 82%, transparent 90% 100%)",
-        }}
-      />
-      <article className="glare relative flex h-full flex-col gap-4 overflow-hidden rounded-[19px] bg-tint p-6">
-        <span className="glare-sheen" aria-hidden="true" />
-        <div
-          className="pointer-events-none absolute inset-0"
-          aria-hidden="true"
-          style={{
-            background:
-              "radial-gradient(120% 90% at 88% 4%, rgba(236,72,153,.28), transparent 62%),radial-gradient(110% 90% at 4% 100%, rgba(139,92,246,.24), transparent 60%)",
-          }}
-        />
-        {service.token && <Token text={service.token} className="relative bg-black/30 text-[#f0d6e1]" />}
-        <div className="relative flex flex-col gap-2">
-          <h3 className="text-xl font-medium leading-snug tracking-[.2px] text-white">{service.title}</h3>
-          <p className="text-base leading-relaxed text-[#e5d0d9]">{service.body}</p>
+    <Reveal className={service.span}>
+      <article className="sticker-card flex h-full flex-col gap-4 rounded-cardlg border border-carbon bg-tint p-6">
+        {service.token && <Token text={service.token} className="bg-sun text-carbon" />}
+        <div className="flex flex-col gap-2">
+          <h3 className="text-xl font-bold leading-snug text-carbon">{service.title}</h3>
+          <p className="text-base leading-relaxed text-ash">{service.body}</p>
         </div>
         {service.tags && (
-          <ul className="relative mt-auto flex flex-wrap gap-2 pt-4">
+          <ul className="mt-auto flex flex-wrap gap-2 pt-4">
             {service.tags.map((t) => (
-              <li key={t} className="badge bg-black/30">
+              <li key={t} className="badge bg-sun">
                 {t}
               </li>
             ))}
@@ -141,12 +126,12 @@ function FeaturedCard({ service }: { service: Service }) {
 
 export function Services() {
   return (
-    <section className="py-20 md:py-28" id="servicios">
+    <section className="bg-card border-y border-carbon py-20 md:py-28" id="servicios">
       <div className="mx-auto w-full max-w-[1200px] px-4 md:px-10">
         <Reveal className="mb-10 max-w-[44ch] md:mb-14">
           <SplitHeading
             text="Todo lo que tu marca necesita para verse y funcionar bien."
-            className="text-[clamp(26px,3.4vw,32px)] font-normal leading-tight tracking-[.2px] text-white"
+            className="display display-md"
           />
           <p className="mt-4 max-w-[62ch] text-base leading-relaxed text-ash">
             Trabajamos las dos mitades del mismo problema: la pieza técnica que sostiene el negocio y el

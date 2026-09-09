@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Geist_Mono } from "next/font/google";
+import { Inter, Anton } from "next/font/google";
 import "./globals.css";
 import { MarkGradient } from "@/components/brand/Mark";
 import { MotionProvider } from "@/components/motion/MotionProvider";
@@ -15,10 +15,13 @@ const inter = Inter({
   display: "swap",
 });
 
-const geistMono = Geist_Mono({
+/* Anton hace de Lateral: un solo peso, ultracondensado y pesado, que
+   es lo que permite el interlineado aplastado sin que las líneas se
+   toquen. Es el sustituto libre más cercano al display del original. */
+const anton = Anton({
   subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-geist-mono",
+  weight: ["400"],
+  variable: "--font-anton",
   display: "swap",
 });
 
@@ -35,12 +38,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#040506",
+  themeColor: "#EAE3FB",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${inter.variable} ${geistMono.variable}`}>
+    <html lang="es" className={`${inter.variable} ${anton.variable}`}>
       <body>
         <MarkGradient />
         <Preloader />
@@ -49,7 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <MotionProvider />
 
         <a
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-btn focus:border focus:border-hairline focus:bg-recessed focus:px-4 focus:py-2 focus:text-[13px] focus:text-white"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-btn focus:border focus:border-carbon focus:bg-recessed focus:px-4 focus:py-2 focus:text-[13px] focus:text-carbon"
           href="#main"
         >
           Ir al contenido

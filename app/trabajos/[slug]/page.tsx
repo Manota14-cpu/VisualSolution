@@ -58,7 +58,7 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
           </Link>
           <Link className="inline-flex items-center gap-2" href="/" aria-label={`${site.name}, inicio`}>
             <Mark className="block h-auto w-[22px]" />
-            <span className="text-[13px] font-medium text-white">
+            <span className="text-[13px] font-medium text-carbon">
               Visual <span className="text-smoke">Solution</span>
             </span>
           </Link>

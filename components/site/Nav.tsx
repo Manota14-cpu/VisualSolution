@@ -56,13 +56,13 @@ export function Nav() {
       />
 
       <header
-        className={`nav-shell fixed inset-x-0 top-4 z-40 mx-auto flex w-[calc(100%-2rem)] max-w-[1200px] items-center justify-between gap-6 rounded-btn border border-hairline bg-card/60 py-2 pl-4 pr-2 backdrop-blur-[48px] backdrop-saturate-150 ${
+        className={`nav-shell fixed inset-x-0 top-4 z-40 mx-auto flex w-[calc(100%-2rem)] max-w-[1200px] items-center justify-between gap-6 rounded-btn border border-carbon bg-card py-2 pl-4 pr-2 ${
           stuck ? "is-stuck" : ""
         }`}
       >
         <a className="inline-flex items-center gap-2" href="#top" aria-label="Visual Solution, inicio">
           <Mark className={`block h-auto w-[26px] ${pop ? "nav-pop" : ""}`} />
-          <span className="text-[13px] font-medium text-white">
+          <span className="text-[13px] font-bold text-carbon">
             Visual <span className="text-smoke">Solution</span>
           </span>
         </a>
@@ -71,7 +71,7 @@ export function Nav() {
           {nav.map((item) => (
             <a
               key={item.href}
-              className="text-[13px] font-medium text-ash transition-colors duration-200 hover:text-white"
+              className="nav-link"
               href={item.href}
             >
               {item.label}
@@ -80,12 +80,12 @@ export function Nav() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <a className="btn btn-solid btn-sm mag hidden md:inline-flex" href="#contacto">
+          <a className="btn btn-solid btn-sm hidden md:inline-flex" href="#contacto">
             <i className="diamond" aria-hidden="true" />
             {hero.primaryCta}
           </a>
           <button
-            className="grid size-9 place-items-center rounded-btn border border-hairline md:hidden"
+            className="grid size-9 place-items-center rounded-btn border border-carbon md:hidden"
             type="button"
             aria-expanded={open}
             aria-controls="menu"
@@ -95,7 +95,7 @@ export function Nav() {
             <svg width="15" height="12" viewBox="0 0 15 12" fill="none" aria-hidden="true">
               <path
                 d="M1 1.5h13"
-                stroke="#e6e6e6"
+                stroke="#000000"
                 strokeWidth="1.2"
                 strokeLinecap="round"
                 style={{
@@ -106,14 +106,14 @@ export function Nav() {
               />
               <path
                 d="M1 6h13"
-                stroke="#e6e6e6"
+                stroke="#000000"
                 strokeWidth="1.2"
                 strokeLinecap="round"
                 style={{ opacity: open ? 0 : 1, transition: "opacity .2s" }}
               />
               <path
                 d="M1 10.5h13"
-                stroke="#e6e6e6"
+                stroke="#000000"
                 strokeWidth="1.2"
                 strokeLinecap="round"
                 style={{
@@ -129,14 +129,14 @@ export function Nav() {
 
       <div
         id="menu"
-        className={`fixed inset-0 z-40 flex-col bg-canvas/95 px-4 pb-10 pt-24 backdrop-blur-xl ${
+        className={`fixed inset-0 z-40 flex-col bg-canvas px-4 pb-10 pt-24  ${
           open ? "flex" : "hidden"
         }`}
       >
         {nav.map((item) => (
           <a
             key={item.href}
-            className="border-b border-hairline py-4 text-2xl text-white"
+            className="display border-b border-carbon py-4 text-[clamp(34px,12vw,60px)] text-carbon"
             href={item.href}
             onClick={() => setOpen(false)}
           >

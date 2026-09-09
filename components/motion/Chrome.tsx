@@ -70,14 +70,16 @@ export function ScrollProgress() {
     <div className="progress-wrap fixed inset-x-0 top-0 z-50 h-0.5" aria-hidden="true">
       <div
         className="progress h-full w-full"
-        style={{ background: "linear-gradient(102deg,#8B5CF6,#EC4899)" }}
+        style={{ background: "var(--color-violet)" }}
       />
     </div>
   );
 }
 
+/* El grano se fue con el mundo oscuro: acá las superficies son
+   papel plano, sin textura encima. */
 export function Grain() {
-  return <div className="grain pointer-events-none fixed inset-0 z-50 opacity-[.035]" aria-hidden="true" />;
+  return null;
 }
 
 export function BackToTop() {

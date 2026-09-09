@@ -45,11 +45,11 @@ function Facts({ work }: { work: Work }) {
     ];
 
   return (
-    <dl className="grid grid-cols-2 gap-x-8 gap-y-6 border-y border-hairline py-8 md:grid-cols-4">
+    <dl className="grid grid-cols-2 gap-x-8 gap-y-6 border-y border-carbon py-8 md:grid-cols-4">
       {facts.map((f) => (
         <div key={f.label}>
-          <dt className="font-mono text-[11px] uppercase tracking-[.8px] text-smoke">{f.label}</dt>
-          <dd className="mt-2 text-base text-white">{f.value}</dd>
+          <dt className="label text-smoke">{f.label}</dt>
+          <dd className="mt-2 text-base text-carbon">{f.value}</dd>
         </div>
       ))}
     </dl>
@@ -62,7 +62,7 @@ function Chapter({ chapter, index }: { chapter: NonNullable<Work["chapters"]>[nu
   return (
     <section className="grid grid-cols-1 gap-8 py-14 md:grid-cols-[1fr_1.1fr] md:gap-16 md:py-20">
       <div className="md:sticky md:top-24 md:self-start">
-        <h2 className="text-[clamp(22px,2.6vw,30px)] font-normal leading-tight tracking-[.2px] text-white">
+        <h2 className="display display-sm">
           {chapter.title}
         </h2>
         <p className="mt-5 max-w-[58ch] text-base leading-relaxed text-ash">{chapter.body}</p>
@@ -82,7 +82,7 @@ function Chapter({ chapter, index }: { chapter: NonNullable<Work["chapters"]>[nu
         /* Sin imagen el capítulo respira solo: una regla y el número,
            en vez de un hueco o una tarjeta vacía. */
         <div className="hidden items-start justify-end md:flex">
-          <span className="font-mono text-[11px] uppercase tracking-[.8px] text-smoke">
+          <span className="label text-smoke">
             {String(index + 1).padStart(2, "0")}
           </span>
         </div>
@@ -149,7 +149,7 @@ export function CaseProgress({ scroller }: { scroller?: React.RefObject<HTMLElem
         className="h-full origin-left"
         style={{
           transform: `scaleX(${p})`,
-          background: "linear-gradient(90deg,#8B5CF6,#EC4899)",
+          background: "var(--color-violet)",
         }}
       />
     </div>
@@ -175,7 +175,7 @@ export function CaseStudy({
         {/* El año no se repite acá: ya está en la fila de datos, y como
             insignia suelta quedaba colgando sin alinearse con nada. */}
         <div className="mt-8">
-          <h1 className="text-[clamp(30px,4.4vw,48px)] font-normal leading-[1.1] tracking-[.22px] text-white">
+          <h1 className="display display-lg">
             {work.title}
           </h1>
           {work.summary && (
@@ -189,7 +189,7 @@ export function CaseStudy({
       </div>
 
       {hasStory ? (
-        <div className="divide-y divide-hairline">
+        <div className="divide-y divide-carbon">
           {work.chapters!.map((c, i) => (
             <Chapter key={c.title} chapter={c} index={i} />
           ))}
@@ -205,12 +205,12 @@ export function CaseStudy({
 
       {work.gallery?.length ? <Gallery images={work.gallery} title={work.title} /> : null}
 
-      <footer className="border-t border-hairline pt-12 text-center">
-        <p className="mx-auto max-w-[34ch] text-[clamp(22px,2.6vw,30px)] font-normal leading-tight tracking-[.2px] text-white">
+      <footer className="border-t border-carbon pt-12 text-center">
+        <p className="mx-auto max-w-[34ch] display display-sm">
           ¿Querés algo así para tu negocio?
         </p>
         <button
-          className="btn btn-solid mag mt-7"
+          className="btn btn-solid mt-7"
           type="button"
           onClick={() => {
             askAbout(work.title);

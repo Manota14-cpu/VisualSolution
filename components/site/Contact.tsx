@@ -132,13 +132,12 @@ export function Contact() {
   }
 
   return (
-    <section className="border-t border-hairline py-20 md:py-28" id="contacto">
+    <section className="bg-canvas py-20 md:py-28" id="contacto">
       <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 items-start gap-10 px-4 md:px-10 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
         <Reveal>
-          <p className="eyebrow mb-6 block">Contacto</p>
           <SplitHeading
             text="Hablemos de tu proyecto."
-            className="text-[clamp(26px,3.4vw,32px)] font-normal leading-tight tracking-[.2px] text-white"
+            className="display display-md"
           />
           <p className="mt-4 max-w-[62ch] text-base leading-relaxed text-ash">
             Contanos qué necesitás y te respondemos con una propuesta concreta: alcance, plazo y precio.
@@ -146,7 +145,7 @@ export function Contact() {
 
           <dl className="mt-10 grid gap-6">
             <div>
-              <dt className="eyebrow mb-2 block">Correo</dt>
+              <dt className="label mb-2 block text-smoke">Correo</dt>
               <dd className="m-0">
                 <a className="link" href={`mailto:${site.email}`}>
                   {site.email}
@@ -154,7 +153,7 @@ export function Contact() {
               </dd>
             </div>
             <div>
-              <dt className="eyebrow mb-2 block">Instagram</dt>
+              <dt className="label mb-2 block text-smoke">Instagram</dt>
               <dd className="m-0">
                 <a className="link" href={site.instagram.url} target="_blank" rel="noopener">
                   {site.instagram.handle}
@@ -162,7 +161,7 @@ export function Contact() {
               </dd>
             </div>
             <div>
-              <dt className="eyebrow mb-2 block">Respuesta</dt>
+              <dt className="label mb-2 block text-smoke">Respuesta</dt>
               <dd className="m-0 text-base text-smoke">Contestamos todos los mensajes.</dd>
             </div>
           </dl>
@@ -171,10 +170,10 @@ export function Contact() {
         <Reveal delay={1}>
           {sent ? (
             <div className="rounded-cardlg bg-card p-8 shadow-keysoft" role="status">
-              <h3 className="text-2xl font-normal leading-tight text-white">Mensaje listo para enviar</h3>
+              <h3 className="display display-sm">Mensaje listo para enviar</h3>
               <p className="mt-2 max-w-[44ch] text-base leading-relaxed text-ash">{sent}</p>
               <button
-                className="btn btn-ghost mag mt-6"
+                className="btn btn-ghost mt-6"
                 type="button"
                 onClick={() => {
                   setValues(empty);
@@ -203,7 +202,7 @@ export function Contact() {
                     />
                     <label htmlFor="nombre">Nombre</label>
                   </div>
-                  {errors.nombre && <p className="text-xs text-[#f0a6c2]">{errors.nombre}</p>}
+                  {errors.nombre && <p className="text-xs text-alert">{errors.nombre}</p>}
                 </div>
 
                 <div className={`grid gap-2 ${errors.email ? "has-error" : ""}`}>
@@ -222,7 +221,7 @@ export function Contact() {
                     />
                     <label htmlFor="email">Correo</label>
                   </div>
-                  {errors.email && <p className="text-xs text-[#f0a6c2]">{errors.email}</p>}
+                  {errors.email && <p className="text-xs text-alert">{errors.email}</p>}
                 </div>
               </div>
 
@@ -238,7 +237,7 @@ export function Contact() {
                     required
                     style={{
                       backgroundImage:
-                        "linear-gradient(45deg,transparent 50%,#9c9c9d 50%),linear-gradient(135deg,#9c9c9d 50%,transparent 50%)",
+                        "linear-gradient(45deg,transparent 50%,#000 50%),linear-gradient(135deg,#000 50%,transparent 50%)",
                       backgroundPosition: "calc(100% - 18px) calc(50% + 5px), calc(100% - 13px) calc(50% + 5px)",
                       backgroundSize: "5px 5px, 5px 5px",
                       backgroundRepeat: "no-repeat",
@@ -251,7 +250,7 @@ export function Contact() {
                   </select>
                   <label htmlFor="servicio">Qué necesitás</label>
                 </div>
-                {errors.servicio && <p className="text-xs text-[#f0a6c2]">{errors.servicio}</p>}
+                {errors.servicio && <p className="text-xs text-alert">{errors.servicio}</p>}
               </div>
 
               <div className={`grid gap-2 ${errors.mensaje ? "has-error" : ""}`}>
@@ -272,21 +271,21 @@ export function Contact() {
                 <p className="text-xs text-smoke">
                   Con dos o tres líneas alcanza para armar una primera propuesta.
                 </p>
-                {errors.mensaje && <p className="text-xs text-[#f0a6c2]">{errors.mensaje}</p>}
+                {errors.mensaje && <p className="text-xs text-alert">{errors.mensaje}</p>}
               </div>
 
               {sending && (
                 <div className="h-0.5 overflow-hidden rounded-sm bg-white/10" aria-hidden="true">
                   <i
                     className="animate-load block h-full w-[36%]"
-                    style={{ background: "linear-gradient(102deg,#8B5CF6,#EC4899)" }}
+                    style={{ background: "var(--color-violet)" }}
                   />
                 </div>
               )}
 
               <div className="mt-2 flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-center">
-                <p className="font-mono text-xs text-smoke">Usamos estos datos solo para responderte.</p>
-                <button className={`btn btn-solid mag ${ok ? "ok" : ""}`} type="submit" disabled={sending}>
+                <p className="label text-smoke">Usamos estos datos solo para responderte.</p>
+                <button className={`btn btn-solid ${ok ? "ok" : ""}`} type="submit" disabled={sending}>
                   <span className="send-label">{sending ? "Enviando" : "Enviar mensaje"}</span>
                   <span className="send-ok" aria-hidden="true">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -303,7 +302,7 @@ export function Contact() {
               </div>
 
               {failed && (
-                <p className="text-xs text-[#f0a6c2]" role="alert">
+                <p className="text-xs text-alert" role="alert">
                   {failed}
                 </p>
               )}

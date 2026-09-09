@@ -83,7 +83,7 @@ export function CaseLayer({
             </svg>
             Catálogo
           </button>
-          <p className="truncate font-mono text-xs text-smoke">{work.title}</p>
+          <p className="truncate label text-smoke">{work.title}</p>
         </div>
         <CaseProgress scroller={scroller} />
       </div>

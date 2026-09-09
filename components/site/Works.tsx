@@ -107,12 +107,12 @@ function WorkCard({
       </a>
       <div className="mt-4 flex items-baseline justify-between gap-4">
         <div>
-          <h3 className="text-sm font-medium text-white">{work.title}</h3>
+          <h3 className="text-[17px] font-bold leading-snug text-carbon">{work.title}</h3>
           <p className="mt-1 text-xs text-smoke">{work.kind}</p>
         </div>
         <span className="badge">{work.year}</span>
       </div>
-      <p className="work-detail mt-2 font-mono text-[11px] uppercase tracking-[.8px] text-smoke">{detail}</p>
+      <p className="work-detail mt-2 label text-smoke">{detail}</p>
     </article>
   );
 }
@@ -184,14 +184,13 @@ export function Works() {
   }, [close]);
 
   return (
-    <section className="border-t border-hairline py-20 md:py-28" id="trabajos">
+    <section className="bg-canvas py-20 md:py-28" id="trabajos">
       <div className="mx-auto w-full max-w-[1200px] px-4 md:px-10">
         <div className="mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <Reveal>
-            <p className="eyebrow mb-6 block">Trabajos</p>
             <SplitHeading
               text="Catálogo"
-              className="text-[clamp(26px,3.4vw,32px)] font-normal leading-tight tracking-[.2px] text-white"
+              className="display display-md"
             />
           </Reveal>
           <Reveal as="a" delay={1} className="link" href="#contacto">
@@ -226,7 +225,7 @@ export function Works() {
         </div>
 
         {visible.length === 0 && (
-          <p className="mt-8 font-mono text-xs text-smoke">No hay trabajos de ese tipo todavía.</p>
+          <p className="mt-8 label text-smoke">No hay trabajos de ese tipo todavía.</p>
         )}
       </div>
 

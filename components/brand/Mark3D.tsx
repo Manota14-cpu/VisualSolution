@@ -147,16 +147,6 @@ export function Mark3D({
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(30, 1, 1, 3000);
 
-        let envMap: THREE_NS.Texture | null = null;
-        try {
-          const pmrem = new THREE.PMREMGenerator(renderer);
-          pmrem.compileEquirectangularShader();
-          envMap = pmrem.fromEquirectangular(envTexture(THREE)).texture;
-          scene.environment = envMap;
-          pmrem.dispose();
-        } catch {
-          envMap = null;
-        }
 
         const extrude = {
           depth: 22,
@@ -168,14 +158,11 @@ export function Mark3D({
           curveSegments: 4,
         };
 
-        const material = new THREE.MeshStandardMaterial({
-          color: 0xf2eff8,
-          metalness: envMap ? 0.58 : 0.32,
-          roughness: envMap ? 0.2 : 0.24,
-          envMap,
-          // el entorno da el reflejo; bajo para que el metal siga leyendose
-          // claro y no se tina entero de rosa
-          envMapIntensity: 0.9,
+const material = new THREE.MeshStandardMaterial({
+          color: 0x8b5cf6,
+          metalness: 0,
+          roughness: 0.92,
+          flatShading: false,
         });
 
         const group = new THREE.Group();
@@ -190,63 +177,30 @@ export function Mark3D({
           group.add(new THREE.Mesh(g, material));
         }
 
-        // halo: copia agrandada con material aditivo. Es el equivalente
-        // barato de un bloom, sin cargar post-proceso.
-        let glowMat: THREE_NS.MeshBasicMaterial | null = null;
-        if (!lite) {
-          glowMat = new THREE.MeshBasicMaterial({
-            color: 0xec4899,
-            transparent: true,
-            opacity: 0.13,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false,
-            side: THREE.BackSide,
-          });
-          for (const g of geometries) {
-            const halo = new THREE.Mesh(g, glowMat);
-            halo.scale.set(1.05, 1.05, 1.05);
-            halo.position.z = -6;
-            group.add(halo);
-          }
+        /* El contorno recortado a mano: una copia de cada pieza, un poco
+           más grande y con las caras dadas vuelta, pintada de negro. Sólo
+           asoma por fuera del volumen, así que se lee como el mismo trazo
+           de 1px que el sistema usa en botones y tarjetas. */
+        const outlineMat = new THREE.MeshBasicMaterial({
+          color: 0x000000,
+          side: THREE.BackSide,
+        });
+        for (const g of geometries) {
+          const outline = new THREE.Mesh(g, outlineMat);
+          outline.scale.set(1.04, 1.04, 1.05);
+          group.add(outline);
         }
         scene.add(group);
 
-        // campo de puntos detrás del logo
-        let dots: THREE_NS.Points | null = null;
-        if (!lite) {
-          const N = 220;
-          const pos = new Float32Array(N * 3);
-          for (let i = 0; i < N; i++) {
-            pos[i * 3] = (Math.random() - 0.5) * 460;
-            pos[i * 3 + 1] = (Math.random() - 0.5) * 300;
-            pos[i * 3 + 2] = -60 - Math.random() * 320;
-          }
-          const pg = new THREE.BufferGeometry();
-          pg.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-          dots = new THREE.Points(
-            pg,
-            new THREE.PointsMaterial({
-              color: 0xa98bf0,
-              size: 2.1,
-              sizeAttenuation: true,
-              transparent: true,
-              opacity: 0.5,
-              depthWrite: false,
-            })
-          );
-          scene.add(dots);
-        }
 
         /* Los satélites. Hay cinco preparados y se van revelando a medida
            que la persona mete servicios: crecen desde cero con un rebote
            corto, en vez de aparecer de golpe. */
         const MAX_ORBIT = 5;
-        const orbitMat = new THREE.MeshStandardMaterial({
-          color: 0xf2eff8,
-          metalness: 0.55,
-          roughness: 0.25,
-          envMap,
-          envMapIntensity: 0.9,
+const orbitMat = new THREE.MeshStandardMaterial({
+          color: 0xffd24a,
+          metalness: 0,
+          roughness: 0.9,
         });
         const orbitGeo = new THREE.OctahedronGeometry(7, 0);
         const orbits: { mesh: THREE_NS.Mesh; r: number; speed: number; phase: number; tilt: number }[] = [];
@@ -264,14 +218,14 @@ export function Mark3D({
           scene.add(mesh);
         }
 
-        scene.add(new THREE.AmbientLight(0x14101f, envMap ? 0.6 : 1.1));
-        const key = new THREE.DirectionalLight(0x8b5cf6, envMap ? 1.9 : 2.8);
+scene.add(new THREE.AmbientLight(0xffffff, 1.35));
+        const key = new THREE.DirectionalLight(0xffffff, 1.5);
         key.position.set(-150, 120, 160);
-        const fill = new THREE.DirectionalLight(0xec4899, envMap ? 1.8 : 2.5);
+        const fill = new THREE.DirectionalLight(0xd9c7ff, 0.9);
         fill.position.set(170, -70, 120);
-        const rim = new THREE.DirectionalLight(0xffffff, 1.0);
+        const rim = new THREE.DirectionalLight(0xffffff, 0.7);
         rim.position.set(30, 140, -180);
-        const spark = new THREE.PointLight(0xffffff, 0.6, 900);
+        const spark = new THREE.PointLight(0xffffff, 0.3, 900);
         spark.position.set(-40, 60, 220);
         scene.add(key, fill, rim, spark);
 
@@ -369,10 +323,6 @@ export function Mark3D({
           group.scale.setScalar(1 - heroProgress * 0.18);
           camera.position.z = baseZ * (1 + heroProgress * 0.35);
 
-          if (dots) {
-            dots.rotation.y += 0.0006;
-            dots.rotation.x = curX * 0.15;
-          }
 
           /* Cada satélite crece hasta 1 si su índice entra en el conteo,
              y se encoge a 0 si la persona lo sacó. La escala es lo que
@@ -431,12 +381,10 @@ export function Mark3D({
           el.removeEventListener("pointermove", onMove);
           el.removeEventListener("pointerleave", onLeave);
           geometries.forEach((g) => g.dispose());
-          dots?.geometry.dispose();
           orbitGeo.dispose();
           orbitMat.dispose();
           material.dispose();
-          glowMat?.dispose();
-          envMap?.dispose();
+          outlineMat.dispose();
           renderer.dispose();
           cv.remove();
         };
