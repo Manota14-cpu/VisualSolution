@@ -2,7 +2,7 @@
    El símbolo VS. Es el mismo path que public/logo.svg, en un
    viewBox de 143.5 x 76.
    Si alguna vez rediseñás el logo hay que actualizar tres lugares:
-   este archivo, markShapes() en Mark3D.tsx y public/favicon.svg.
+   este archivo, public/logo.svg y public/favicon.svg.
    ============================================================ */
 
 export const MARK_PATH =

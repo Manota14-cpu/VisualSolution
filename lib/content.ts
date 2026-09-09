@@ -29,7 +29,9 @@ export const nav = [
 ] as const;
 
 export const hero = {
-  headline: "Programamos tu sitio. Producimos tu contenido.",
+  headline: "Donde la idea toca la máquina.",
+  /* El reclamo del hero, partido en las dos lineas del afiche. */
+  claim: ["Donde la idea", "toca la máquina."],
   sub: "Estudio de desarrollo web y producción audiovisual. Un solo equipo para toda tu presencia digital.",
   primaryCta: "Empezar proyecto",
   secondaryCta: "Ver trabajos",

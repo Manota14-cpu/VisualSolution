@@ -1,27 +1,30 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { Mark3D } from "@/components/brand/Mark3D";
+import { Hands } from "@/components/brand/Hands";
 import { askForServices } from "@/lib/consult";
 import { scrollToId } from "@/components/motion/MotionProvider";
 import { hero, capabilities, heroServices, type HeroService } from "@/lib/content";
 
 /* ============================================================
    EL HERO
-   Un afiche: papel lavanda a sangre, el titular gigante con el
+   Un afiche: papel lavanda a sangre, la escena de las dos manos
+   a punto de tocarse, y debajo el titular gigante con el
    interlineado aplastado para que las líneas se apilen como
-   bloques físicos, y la cinta 3D pasando por detrás.
-   Las calcomanías de servicio se arrastran adentro de la cinta y
-   arman la consulta. Si nadie toca nada, el afiche se lee igual.
+   bloques físicos.
+   Las calcomanías de servicio se arrastran al hueco entre las
+   manos y arman la consulta. Si nadie toca nada, el afiche se
+   lee igual.
    ============================================================ */
 
-/* Posiciones de collage: nunca alineadas a la grilla. */
+/* Posiciones de collage: pegadas a los bordes, nunca encima del
+   punto de contacto, que es lo único que no se puede tapar. */
 const ARC: React.CSSProperties[] = [
-  { top: "2%", left: "-1%" },
-  { top: "36%", left: "-7%" },
+  { top: "-5%", left: "1%" },
+  { top: "31%", left: "-6%" },
   { top: "74%", left: "3%" },
-  { top: "9%", right: "-1%" },
-  { top: "55%", right: "-6%" },
+  { top: "-3%", right: "2%" },
+  { top: "35%", right: "-6%" },
 ];
 
 function Chip({
@@ -119,17 +122,15 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden bg-canvas pb-16 pt-28 md:pb-24 md:pt-32" id="top">
       <div className="relative mx-auto w-full max-w-[1440px] px-4 md:px-10">
-        {/* El bloque escultórico. La cinta pasa por detrás del titular:
-            el texto se comporta como objeto, no como párrafo. */}
-        <div className="relative mx-auto w-full max-w-[1000px]">
-          <div ref={stage} className={`stage relative mx-auto ${over ? "is-over" : ""}`}>
-            <Mark3D
-              className="animate-rise relative mx-auto grid aspect-video w-[min(340px,72vw)] place-items-center md:w-[min(520px,58vw)]"
+        {/* La escena. Las calcomanías flotan sobre ella en collage. */}
+        <div className="relative mx-auto w-full max-w-[1040px]">
+          <div ref={stage} className={`stage relative ${over ? "is-over" : ""}`}>
+            <Hands
+              className="animate-rise aspect-[6/5] w-full border border-carbon md:aspect-[15/7]"
               services={taken}
             />
           </div>
 
-          {/* En pantalla ancha las calcomanías flotan en collage. */}
           <div className="pointer-events-none absolute inset-0 hidden md:block">
             {heroServices.map((s, i) => (
               <div key={s.id} className="pointer-events-auto absolute" style={ARC[i]}>
@@ -161,14 +162,14 @@ export function Hero() {
         </div>
 
         <p className={`hint mt-5 text-center ${taken.length ? "is-done" : ""}`}>
-          <span className="hidden md:inline">Arrastrá un servicio a la cinta</span>
+          <span className="hidden md:inline">Arrastrá un servicio al punto de contacto</span>
           <span className="md:hidden">Tocá lo que necesitás</span>
         </p>
 
         <h1 className="display display-xl animate-rise mt-6 text-center" style={{ animationDelay: ".1s" }}>
-          Programamos
+          {hero.claim[0]}
           <br />
-          tu sitio.
+          {hero.claim[1]}
         </h1>
 
         <p

@@ -105,7 +105,7 @@ body {
   text-transform: uppercase;
   color: var(--color-carbon);
 }
-.display-xl { font-size: clamp(56px, 13vw, 200px); line-height: 0.78; }  /* el afiche del hero */
+.display-xl { font-size: clamp(44px, 10.4vw, 148px); line-height: 0.80; }  /* el afiche del hero */
 .display-lg { font-size: clamp(40px, 7vw, 96px);   line-height: 0.82; }  /* titular a todo el ancho */
 .display-md { font-size: clamp(30px, 4vw, 56px);   line-height: 0.86; }  /* cabecera de seccion en columna */
 .display-sm { font-size: clamp(23px, 2.5vw, 34px); line-height: 0.94; }  /* subtitulo dentro del caso */
@@ -270,6 +270,133 @@ body {
   .pill:hover { background: var(--color-tint); }
   .pill[aria-pressed="true"] { background: var(--color-carbon); color: #fff; }
 /* (la capa sigue abierta: todo el sistema de clases vive adentro, si no, .hidden y compania no pueden ganarle) */
+
+/* ==========================================================
+   EL ENCUENTRO
+   La escena de las dos manos. Todo el acercamiento cuelga de
+   --reach (0 lejos, 1 a punto de tocarse), que escribe el puntero
+   sobre el contenedor. Nada de esto pasa por React.
+   ========================================================== */
+.hands {
+  --reach: 0;
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-cardlg);
+}
+.hands svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* El contorno es siempre el mismo grosor en pantalla, mida lo que
+   mida la escena: es el mismo 1px negro que usa el resto del sitio. */
+.hands path,
+.hands circle {
+  vector-effect: non-scaling-stroke;
+}
+
+/* Primera pasada: relleno y trazo negros. Como las piezas se pisan,
+   el trazo sobrevive solo por afuera del conjunto. */
+.hands .ink path {
+  fill: var(--color-carbon);
+  stroke: var(--color-carbon);
+  stroke-width: 5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+/* Segunda pasada: el mismo dibujo relleno y sin trazo, que tapa las
+   costuras internas y deja la silueta limpia. */
+.hands .piel-robot path { fill: var(--color-concrete); stroke: none; }
+.hands .piel-humana path { fill: var(--color-coral); stroke: none; }
+
+/* Las costuras que sí van, dibujadas encima. */
+.hands .detalle path {
+  fill: none;
+  stroke: var(--color-carbon);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: .55;
+}
+.hands .unas ellipse {
+  fill: #fff;
+  stroke: var(--color-carbon);
+  stroke-width: 2;
+}
+.hands .perno circle {
+  fill: var(--color-violet);
+  stroke: var(--color-carbon);
+  stroke-width: 2;
+}
+
+/* El acercamiento. Las manos entran desde afuera y se frenan justo
+   antes del contacto: el hueco nunca llega a cerrarse del todo. */
+.hands .hand {
+  transition: transform .5s cubic-bezier(.16,1,.3,1);
+}
+.hand-robot { transform: translateX(calc(var(--reach) * 26px)); }
+.hand-human { transform: translateX(calc(var(--reach) * -26px)); }
+
+/* La chispa vive en el hueco. Crece con el acercamiento. */
+.hands .chispa {
+  transform: scale(calc(.18 + var(--reach) * .82)) rotate(calc(var(--reach) * 45deg));
+  opacity: calc(.15 + var(--reach) * .85);
+  transition: transform .5s cubic-bezier(.16,1,.3,1), opacity .4s;
+}
+.hands .rayos path {
+  fill: var(--color-pink);
+  stroke: var(--color-carbon);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.hands .nucleo {
+  fill: var(--color-sun);
+  stroke: var(--color-carbon);
+  stroke-width: 3;
+}
+
+/* Con un servicio adentro el contacto queda hecho: las manos se
+   quedan pegadas y la chispa late. */
+.hands.is-linked .hand-robot { transform: translateX(30px); }
+.hands.is-linked .hand-human { transform: translateX(-30px); }
+.hands.is-linked .chispa {
+  opacity: 1;
+  animation: latido 1.9s cubic-bezier(.16,1,.3,1) infinite;
+}
+@keyframes latido {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50%      { transform: scale(1.16) rotate(22deg); }
+}
+
+/* Los servicios elegidos, orbitando el punto de contacto. */
+.hands .orbita circle {
+  stroke: var(--color-carbon);
+  stroke-width: 3;
+}
+.hands .orbita text {
+  fill: var(--color-carbon);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .032em;
+  text-anchor: middle;
+}
+.hands .orbita > g {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: aterrizar .45s cubic-bezier(.16,1,.3,1) backwards;
+}
+@keyframes aterrizar {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hands.is-linked .chispa { animation: none; }
+}
 
 /* ==========================================================
    LA CINTA Y LAS CALCOMANÍAS

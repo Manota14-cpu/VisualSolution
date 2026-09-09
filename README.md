@@ -3,8 +3,9 @@
 Sitio del estudio. Next.js 15 (App Router) + React 19 + Tailwind v4. El
 sistema visual es un afiche impreso: papel lavanda, contorno negro de 1px,
 tipografía display gigante y colores de marca puestos como calcomanías. En
-el hero, el símbolo VS renderizado en 3D con Three.js como cinta inflada,
-con las calcomanías de servicio que se le arrastran adentro.
+el hero, dos manos a punto de tocarse —la de la máquina y la de la
+persona— dibujadas en SVG con esa misma lógica, y las calcomanías de
+servicio que se arrastran al hueco entre las dos.
 
 ```
 app/
@@ -12,7 +13,7 @@ app/
   page.tsx          compone las secciones
   globals.css       tokens de Tailwind, componentes y capa de movimiento
 components/
-  brand/            el símbolo VS, plano y en 3D
+  brand/            el símbolo VS y la escena de las manos
   motion/           capa global de movimiento, revelados, elementos fijos
   site/             las secciones de la página
 lib/
@@ -87,16 +88,12 @@ con JSON, y quedan activos la barra de carga y el mensaje de error.
 
 ## El logo
 
-El símbolo VS vive en tres lugares que hay que mantener juntos si alguna vez
+El símbolo VS vive en dos lugares que hay que mantener juntos si alguna vez
 lo rediseñás:
 
 - **Marca plana:** `MARK_PATH` en `components/brand/Mark.tsx`. Es el mismo
   `path` que `public/logo.svg`, en un viewBox de 143.5 x 76. Lo usan la barra,
-  el pie, el botón de volver arriba, el preloader y el respaldo del hero.
-- **Marca 3D:** `markShapes()` en `components/brand/Mark3D.tsx` devuelve las
-  tres piezas del trazado como contornos cerrados, en la misma caja pero con
-  el eje Y hacia arriba, por eso las coordenadas están espejadas respecto del
-  SVG. Se extruyen con bisel y se centran con `translate(-71.75, -38, ...)`.
+  el pie, el botón de volver arriba y el preloader.
 - **Favicon:** `public/favicon.svg`.
 
 ## Sistema de diseño
@@ -150,13 +147,23 @@ el grano se fueron con el mundo oscuro.
 
 **Hero**
 
-- Logo VS en 3D como cinta inflada: color plano violeta, contorno negro hecho
-  con una copia agrandada de caras invertidas, sin metal ni reflejos. Gira
-  siguiendo al puntero y conserva el impulso al soltarlo.
-- Cinco calcomanías de servicio que se arrastran adentro de la cinta y arman
-  la consulta: cada una que entra suma un satélite en órbita y cambia la
-  etiqueta del botón. El clic seco hace lo mismo que el arrastre.
+- El encuentro (`components/brand/Hands.tsx`): la mano de la máquina entra
+  por la izquierda, la de la persona por la derecha, y entre las yemas de los
+  índices queda el hueco donde salta la chispa. Están dibujadas en SVG con
+  relleno plano y contorno negro, como el resto del sitio.
+- Las manos se acercan al puntero. Todo el acercamiento cuelga de una sola
+  custom property, `--reach` (0 lejos, 1 a punto de tocarse), que el puntero
+  escribe sobre el contenedor: ni un solo render de React por movimiento.
+  Sin puntero fino, o con movimiento reducido, se quedan quietas y ya cerca.
+- Nunca llegan a tocarse del todo. El hueco es el tema del afiche.
+- Cinco calcomanías de servicio que se arrastran a ese hueco y arman la
+  consulta: cada una que entra se queda orbitando el punto de contacto y
+  cambia la etiqueta del botón. El clic seco hace lo mismo que el arrastre.
 - Si nadie toca nada, el afiche se lee igual.
+
+Las falanges no están escritas a mano: `seg()` arma una cápsula y `finger()`
+las encadena. Para mover un dedo se tocan tres números —ángulos, largos y
+anchos— y no quince paths.
 
 **Por sección**
 
@@ -173,10 +180,9 @@ el grano se fueron con el mundo oscuro.
 
 - Con `prefers-reduced-motion: reduce` se apaga entero, no se hace más lento.
 - Un solo bucle de `requestAnimationFrame` en `lib/motion.ts` para todo lo
-  continuo, que se detiene con la pestaña oculta. El 3D además se pausa al
-  salir de pantalla.
-- Sin WebGL el hero cae a la marca plana en SVG y no se rompe nada.
-- Three.js entra por `import()` dinámico: no pesa en el bundle inicial.
+  continuo, que se detiene con la pestaña oculta.
+- El hero es SVG y CSS: no hay WebGL, no hay canvas y no hay nada que pueda
+  fallar en un equipo viejo. Three.js se fue del proyecto con el logo 3D.
 
 ### Una trampa que ya está resuelta
 

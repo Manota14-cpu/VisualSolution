@@ -62,12 +62,12 @@ export function Nav() {
       >
         <a className="inline-flex items-center gap-2" href="#top" aria-label="Visual Solution, inicio">
           <Mark className={`block h-auto w-[26px] ${pop ? "nav-pop" : ""}`} />
-          <span className="text-[13px] font-bold text-carbon">
+          <span className="whitespace-nowrap text-[13px] font-bold text-carbon">
             Visual <span className="text-smoke">Solution</span>
           </span>
         </a>
 
-        <nav className="hidden items-center gap-6 md:flex" aria-label="Principal">
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Principal">
           {nav.map((item) => (
             <a
               key={item.href}
@@ -80,12 +80,12 @@ export function Nav() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <a className="btn btn-solid btn-sm hidden md:inline-flex" href="#contacto">
+          <a className="btn btn-solid btn-sm hidden lg:inline-flex" href="#contacto">
             <i className="diamond" aria-hidden="true" />
             {hero.primaryCta}
           </a>
           <button
-            className="grid size-9 place-items-center rounded-btn border border-carbon md:hidden"
+            className="grid size-9 place-items-center rounded-btn border border-carbon lg:hidden"
             type="button"
             aria-expanded={open}
             aria-controls="menu"
