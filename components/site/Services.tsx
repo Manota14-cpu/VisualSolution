@@ -66,7 +66,7 @@ function Token({ text, className = "" }: { text: string; className?: string }) {
 function Shot({ src, alt }: { src: string; alt: string }) {
   const ref = useReveal<HTMLDivElement>();
   return (
-    <div ref={ref} className="shot wipe relative aspect-video border-b border-carbon">
+    <div ref={ref} className="shot wipe relative aspect-video">
       <Image src={src} alt={alt} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
     </div>
   );
@@ -77,12 +77,12 @@ function PlainCard({ service }: { service: Service }) {
   // el <article> lleva .rv: hay que registrarlo aunque el ref sea del tilt
   useReveal<HTMLElement>(ref);
   return (
-    <article ref={ref} className={`card group rv ${service.image ? "" : "gap-4 p-6"} ${service.span}`}>
+    <article ref={ref} className={`card group rv ${service.image ? "" : "gap-4 p-10"} ${service.span}`}>
       {service.image && <Shot src={service.image.src} alt={service.image.alt} />}
       {service.token && <Token text={service.token} />}
-      <div className={`flex flex-col gap-2 ${service.image ? "flex-1 p-6" : ""}`}>
-        <h3 className="text-xl font-bold leading-snug text-carbon">{service.title}</h3>
-        <p className="text-base leading-relaxed text-ash">{service.body}</p>
+      <div className={`flex flex-col gap-2 ${service.image ? "flex-1 p-10" : ""}`}>
+        <h3 className="text-[26px] font-medium leading-snug text-chalk">{service.title}</h3>
+        <p className="text-base leading-relaxed text-chalk/70">{service.body}</p>
         {service.tags && (
           <ul className="mt-auto flex flex-wrap gap-2 pt-4">
             {service.tags.map((t) => (
@@ -97,23 +97,22 @@ function PlainCard({ service }: { service: Service }) {
   );
 }
 
-/* La tarjeta destacada: no se distingue por brillar sino por estar
-   apoyada torcida sobre las demas, tenida y con el sello amarillo.
-   El borde conico giratorio, el brillo diagonal y los degradados de
-   esquina se fueron: pertenecian al mundo oscuro. */
+/* La única superficie violeta del sistema. DESIGN.md la reserva
+   para una sola tarjeta destacada: violeta con la trama de puntos
+   encima y el texto en obsidiana. No se repite en ningún otro lado. */
 function FeaturedCard({ service }: { service: Service }) {
   return (
     <Reveal className={service.span}>
-      <article className="sticker-card flex h-full flex-col gap-4 rounded-cardlg border border-carbon bg-tint p-6">
-        {service.token && <Token text={service.token} className="bg-sun text-carbon" />}
+      <article className="violet-card flex h-full flex-col gap-4 rounded-cards p-10">
+        {service.token && <Token text={service.token} />}
         <div className="flex flex-col gap-2">
-          <h3 className="text-xl font-bold leading-snug text-carbon">{service.title}</h3>
-          <p className="text-base leading-relaxed text-ash">{service.body}</p>
+          <h3 className="text-[26px] font-medium leading-snug text-chalk">{service.title}</h3>
+          <p className="text-base leading-relaxed text-chalk/70">{service.body}</p>
         </div>
         {service.tags && (
           <ul className="mt-auto flex flex-wrap gap-2 pt-4">
             {service.tags.map((t) => (
-              <li key={t} className="badge bg-sun">
+              <li key={t} className="badge">
                 {t}
               </li>
             ))}
@@ -126,14 +125,14 @@ function FeaturedCard({ service }: { service: Service }) {
 
 export function Services() {
   return (
-    <section className="bg-card border-y border-carbon py-20 md:py-28" id="servicios">
+    <section className="bg-onyx py-20 md:py-28" id="servicios">
       <div className="mx-auto w-full max-w-[1200px] px-4 md:px-10">
         <Reveal className="mb-10 max-w-[44ch] md:mb-14">
           <SplitHeading
             text="Todo lo que tu marca necesita para verse y funcionar bien."
             className="display display-md"
           />
-          <p className="mt-4 max-w-[62ch] text-base leading-relaxed text-ash">
+          <p className="mt-4 max-w-[62ch] text-base leading-relaxed text-chalk/70">
             Trabajamos las dos mitades del mismo problema: la pieza técnica que sostiene el negocio y el
             contenido que lo hace visible.
           </p>

@@ -132,20 +132,20 @@ export function Contact() {
   }
 
   return (
-    <section className="bg-canvas py-20 md:py-28" id="contacto">
+    <section className="bg-onyx py-20 md:py-28" id="contacto">
       <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 items-start gap-10 px-4 md:px-10 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
         <Reveal>
           <SplitHeading
             text="Hablemos de tu proyecto."
             className="display display-md"
           />
-          <p className="mt-4 max-w-[62ch] text-base leading-relaxed text-ash">
+          <p className="mt-4 max-w-[62ch] text-base leading-relaxed text-chalk/70">
             Contanos qué necesitás y te respondemos con una propuesta concreta: alcance, plazo y precio.
           </p>
 
           <dl className="mt-10 grid gap-6">
             <div>
-              <dt className="label mb-2 block text-smoke">Correo</dt>
+              <dt className="label mb-2 block text-chalk/55">Correo</dt>
               <dd className="m-0">
                 <a className="link" href={`mailto:${site.email}`}>
                   {site.email}
@@ -153,7 +153,7 @@ export function Contact() {
               </dd>
             </div>
             <div>
-              <dt className="label mb-2 block text-smoke">Instagram</dt>
+              <dt className="label mb-2 block text-chalk/55">Instagram</dt>
               <dd className="m-0">
                 <a className="link" href={site.instagram.url} target="_blank" rel="noopener">
                   {site.instagram.handle}
@@ -161,17 +161,17 @@ export function Contact() {
               </dd>
             </div>
             <div>
-              <dt className="label mb-2 block text-smoke">Respuesta</dt>
-              <dd className="m-0 text-base text-smoke">Contestamos todos los mensajes.</dd>
+              <dt className="label mb-2 block text-chalk/55">Respuesta</dt>
+              <dd className="m-0 text-base text-chalk/55">Contestamos todos los mensajes.</dd>
             </div>
           </dl>
         </Reveal>
 
         <Reveal delay={1}>
           {sent ? (
-            <div className="rounded-cardlg bg-card p-8 shadow-keysoft" role="status">
+            <div className="rounded-cards bg-carbon p-8" role="status">
               <h3 className="display display-sm">Mensaje listo para enviar</h3>
-              <p className="mt-2 max-w-[44ch] text-base leading-relaxed text-ash">{sent}</p>
+              <p className="mt-2 max-w-[44ch] text-base leading-relaxed text-chalk/70">{sent}</p>
               <button
                 className="btn btn-ghost mt-6"
                 type="button"
@@ -184,7 +184,7 @@ export function Contact() {
               </button>
             </div>
           ) : (
-            <form className="grid gap-4 rounded-cardlg bg-card p-6 shadow-keysoft" onSubmit={onSubmit} noValidate>
+            <form className="grid gap-4 rounded-cards bg-carbon p-6" onSubmit={onSubmit} noValidate>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className={`grid gap-2 ${errors.nombre ? "has-error" : ""}`}>
                   <div className="fl">
@@ -202,7 +202,7 @@ export function Contact() {
                     />
                     <label htmlFor="nombre">Nombre</label>
                   </div>
-                  {errors.nombre && <p className="text-xs text-alert">{errors.nombre}</p>}
+                  {errors.nombre && <p className="text-xs text-magenta">{errors.nombre}</p>}
                 </div>
 
                 <div className={`grid gap-2 ${errors.email ? "has-error" : ""}`}>
@@ -221,7 +221,7 @@ export function Contact() {
                     />
                     <label htmlFor="email">Correo</label>
                   </div>
-                  {errors.email && <p className="text-xs text-alert">{errors.email}</p>}
+                  {errors.email && <p className="text-xs text-magenta">{errors.email}</p>}
                 </div>
               </div>
 
@@ -237,7 +237,7 @@ export function Contact() {
                     required
                     style={{
                       backgroundImage:
-                        "linear-gradient(45deg,transparent 50%,#000 50%),linear-gradient(135deg,#000 50%,transparent 50%)",
+                        "linear-gradient(45deg,transparent 50%,#ffffff 50%),linear-gradient(135deg,#ffffff 50%,transparent 50%)",
                       backgroundPosition: "calc(100% - 18px) calc(50% + 5px), calc(100% - 13px) calc(50% + 5px)",
                       backgroundSize: "5px 5px, 5px 5px",
                       backgroundRepeat: "no-repeat",
@@ -250,7 +250,7 @@ export function Contact() {
                   </select>
                   <label htmlFor="servicio">Qué necesitás</label>
                 </div>
-                {errors.servicio && <p className="text-xs text-alert">{errors.servicio}</p>}
+                {errors.servicio && <p className="text-xs text-magenta">{errors.servicio}</p>}
               </div>
 
               <div className={`grid gap-2 ${errors.mensaje ? "has-error" : ""}`}>
@@ -268,23 +268,23 @@ export function Contact() {
                   />
                   <label htmlFor="mensaje">Sobre el proyecto</label>
                 </div>
-                <p className="text-xs text-smoke">
+                <p className="text-xs text-chalk/55">
                   Con dos o tres líneas alcanza para armar una primera propuesta.
                 </p>
-                {errors.mensaje && <p className="text-xs text-alert">{errors.mensaje}</p>}
+                {errors.mensaje && <p className="text-xs text-magenta">{errors.mensaje}</p>}
               </div>
 
               {sending && (
-                <div className="h-0.5 overflow-hidden rounded-sm bg-white/10" aria-hidden="true">
+                <div className="h-0.5 overflow-hidden rounded-sm bg-chalk/15" aria-hidden="true">
                   <i
                     className="animate-load block h-full w-[36%]"
-                    style={{ background: "var(--color-violet)" }}
+                    style={{ background: "var(--color-magenta)" }}
                   />
                 </div>
               )}
 
               <div className="mt-2 flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-center">
-                <p className="label text-smoke">Usamos estos datos solo para responderte.</p>
+                <p className="label text-chalk/55">Usamos estos datos solo para responderte.</p>
                 <button className={`btn btn-solid ${ok ? "ok" : ""}`} type="submit" disabled={sending}>
                   <span className="send-label">{sending ? "Enviando" : "Enviar mensaje"}</span>
                   <span className="send-ok" aria-hidden="true">
@@ -302,7 +302,7 @@ export function Contact() {
               </div>
 
               {failed && (
-                <p className="text-xs text-alert" role="alert">
+                <p className="text-xs text-magenta" role="alert">
                   {failed}
                 </p>
               )}

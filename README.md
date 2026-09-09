@@ -1,11 +1,13 @@
 # Visual Solution
 
-Sitio del estudio. Next.js 15 (App Router) + React 19 + Tailwind v4. El
-sistema visual es un afiche impreso: papel lavanda, contorno negro de 1px,
-tipografía display gigante y colores de marca puestos como calcomanías. En
-el hero, dos manos a punto de tocarse —la de la máquina y la de la
-persona— dibujadas en SVG con esa misma lógica, y las calcomanías de
-servicio que se arrastran al hueco entre las dos.
+Sitio del estudio. Next.js 15 (App Router) + React 19 + Tailwind v4.
+
+El sistema visual es **Caldera**, definido en `DESIGN.md` y en `design/`:
+negro total, magenta y violeta como únicas luces, tipografía comprimida
+ultrabold hasta 189px y cero sombras. En el hero, el bloque de trama de
+puntos con dos manos apoyadas encima a punto de tocarse —la de la máquina y
+la de la persona— dibujadas en SVG, y las fichas de servicio que se arrastran
+al hueco entre las dos.
 
 ```
 app/
@@ -14,6 +16,8 @@ app/
   globals.css       tokens de Tailwind, componentes y capa de movimiento
 components/
   brand/            el símbolo VS y la escena de las manos
+DESIGN.md           el sistema de diseño, tal como lo mandó el cliente
+design/             sus tokens: variables.css, theme.css y tokens.json
   motion/           capa global de movimiento, revelados, elementos fijos
   site/             las secciones de la página
 lib/
@@ -98,42 +102,69 @@ lo rediseñás:
 
 ## Sistema de diseño
 
-Los tokens están en el bloque `@theme` de `app/globals.css` y Tailwind genera
-las utilidades a partir de ahí: `bg-card`, `text-ash`, `border-carbon`,
-`rounded-cardlg`, `bg-sun`.
+El sistema es **Caldera** y está definido, entero, en cuatro archivos que
+mandó el cliente y que son la fuente de verdad:
 
-El sitio es un afiche impreso, no una interfaz iluminada: papel plano, contorno
-negro y colores puestos como calcomanías. No hay degradados, ni sombras, ni
-vidrio esmerilado. Si aparece uno, es un resto del sistema anterior.
+- `DESIGN.md` — la referencia larga: roles de cada color, los do's y don'ts,
+  la descripción de cada componente y los motivos firma.
+- `design/variables.css` — los tokens como custom properties.
+- `design/theme.css` — los mismos tokens en el bloque `@theme` de Tailwind v4.
+- `design/tokens.json` — los mismos, en JSON.
 
-- **Superficies:** papel `#EAE3FB`, tarjeta `#FFFFFF`, hueco `#F4F0FC`,
-  hormigón `#CFCBD6`, tinta `#000000`. Las secciones alternan entre esos
-  fondos a sangre y el pie cierra en negro.
-- **Texto:** negro `#000000` para todo lo estructural, `#17141F` para lectura
-  larga, `#5B5468` para lo secundario. Sobre el pie negro, blanco al 60–70%.
-- **Calcomanías:** violeta `#8B5CF6`, rosa `#EC4899`, peri `#7C9CFF`,
-  coral `#FF7A4D`, sol `#FFD24A`, tinte `#D9C7FF`. Son rellenos, nunca texto.
-- **Alerta:** `#C62247`, el único rojo del sistema. Es el error del formulario
-  y está calculado para leerse sobre papel y sobre blanco.
-- **Tipografía:** Anton para el display (`.display` más `.display-xl/lg/md/sm`),
-  con interlineado aplastado y en versalitas: el titular es escultura, no
-  oración. Inter para todo lo demás, en 400 para lectura y 700 para estructura;
-  no hay pesos intermedios. `.label` es la etiqueta chica en versalitas.
-  Las sirve `next/font` desde el propio dominio: sin pedido a Google.
-- **Elevación:** un contorno negro de 1.5px (`shadow-key`). No hay sombras.
-- **Radios:** botones y pastillas en círculo completo, 20px tarjetas,
-  40px tarjetas grandes.
+`app/globals.css` copia esos valores tal cual. **Si hay que cambiar un color o
+un radio, se cambia primero en esos archivos.**
+
+Neón prensado contra obsidiana: el lienzo es negro total y cada elemento
+magenta o violeta se lee como luz que sube desde abajo de la superficie.
+
+- **Superficies:** ónix `#000000` de punta a punta, carbón `#18151E` para
+  tarjetas y bloques de contenido, magenta `#EC4899` para lo destacado y
+  violeta `#8B5CF6` para una sola tarjeta y el bloque del hero.
+- **Texto:** tiza `#FFFFFF` para absolutamente todo lo que se apoya sobre el
+  lienzo. Lo secundario baja opacidad (70% y 55%), que no es un color nuevo.
+  Obsidiana `#070607` existe solo para escribir **encima** de un relleno
+  brillante: magenta, violeta o tinte. Nunca sobre el negro.
+- **Etiquetas:** tinte violeta `#C4B5FD` con texto obsidiana. Es el único
+  elemento teñido de todo el sistema.
+- **Tipografía:** Anton para el display, que es el sustituto libre de
+  PP Neue Corp Compact (la original es de pago; `DESIGN.md` la nombra junto a
+  Bebas Neue y Druk Wide Bold). Va de 26px a 189px con tracking **positivo**
+  de +0.02em: a esa escala los trazos gruesos se chocan sin él. DM Sans para
+  todo lo demás, **siempre en 500** — en 400 se ve anémica al lado del display
+  y en 700 le compite. Las sirve `next/font` desde el propio dominio.
+- **Radios, el sistema de tres:** 100px los campos, 40px las tarjetas y los
+  botones rectangulares, píldora completa el resto.
+- **Elevación:** ninguna. Ni una sombra en todo el sitio. La jerarquía se arma
+  con contraste de color: negro → carbón → magenta.
+- **Divisores:** punteados de 1.5px, nunca rayados ni llenos.
+- **Layout:** 1280px de ancho máximo, 80px entre secciones, 40px de relleno
+  de tarjeta.
+
+### Las tres reglas que no se negocian
+
+1. Ni una sombra.
+2. Solo magenta y violeta como acentos, más el tinte violeta para etiquetas.
+   Ningún color más — el rojo de error también es magenta.
+3. El violeta no se usa para controles. Es superficie del hero, efecto y una
+   sola tarjeta destacada. Los botones son magenta.
 
 Las reglas de componentes (`.btn`, `.chip`, `.nav-link`, `.field-input`) van
 **dentro** de `@layer components`. Es importante: lo que queda fuera de una capa
 le gana a las utilidades de Tailwind, y entonces `md:hidden` deja de funcionar
 sobre cualquier componente que fije `display`. Ya pasó dos veces.
 
+### Los motivos firma
+
+1. **La trama de puntos** (`.halftone`): puntos magenta sobre un degradado
+   violeta→magenta que termina en magenta pleno arriba a la derecha. Va
+   siempre a escala de hero y con 40px de radio. Es lo más reconocible del
+   sistema.
+2. **El titular a 189px**, con interlineado 0.94.
+3. **El sistema de tres radios**, que da redondez sin monotonía.
+
 ## Animación
 
-El movimiento acompaña al collage, no lo protagoniza. El cursor propio, el campo
-de partículas, el magnetismo de los botones, la inclinación 3D de las tarjetas y
-el grano se fueron con el mundo oscuro.
+El movimiento acompaña, no protagoniza: el sistema es plano y editorial.
 
 **Capa global** (`components/motion/MotionProvider.tsx`)
 
@@ -147,32 +178,35 @@ el grano se fueron con el mundo oscuro.
 
 **Hero**
 
-- El encuentro (`components/brand/Hands.tsx`): la mano de la máquina entra
-  por la izquierda, la de la persona por la derecha, y entre las yemas de los
-  índices queda el hueco donde salta la chispa. Están dibujadas en SVG con
-  relleno plano y contorno negro, como el resto del sitio.
+- El bloque de trama a escala de hero, con dos manos apoyadas encima a punto
+  de tocarse: la de la máquina en obsidiana, la de la persona en tiza. Las dos
+  siluetas leen a máximo contraste contra el degradado, y obsidiana solo se usa
+  así, sobre un relleno brillante.
+- Están dibujadas en SVG (`components/brand/Hands.tsx`). Cada mano se arma en
+  dos pasadas: primero todas las piezas rellenas **y** trazadas del mismo
+  color, que al pisarse dejan una silueta sin costuras, y después las mismas
+  piezas sin trazo, que tapan lo que haya quedado adentro.
+- Las falanges no están escritas a mano: `seg()` arma una cápsula y `finger()`
+  las encadena. Para mover un dedo se tocan tres números —ángulos, largos y
+  anchos— y no quince paths.
 - Las manos se acercan al puntero. Todo el acercamiento cuelga de una sola
   custom property, `--reach` (0 lejos, 1 a punto de tocarse), que el puntero
   escribe sobre el contenedor: ni un solo render de React por movimiento.
   Sin puntero fino, o con movimiento reducido, se quedan quietas y ya cerca.
-- Nunca llegan a tocarse del todo. El hueco es el tema del afiche.
-- Cinco calcomanías de servicio que se arrastran a ese hueco y arman la
-  consulta: cada una que entra se queda orbitando el punto de contacto y
-  cambia la etiqueta del botón. El clic seco hace lo mismo que el arrastre.
+- **Nunca llegan a tocarse.** El hueco es el tema del afiche.
+- Cinco fichas de servicio que se arrastran a ese hueco y arman la consulta:
+  cada una que entra se queda orbitando el punto de contacto y cambia la
+  etiqueta del botón. El clic seco hace lo mismo que el arrastre.
 - Si nadie toca nada, el afiche se lee igual.
-
-Las falanges no están escritas a mano: `seg()` arma una cápsula y `finger()`
-las encadena. Para mover un dedo se tocan tres números —ángulos, largos y
-anchos— y no quince paths.
 
 **Por sección**
 
-- Marquesina negra a sangre entre el hero y el resto.
-- Servicios: la pieza destacada está apoyada torcida y se endereza al hover.
+- Marquesina de carbón a sangre, cerrada por divisores punteados.
+- Servicios: una sola tarjeta violeta con la trama encima, el resto en carbón.
 - Trabajos: barrido de revelado, filtros por tipo con `View Transitions` y
   visor de caso con foco atrapado y cierre con `Esc`.
-- Proceso: línea vertical que se dibuja con el scroll y paso activo encendido.
-- Preguntas: acordeón, con la fila abierta teñida.
+- Proceso: línea vertical que se dibuja en magenta con el scroll.
+- Preguntas: acordeón, con la fila abierta sobre carbón.
 - Contacto: etiquetas flotantes y botón que muta a un tilde dibujado.
 - Volver arriba: el símbolo gira 360° mientras la página sube.
 

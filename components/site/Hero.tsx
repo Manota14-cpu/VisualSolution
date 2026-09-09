@@ -8,16 +8,15 @@ import { hero, capabilities, heroServices, type HeroService } from "@/lib/conten
 
 /* ============================================================
    EL HERO
-   Un afiche: papel lavanda a sangre, la escena de las dos manos
-   a punto de tocarse, y debajo el titular gigante con el
-   interlineado aplastado para que las líneas se apilen como
-   bloques físicos.
-   Las calcomanías de servicio se arrastran al hueco entre las
-   manos y arman la consulta. Si nadie toca nada, el afiche se
-   lee igual.
+   El bloque de trama a escala de hero —puntos magenta sobre el
+   degradado violeta→magenta, que es la firma del sistema— con las
+   dos manos apoyadas encima a punto de tocarse. Debajo, el titular
+   a 189px, que es la otra firma.
+   Las fichas de servicio se arrastran al hueco entre las manos y
+   arman la consulta. Si nadie toca nada, el afiche se lee igual.
    ============================================================ */
 
-/* Posiciones de collage: pegadas a los bordes, nunca encima del
+/* Las fichas se apoyan en los bordes del bloque, nunca encima del
    punto de contacto, que es lo único que no se puede tapar. */
 const ARC: React.CSSProperties[] = [
   { top: "-5%", left: "1%" },
@@ -44,12 +43,6 @@ function Chip({
     <button
       type="button"
       className={`chip ${taken ? "is-taken" : ""} ${dragging ? "is-dragging" : ""}`}
-      style={
-        {
-          "--sticker": service.sticker,
-          "--rot": `${service.rot}deg`,
-        } as React.CSSProperties
-      }
       aria-pressed={taken}
       onClick={onToggle}
       onPointerDown={(e) => {
@@ -120,13 +113,14 @@ export function Hero() {
   }, [elegidos]);
 
   return (
-    <section className="relative overflow-hidden bg-canvas pb-16 pt-28 md:pb-24 md:pt-32" id="top">
+    <section className="relative overflow-hidden bg-onyx pb-16 pt-28 md:pb-24 md:pt-32" id="top">
       <div className="relative mx-auto w-full max-w-[1440px] px-4 md:px-10">
-        {/* La escena. Las calcomanías flotan sobre ella en collage. */}
+        {/* El bloque de trama con las manos encima. Las fichas se apoyan
+            en sus bordes. */}
         <div className="relative mx-auto w-full max-w-[1040px]">
           <div ref={stage} className={`stage relative ${over ? "is-over" : ""}`}>
             <Hands
-              className="animate-rise aspect-[6/5] w-full border border-carbon md:aspect-[15/7]"
+              className="halftone animate-rise aspect-[6/5] w-full md:aspect-[15/7]"
               services={taken}
             />
           </div>
@@ -167,9 +161,11 @@ export function Hero() {
         </p>
 
         <h1 className="display display-xl animate-rise mt-6 text-center" style={{ animationDelay: ".1s" }}>
-          {hero.claim[0]}
-          <br />
-          {hero.claim[1]}
+          {hero.claim.map((linea, i) => (
+            <span key={linea} className="block">
+              {linea}
+            </span>
+          ))}
         </h1>
 
         <p
@@ -182,14 +178,13 @@ export function Hero() {
         {/* Lo armado. Cada pieza se saca desde acá. */}
         {elegidos.length > 0 && (
           <div className="mt-8 text-center">
-            <p className="label text-smoke">Tu proyecto</p>
+            <p className="label text-chalk/55">Tu proyecto</p>
             <ul className="mt-3 flex flex-wrap justify-center gap-2">
               {elegidos.map((s) => (
                 <li key={s.id}>
                   <button
                     type="button"
                     className="taken"
-                    style={{ "--sticker": s.sticker } as React.CSSProperties}
                     onClick={() => toggle(s.id)}
                   >
                     {s.label}
@@ -229,14 +224,14 @@ export function Marquee() {
       {capabilities.map((cap) => (
         <span key={cap}>
           {cap}
-          <span aria-hidden="true"> ✦ </span>
+          <span className="sep" aria-hidden="true"> ✦ </span>
         </span>
       ))}
     </div>
   );
 
   return (
-    <div className="marquee-band border-y border-carbon">
+    <div className="marquee-band border-y border-chalk/20">
       <div className="overflow-hidden">
         <div className="animate-marquee flex w-max">
           {line(false)}

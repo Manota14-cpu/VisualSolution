@@ -70,14 +70,14 @@ export function ScrollProgress() {
     <div className="progress-wrap fixed inset-x-0 top-0 z-50 h-0.5" aria-hidden="true">
       <div
         className="progress h-full w-full"
-        style={{ background: "var(--color-violet)" }}
+        style={{ background: "var(--color-magenta)" }}
       />
     </div>
   );
 }
 
-/* El grano se fue con el mundo oscuro: acá las superficies son
-   papel plano, sin textura encima. */
+/* El grano no va: Caldera es plano y la textura del sistema es la
+   trama de puntos del hero, no un ruido encima de todo. */
 export function Grain() {
   return null;
 }

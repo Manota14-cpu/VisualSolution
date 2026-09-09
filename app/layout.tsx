@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Anton } from "next/font/google";
+import { DM_Sans, Anton } from "next/font/google";
 import "./globals.css";
 import { MarkGradient } from "@/components/brand/Mark";
 import { MotionProvider } from "@/components/motion/MotionProvider";
@@ -8,16 +8,19 @@ import { site } from "@/lib/content";
 
 /* next/font descarga y sirve las tipografías desde el propio dominio:
    sin pedido a Google en runtime y sin salto de layout al cargar. */
-const inter = Inter({
+/* DM Sans va solo en 500. El sistema no admite ni 400 ni 700: en 400
+   se ve anémica al lado del display ultrabold y en 700 le compite. */
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-inter",
+  weight: ["500"],
+  variable: "--font-dm-sans",
   display: "swap",
 });
 
-/* Anton hace de Lateral: un solo peso, ultracondensado y pesado, que
-   es lo que permite el interlineado aplastado sin que las líneas se
-   toquen. Es el sustituto libre más cercano al display del original. */
+/* Anton reemplaza a PP Neue Corp Compact, que es una tipografía de
+   pago. DESIGN.md la nombra como sustituto válido junto a Bebas Neue y
+   Druk Wide Bold: un solo peso, ultracondensado y pesado, que es lo que
+   sostiene el display a 189px. */
 const anton = Anton({
   subsets: ["latin"],
   weight: ["400"],
@@ -38,12 +41,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#EAE3FB",
+  themeColor: "#000000",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${inter.variable} ${anton.variable}`}>
+    <html lang="es" className={`${dmSans.variable} ${anton.variable}`}>
       <body>
         <MarkGradient />
         <Preloader />
@@ -52,7 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <MotionProvider />
 
         <a
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-btn focus:border focus:border-carbon focus:bg-recessed focus:px-4 focus:py-2 focus:text-[13px] focus:text-carbon"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-pills focus:bg-magenta focus:px-5 focus:py-3 focus:text-obsidian"
           href="#main"
         >
           Ir al contenido

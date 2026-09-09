@@ -93,7 +93,7 @@ function WorkCard({
       >
         <div
           ref={wipe}
-          className={`tilt shot wipe relative rounded-card shadow-keysoft ${work.ratio}`}
+          className={`tilt shot wipe relative rounded-cards ${work.ratio}`}
           style={morphing ? ({ viewTransitionName: morphNameFor(work.id) } as React.CSSProperties) : undefined}
         >
           <Image
@@ -107,12 +107,12 @@ function WorkCard({
       </a>
       <div className="mt-4 flex items-baseline justify-between gap-4">
         <div>
-          <h3 className="text-[17px] font-bold leading-snug text-carbon">{work.title}</h3>
-          <p className="mt-1 text-xs text-smoke">{work.kind}</p>
+          <h3 className="text-lg font-medium leading-snug text-chalk">{work.title}</h3>
+          <p className="mt-1 text-xs text-chalk/55">{work.kind}</p>
         </div>
         <span className="badge">{work.year}</span>
       </div>
-      <p className="work-detail mt-2 label text-smoke">{detail}</p>
+      <p className="work-detail mt-2 label text-chalk/55">{detail}</p>
     </article>
   );
 }
@@ -184,7 +184,7 @@ export function Works() {
   }, [close]);
 
   return (
-    <section className="bg-canvas py-20 md:py-28" id="trabajos">
+    <section className="bg-onyx py-20 md:py-28" id="trabajos">
       <div className="mx-auto w-full max-w-[1200px] px-4 md:px-10">
         <div className="mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <Reveal>
@@ -225,7 +225,7 @@ export function Works() {
         </div>
 
         {visible.length === 0 && (
-          <p className="mt-8 label text-smoke">No hay trabajos de ese tipo todavía.</p>
+          <p className="mt-8 label text-chalk/55">No hay trabajos de ese tipo todavía.</p>
         )}
       </div>
 

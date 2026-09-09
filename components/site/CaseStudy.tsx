@@ -20,7 +20,7 @@ import type { Work } from "@/lib/content";
 export function CaseCover({ work, morphName }: { work: Work; morphName?: string }) {
   return (
     <div
-      className="shot relative aspect-[16/9] w-full overflow-hidden rounded-card md:aspect-[21/9]"
+      className="shot relative aspect-[16/9] w-full overflow-hidden rounded-cards md:aspect-[21/9]"
       style={morphName ? ({ viewTransitionName: morphName } as React.CSSProperties) : undefined}
     >
       <Image
@@ -45,11 +45,11 @@ function Facts({ work }: { work: Work }) {
     ];
 
   return (
-    <dl className="grid grid-cols-2 gap-x-8 gap-y-6 border-y border-carbon py-8 md:grid-cols-4">
+    <dl className="grid grid-cols-2 gap-x-8 gap-y-6 border-y border-dotted border-chalk/30 py-8 md:grid-cols-4">
       {facts.map((f) => (
         <div key={f.label}>
-          <dt className="label text-smoke">{f.label}</dt>
-          <dd className="mt-2 text-base text-carbon">{f.value}</dd>
+          <dt className="label text-chalk/55">{f.label}</dt>
+          <dd className="mt-2 text-base text-chalk">{f.value}</dd>
         </div>
       ))}
     </dl>
@@ -65,11 +65,11 @@ function Chapter({ chapter, index }: { chapter: NonNullable<Work["chapters"]>[nu
         <h2 className="display display-sm">
           {chapter.title}
         </h2>
-        <p className="mt-5 max-w-[58ch] text-base leading-relaxed text-ash">{chapter.body}</p>
+        <p className="mt-5 max-w-[58ch] text-base leading-relaxed text-chalk/70">{chapter.body}</p>
       </div>
 
       {chapter.image ? (
-        <div className="shot relative aspect-[4/3] overflow-hidden rounded-card shadow-keysoft">
+        <div className="shot relative aspect-[4/3] overflow-hidden rounded-cards">
           <Image
             src={chapter.image}
             alt=""
@@ -82,7 +82,7 @@ function Chapter({ chapter, index }: { chapter: NonNullable<Work["chapters"]>[nu
         /* Sin imagen el capítulo respira solo: una regla y el número,
            en vez de un hueco o una tarjeta vacía. */
         <div className="hidden items-start justify-end md:flex">
-          <span className="label text-smoke">
+          <span className="label text-chalk/55">
             {String(index + 1).padStart(2, "0")}
           </span>
         </div>
@@ -101,7 +101,7 @@ function Gallery({ images, title }: { images: string[]; title: string }) {
         {images.map((src, i) => (
           <div
             key={src}
-            className="shot relative aspect-[3/4] w-[72vw] shrink-0 snap-center overflow-hidden rounded-card shadow-keysoft md:w-[340px]"
+            className="shot relative aspect-[3/4] w-[72vw] shrink-0 snap-center overflow-hidden rounded-cards md:w-[340px]"
           >
             <Image
               src={src}
@@ -144,12 +144,12 @@ export function CaseProgress({ scroller }: { scroller?: React.RefObject<HTMLElem
   }, [scroller]);
 
   return (
-    <div className="absolute inset-x-0 bottom-0 h-px bg-hairline" aria-hidden="true">
+    <div className="absolute inset-x-0 bottom-0 h-px bg-chalk/20" aria-hidden="true">
       <div
         className="h-full origin-left"
         style={{
           transform: `scaleX(${p})`,
-          background: "var(--color-violet)",
+          background: "var(--color-magenta)",
         }}
       />
     </div>
@@ -179,7 +179,7 @@ export function CaseStudy({
             {work.title}
           </h1>
           {work.summary && (
-            <p className="mt-4 max-w-[58ch] text-lg leading-relaxed text-ash">{work.summary}</p>
+            <p className="mt-4 max-w-[58ch] text-lg leading-relaxed text-chalk/70">{work.summary}</p>
           )}
         </div>
       </header>
@@ -189,7 +189,7 @@ export function CaseStudy({
       </div>
 
       {hasStory ? (
-        <div className="divide-y divide-carbon">
+        <div className="divide-y divide-dotted divide-chalk/30">
           {work.chapters!.map((c, i) => (
             <Chapter key={c.title} chapter={c} index={i} />
           ))}
@@ -197,7 +197,7 @@ export function CaseStudy({
       ) : (
         /* Ficha compacta: no pide disculpas por no tener historia,
            muestra lo que hay y ofrece la conversación. */
-        <p className="max-w-[58ch] py-14 text-base leading-relaxed text-ash md:py-20">
+        <p className="max-w-[58ch] py-14 text-base leading-relaxed text-chalk/70 md:py-20">
           Si querés ver el detalle de este trabajo o algo parecido para tu negocio, escribinos y te lo
           mostramos.
         </p>
@@ -205,7 +205,7 @@ export function CaseStudy({
 
       {work.gallery?.length ? <Gallery images={work.gallery} title={work.title} /> : null}
 
-      <footer className="border-t border-carbon pt-12 text-center">
+      <footer className="border-t border-dotted border-chalk/30 pt-12 text-center">
         <p className="mx-auto max-w-[34ch] display display-sm">
           ¿Querés algo así para tu negocio?
         </p>

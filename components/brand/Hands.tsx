@@ -246,7 +246,7 @@ export function Hands({ className, services = [] }: { className?: string; servic
         <g className="orbita">
           {tomados.map((s, i) => (
             <g key={s.id} style={{ animationDelay: `${i * 70}ms` }}>
-              <circle cx={ORBITA[i].x} cy={ORBITA[i].y} r="26" style={{ fill: s.sticker }} />
+              <circle cx={ORBITA[i].x} cy={ORBITA[i].y} r="26" />
               <text x={ORBITA[i].x} y={ORBITA[i].y + 5}>
                 {s.code}
               </text>

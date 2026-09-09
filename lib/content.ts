@@ -31,7 +31,7 @@ export const nav = [
 export const hero = {
   headline: "Donde la idea toca la máquina.",
   /* El reclamo del hero, partido en las dos lineas del afiche. */
-  claim: ["Donde la idea", "toca la máquina."],
+  claim: ["Donde la idea", "toca la", "máquina."],
   sub: "Estudio de desarrollo web y producción audiovisual. Un solo equipo para toda tu presencia digital.",
   primaryCta: "Empezar proyecto",
   secondaryCta: "Ver trabajos",
@@ -45,14 +45,14 @@ export const hero = {
    valor que recibe el <select> del formulario cuando se elige una
    sola; con dos o mas pasa a 'Varias cosas a la vez'.
    ============================================================ */
-export type HeroService = { id: string; code: string; label: string; formValue: string; sticker: string; rot: number };
+export type HeroService = { id: string; code: string; label: string; formValue: string };
 
 export const heroServices: HeroService[] = [
-  { id: 'web', code: 'WEB', label: 'Sitio web', formValue: 'Sitio web', sticker: 'var(--color-violet)', rot: -7 },
-  { id: 'shop', code: 'SHP', label: 'Tienda online', formValue: 'Tienda online', sticker: 'var(--color-sun)', rot: 5 },
-  { id: 'video', code: 'VID', label: 'Video y foto', formValue: 'Contenido audiovisual', sticker: 'var(--color-coral)', rot: -4 },
-  { id: 'brand', code: 'IDV', label: 'Identidad', formValue: 'Identidad visual', sticker: 'var(--color-pink)', rot: 8 },
-  { id: 'auto', code: 'AUT', label: 'Automatización', formValue: 'Varias cosas a la vez', sticker: 'var(--color-peri)', rot: -6 },
+  { id: 'web', code: 'WEB', label: 'Sitio web', formValue: 'Sitio web' },
+  { id: 'shop', code: 'SHP', label: 'Tienda online', formValue: 'Tienda online' },
+  { id: 'video', code: 'VID', label: 'Video y foto', formValue: 'Contenido audiovisual' },
+  { id: 'brand', code: 'IDV', label: 'Identidad', formValue: 'Identidad visual' },
+  { id: 'auto', code: 'AUT', label: 'Automatización', formValue: 'Varias cosas a la vez' },
 ];
 
 export const capabilities = [
