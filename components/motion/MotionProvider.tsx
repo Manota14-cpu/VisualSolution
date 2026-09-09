@@ -251,8 +251,10 @@ export function MotionProvider() {
     const offTask = addTask(() => {
       rx = lerp(rx, pointer.x, 0.16);
       ry = lerp(ry, pointer.y, 0.16);
-      dot.style.transform = `translate3d(${pointer.x}px,${pointer.y}px,0)`;
-      ring.style.transform = `translate3d(${rx}px,${ry}px,0)`;
+      dot.style.setProperty("--cx", `${pointer.x}px`);
+      dot.style.setProperty("--cy", `${pointer.y}px`);
+      ring.style.setProperty("--cx", `${rx.toFixed(1)}px`);
+      ring.style.setProperty("--cy", `${ry.toFixed(1)}px`);
     });
 
     const HIT = "a, button, .card, [role='button'], summary, .pill, .mq-word";

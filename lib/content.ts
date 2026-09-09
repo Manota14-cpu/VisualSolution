@@ -109,6 +109,9 @@ export const workFilters = [
   { id: "identidad", label: "Identidad" },
 ] as const;
 
+export type Fact = { label: string; value: string };
+export type Chapter = { title: string; body: string; image?: string };
+
 export type Work = {
   id: string;
   title: string;
@@ -120,9 +123,15 @@ export type Work = {
   thumb: string;
   full: string;
   alt: string;
-  /* Opcional. Si esta, aparece en el visor junto a un boton para
-     consultar por el proyecto. Los que no la tienen se muestran igual. */
-  description?: string;
+  /* Frase corta. Se lee bajo el título en la portada del caso. */
+  summary?: string;
+  /* Datos duros del proyecto. Sin esto se arman solos con kind y year. */
+  facts?: Fact[];
+  /* La historia. Un proyecto con capítulos abre el caso completo; sin
+     ellos abre una ficha compacta, que también se ve terminada. */
+  chapters?: Chapter[];
+  /* Imágenes sueltas al pie del caso, en una tira que se desliza. */
+  gallery?: string[];
 };
 
 /* TODO: reemplazar por proyectos reales. Los nombres, rubros y fotos
@@ -139,10 +148,44 @@ export const works: Work[] = [
     thumb: "https://picsum.photos/seed/visualsolution-work-restaurant/1100/690",
     full: "https://picsum.photos/seed/visualsolution-work-restaurant/1600/1000",
     alt: "Sitio web del restaurante Casa Ferrán",
-    /* TODO: reemplazar por la descripcion real de la aplicacion.
-       Conviene contar que resuelve, para quien es y en que estado esta. */
-    description:
-      "PLACEHOLDER: acá va la descripción de la aplicación que estás desarrollando. Contá qué resuelve, para quién es y en qué estado está. Quien la lea puede consultarte desde el botón de abajo.",
+    /* TODO: todo el contenido de este caso es un esqueleto para que lo
+       completes con la aplicación real que estás desarrollando. La
+       estructura ya está: reemplazá los textos y las imágenes. */
+    summary:
+      "PLACEHOLDER: una frase que diga qué es la aplicación y para quién. Es lo primero que se lee al abrir el caso.",
+    facts: [
+      { label: "Rubro", value: "Gastronomía" },
+      { label: "Trabajo", value: "Sitio web y reservas" },
+      { label: "Año", value: "2025" },
+      { label: "Estado", value: "En desarrollo" },
+    ],
+    chapters: [
+      {
+        title: "El problema",
+        body: "PLACEHOLDER: qué estaba roto antes. Qué le costaba tiempo o plata al negocio, y por qué las soluciones que ya existían no alcanzaban. Cuanto más concreto, mejor: acá es donde el lector se reconoce.",
+        image: "https://picsum.photos/seed/visualsolution-case-problema/1400/900",
+      },
+      {
+        title: "Qué construimos",
+        body: "PLACEHOLDER: qué hace la aplicación, contado desde lo que la persona puede hacer con ella, no desde la tecnología. Las decisiones técnicas van en el capítulo siguiente.",
+        image: "https://picsum.photos/seed/visualsolution-case-producto/1400/900",
+      },
+      {
+        title: "Cómo está hecha",
+        body: "PLACEHOLDER: acá sí va lo técnico. Qué stack, qué decisiones tomaste y por qué. Este capítulo es el que convence a un cliente que sabe de qué habla.",
+      },
+      {
+        title: "En qué estado está",
+        body: "PLACEHOLDER: qué funciona hoy, qué falta y cuándo sale. Si querés que te pregunten por la app, este capítulo es el que abre la conversación.",
+        image: "https://picsum.photos/seed/visualsolution-case-estado/1400/900",
+      },
+    ],
+    gallery: [
+      "https://picsum.photos/seed/visualsolution-case-g1/900/1200",
+      "https://picsum.photos/seed/visualsolution-case-g2/900/1200",
+      "https://picsum.photos/seed/visualsolution-case-g3/900/1200",
+      "https://picsum.photos/seed/visualsolution-case-g4/900/1200",
+    ],
   },
   {
     id: "talleres-bravo",
@@ -155,6 +198,8 @@ export const works: Work[] = [
     thumb: "https://picsum.photos/seed/visualsolution-work-store/1100/690",
     full: "https://picsum.photos/seed/visualsolution-work-store/1600/1000",
     alt: "Tienda online de indumentaria",
+    summary:
+      "PLACEHOLDER: una línea sobre qué se vende y qué resolvió la tienda.",
   },
   {
     id: "lumen-cafe",
@@ -167,6 +212,8 @@ export const works: Work[] = [
     thumb: "https://picsum.photos/seed/visualsolution-work-coffee/800/600",
     full: "https://picsum.photos/seed/visualsolution-work-coffee/1400/1050",
     alt: "Contenido vertical para una cafetería",
+    summary:
+      "PLACEHOLDER: una línea sobre el tipo de contenido y con qué frecuencia sale.",
   },
   {
     id: "nordelta-padel",
@@ -179,6 +226,8 @@ export const works: Work[] = [
     thumb: "https://picsum.photos/seed/visualsolution-work-padel/800/600",
     full: "https://picsum.photos/seed/visualsolution-work-padel/1400/1050",
     alt: "Aplicación de reservas de canchas",
+    summary:
+      "PLACEHOLDER: una línea sobre qué reserva la gente y desde dónde.",
   },
   {
     id: "estudio-mirasol",
@@ -191,6 +240,8 @@ export const works: Work[] = [
     thumb: "https://picsum.photos/seed/visualsolution-work-studio-brand/800/600",
     full: "https://picsum.photos/seed/visualsolution-work-studio-brand/1400/1050",
     alt: "Sistema de identidad visual aplicado a papelería",
+    summary:
+      "PLACEHOLDER: una línea sobre el alcance de la identidad y dónde se aplica.",
   },
 ];
 

@@ -4,10 +4,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { flushSync } from "react-dom";
 import { Reveal, SplitHeading, useReveal } from "@/components/motion/Reveal";
-import { lockScroll, scrollToId } from "@/components/motion/MotionProvider";
+import { CaseLayer } from "@/components/site/CaseLayer";
+import { scrollToId } from "@/components/motion/MotionProvider";
 import { askAbout } from "@/lib/consult";
 import { useMotionEnv, withTransition } from "@/lib/motion";
 import { workFilters, works, type Work } from "@/lib/content";
+
+/* El nombre de transición tiene que ser único en todo el documento, así
+   que sólo lo lleva la ficha que se está abriendo. */
+const morphNameFor = (id: string) => `caso-${id}`;
 
 /* Inclinación con el origen en el punto del cursor, con el trabajo por
    cuadro limitado a un rAF. */
@@ -55,25 +60,42 @@ function useTilt<T extends HTMLElement>(strength = 7) {
   return host;
 }
 
-function WorkCard({ work, hidden, onOpen }: { work: Work; hidden: boolean; onOpen: (w: Work) => void }) {
+function WorkCard({
+  work,
+  hidden,
+  morphing,
+  onOpen,
+}: {
+  work: Work;
+  hidden: boolean;
+  morphing: boolean;
+  onOpen: (w: Work) => void;
+}) {
   const host = useTilt<HTMLElement>();
   // el <article> lleva .rv: hay que registrarlo aunque el ref sea del tilt
   useReveal<HTMLElement>(host);
   const wipe = useReveal<HTMLDivElement>();
+  const detail = work.chapters?.length ? "Ver el caso" : "Ver ficha";
 
   return (
-    <article
-      ref={host}
-      className={`work group rv ${work.span} ${hidden ? "is-out" : ""}`}
-      hidden={hidden}
-    >
-      <button
-        type="button"
+    <article ref={host} className={`work group rv ${work.span} ${hidden ? "is-out" : ""}`} hidden={hidden}>
+      <a
         className="work-open block w-full text-left"
-        aria-label={`Ampliar ${work.title}`}
-        onClick={() => onOpen(work)}
+        href={`/trabajos/${work.id}`}
+        aria-label={`Abrir el caso ${work.title}`}
+        onClick={(e) => {
+          // Es un enlace real para que se pueda abrir en otra pestaña y
+          // los buscadores lo sigan. El clic normal lo intercepta la capa.
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+          e.preventDefault();
+          onOpen(work);
+        }}
       >
-        <div ref={wipe} className={`tilt shot wipe relative rounded-card shadow-keysoft ${work.ratio}`}>
+        <div
+          ref={wipe}
+          className={`tilt shot wipe relative rounded-card shadow-keysoft ${work.ratio}`}
+          style={morphing ? ({ viewTransitionName: morphNameFor(work.id) } as React.CSSProperties) : undefined}
+        >
           <Image
             src={work.thumb}
             alt={work.alt}
@@ -82,7 +104,7 @@ function WorkCard({ work, hidden, onOpen }: { work: Work; hidden: boolean; onOpe
             className="object-cover"
           />
         </div>
-      </button>
+      </a>
       <div className="mt-4 flex items-baseline justify-between gap-4">
         <div>
           <h3 className="text-sm font-medium text-white">{work.title}</h3>
@@ -90,129 +112,76 @@ function WorkCard({ work, hidden, onOpen }: { work: Work; hidden: boolean; onOpe
         </div>
         <span className="badge">{work.year}</span>
       </div>
-      {work.description && (
-        <p className="mt-2 font-mono text-[11px] uppercase tracking-[.8px] text-smoke">Ver detalle</p>
-      )}
+      <p className="work-detail mt-2 font-mono text-[11px] uppercase tracking-[.8px] text-smoke">{detail}</p>
     </article>
   );
 }
 
-function Lightbox({ work, onClose }: { work: Work; onClose: () => void }) {
-  const box = useRef<HTMLDivElement>(null);
-  const closeBtn = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    lockScroll(true);
-    closeBtn.current?.focus();
-    return () => lockScroll(false);
-  }, []);
-
-  // foco atrapado mientras el visor está abierto
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-        return;
-      }
-      if (e.key !== "Tab") return;
-      const f = Array.from(box.current?.querySelectorAll<HTMLElement>("button, [href]") ?? []);
-      if (!f.length) return;
-      const first = f[0];
-      const last = f[f.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
-  return (
-    <div
-      ref={box}
-      className="lightbox"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="lb-title"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <button ref={closeBtn} className="lb-close" type="button" aria-label="Cerrar" onClick={onClose}>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-        </svg>
-      </button>
-      <figure>
-        <Image
-          src={work.full}
-          alt={`${work.title}, vista ampliada`}
-          width={1600}
-          height={1000}
-          className="h-auto w-full rounded-[20px]"
-        />
-        <figcaption className="mt-5">
-          <div className="flex items-baseline justify-between gap-4">
-            <div>
-              <h3 className="text-lg font-medium text-white" id="lb-title">
-                {work.title}
-              </h3>
-              <p className="mt-1 text-sm text-smoke">{work.kind}</p>
-            </div>
-            <span className="badge">{work.year}</span>
-          </div>
-
-          {/* Solo los proyectos con descripción muestran el detalle y la
-              puerta de salida hacia el contacto. */}
-          {work.description && (
-            <>
-              <p className="mt-4 max-w-[62ch] text-base leading-relaxed text-ash">{work.description}</p>
-              <button
-                className="btn btn-solid mt-5"
-                type="button"
-                onClick={() => {
-                  askAbout(work.title);
-                  onClose();
-                  window.setTimeout(() => scrollToId("contacto"), 60);
-                }}
-              >
-                <i className="diamond" aria-hidden="true" />
-                Consultar por este proyecto
-              </button>
-            </>
-          )}
-        </figcaption>
-      </figure>
-    </div>
-  );
-}
-
 export function Works() {
-  const [filter, setFilter] = useState<string>("todos");
+  const [filter, setFilter] = useState("todos");
   const [open, setOpen] = useState<Work | null>(null);
+  /* Se separa del abierto: el nombre de transición debe estar puesto en
+     la tarjeta ANTES de que empiece la captura, y seguir puesto hasta
+     que la vuelta termine. */
+  const [morphId, setMorphId] = useState<string | null>(null);
   const { reduce } = useMotionEnv();
+  const pushedUrl = useRef(false);
 
   const visible = works.filter((w) => filter === "todos" || w.category === filter);
 
-  /* flushSync es necesario: dentro de startViewTransition, un setState
-     normal no se aplica a tiempo y la transición captura el DOM viejo,
-     con lo que el filtro y el visor quedan una acción atrasados. */
   const pick = useCallback(
     (id: string) => withTransition(() => flushSync(() => setFilter(id)), reduce),
     [reduce]
   );
+
+  /* Cerrar de verdad. Lo llama sólo el popstate, para que haya un
+     único camino: si cerráramos acá Y además volviéramos atrás, el
+     popstate cerraría por segunda vez y las dos transiciones se
+     pisarían, dejando la capa en un estado inconsistente. */
+  const closeNow = useCallback(() => {
+    withTransition(() => flushSync(() => setOpen(null)), reduce);
+    // el nombre se suelta recién cuando la transición terminó
+    window.setTimeout(() => setMorphId(null), 700);
+  }, [reduce]);
+
+  /* La URL manda: cerrar es volver atrás, y el popstate hace el resto. */
+  const close = useCallback(() => {
+    if (pushedUrl.current) {
+      pushedUrl.current = false;
+      history.back();
+    } else {
+      closeNow();
+    }
+  }, [closeNow]);
+
   const show = useCallback(
-    (w: Work) => withTransition(() => flushSync(() => setOpen(w)), reduce),
+    (work: Work) => {
+      // 1. la tarjeta recibe el nombre y se pinta antes de la captura
+      flushSync(() => setMorphId(work.id));
+      // 2. la transición captura el estado viejo y aplica el nuevo
+      withTransition(() => flushSync(() => setOpen(work)), reduce);
+      // 3. la URL queda compartible y el botón atrás cierra el caso
+      history.pushState({ caso: work.id }, "", `/trabajos/${work.id}`);
+      pushedUrl.current = true;
+    },
     [reduce]
   );
-  const hide = useCallback(
-    () => withTransition(() => flushSync(() => setOpen(null)), reduce),
-    [reduce]
-  );
+
+  /* El botón atrás del navegador cierra el caso en vez de sacarte del
+     sitio. Como la URL ya volvió sola, no hay que tocarla de nuevo. */
+  useEffect(() => {
+    const onPop = () => {
+      pushedUrl.current = false;
+      closeNow();
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [closeNow]);
+
+  const consultar = useCallback(() => {
+    close();
+    window.setTimeout(() => scrollToId("contacto"), 220);
+  }, [close]);
 
   return (
     <section className="border-t border-hairline py-20 md:py-28" id="trabajos">
@@ -250,6 +219,7 @@ export function Works() {
               key={w.id}
               work={w}
               hidden={filter !== "todos" && w.category !== filter}
+              morphing={morphId === w.id}
               onOpen={show}
             />
           ))}
@@ -260,7 +230,14 @@ export function Works() {
         )}
       </div>
 
-      {open && <Lightbox work={open} onClose={hide} />}
+      {open && (
+        <CaseLayer
+          work={open}
+          morphName={morphId === open.id ? morphNameFor(open.id) : undefined}
+          onClose={close}
+          onConsult={consultar}
+        />
+      )}
     </section>
   );
 }

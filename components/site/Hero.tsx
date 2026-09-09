@@ -23,7 +23,6 @@ export function Hero() {
           className="animate-drift-b absolute right-[-10vw] top-[34%] h-24 w-[62vw] rounded-full opacity-55 blur-[46px]"
           style={{ background: "linear-gradient(90deg,transparent,rgba(139,92,246,.8),transparent)" }}
         />
-        <div className="grid-faint absolute inset-0 opacity-70" />
         <div
           className="absolute inset-0"
           style={{ background: "linear-gradient(to bottom,transparent 52%,#040506 100%)" }}

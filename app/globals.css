@@ -309,7 +309,7 @@ body {
 }
 
 /* preguntas */
-.chev { transition: transform .42s cubic-bezier(.34,1.56,.64,1), border-color .3s, color .3s; }
+.chev { transition: transform .42s cubic-bezier(.16,1,.3,1), border-color .3s, color .3s; }
 .faq-row { transition: background-color .3s; border-radius: 12px; }
 .faq-row.is-open { background: rgba(255,255,255,.022); }
 .faq-row.is-open .chev { border-color: var(--color-edge); color: #fff; transform: rotate(135deg); }
@@ -355,10 +355,7 @@ body {
 }
 .fine .mq-word:hover {
   transform: scale(1.14);
-  background: linear-gradient(102deg, #8B5CF6, #EC4899);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #fff;
 }
 
 /* barra de progreso de lectura, solo donde el navegador la soporta */
@@ -377,15 +374,6 @@ body {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='0.55'/></svg>");
 }
 
-/* rejilla tenue de fondo */
-.grid-faint {
-  background-image:
-    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(70% 60% at 50% 40%, #000, transparent 78%);
-  -webkit-mask-image: radial-gradient(70% 60% at 50% 40%, #000, transparent 78%);
-}
 
 /* botones magnéticos */
 .mag { will-change: transform; }
@@ -393,7 +381,7 @@ body {
 
 /* header condensado */
 .nav-shell {
-  transition: padding .35s cubic-bezier(.16,1,.3,1), background-color .35s, border-color .35s, backdrop-filter .35s;
+  transition: background-color .35s, border-color .35s, backdrop-filter .35s;
 }
 .nav-shell.is-stuck {
   padding-top: 5px; padding-bottom: 5px;
@@ -437,9 +425,13 @@ body {
   pointer-events: none;
   border-radius: 9999px;
   opacity: 0;
-  transition: opacity .25s, width .22s cubic-bezier(.16,1,.3,1), height .22s cubic-bezier(.16,1,.3,1), background-color .22s, border-color .22s;
+  transform: translate3d(var(--cx, 0px), var(--cy, 0px), 0) scale(var(--s, 1));
+  transition: opacity .25s, transform .22s cubic-bezier(.16,1,.3,1), background-color .22s, border-color .22s;
   will-change: transform;
 }
+/* El movimiento lo escribe el script cuadro a cuadro en --cx/--cy, así
+   que la transición sólo alcanza al escalado del hover. */
+#cur-dot, #cur-ring { transition-property: opacity, background-color, border-color, scale; }
 #cur-dot { width: 5px; height: 5px; background: #fff; margin: -2.5px 0 0 -2.5px; }
 #cur-ring { width: 30px; height: 30px; border: 1px solid rgba(255,255,255,.35); margin: -15px 0 0 -15px; }
 .fine.cursor-on #cur-dot, .fine.cursor-on #cur-ring { opacity: 1; }
@@ -450,36 +442,12 @@ body {
 .fine.cursor-on.on-field #cur-dot { opacity: 0; }
 .fine.cursor-on.on-field #cur-ring { opacity: .35; }
 .fine.cursor-on.on-hit #cur-ring {
-  width: 52px; height: 52px; margin: -26px 0 0 -26px;
+  --s: 1.73;
   border-color: rgba(236,72,153,.55);
   background: rgba(139,92,246,.08);
 }
-.fine.cursor-on.on-hit #cur-dot { width: 3px; height: 3px; margin: -1.5px 0 0 -1.5px; }
+.fine.cursor-on.on-hit #cur-dot { --s: .6; }
 
-/* visor de caso */
-.lightbox {
-  position: fixed; inset: 0; z-index: 70;
-  display: grid; place-items: center;
-  padding: 24px;
-  background: rgba(4,5,6,.86);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  animation: lb-in .3s cubic-bezier(.16,1,.3,1);
-}
-.lightbox figure { margin: 0; width: min(1000px, 100%); animation: lb-pop .45s cubic-bezier(.16,1,.3,1); }
-.lightbox img {
-  width: 100%; height: auto; display: block;
-  border-radius: 20px;
-  box-shadow: 0 1px 0 0 rgba(255,255,255,.05) inset, 0 0 0 1px rgba(255,255,255,.14), 0 40px 80px -20px rgba(0,0,0,.8);
-}
-.lb-close {
-  position: absolute; top: 20px; right: 20px;
-  display: grid; place-items: center;
-  width: 40px; height: 40px; border-radius: 9999px;
-  border: 1px solid var(--color-hairline); background: rgba(7,8,10,.7); color: var(--color-mist);
-  cursor: pointer; transition: border-color .2s, background-color .2s;
-}
-.lb-close:hover { border-color: var(--color-edge); background: rgba(17,18,20,.9); }
 
 /* volver arriba */
 #btt {
@@ -505,6 +473,94 @@ html.lenis, html.lenis body { height: auto; }
 
 :focus-visible { outline: 2px solid var(--color-pink); outline-offset: 3px; border-radius: 4px; }
 ::selection { background: rgba(236,72,153,.32); color: #fff; }
+
+/* ============================================================
+   EL CASO
+   La capa se monta encima de la grilla y scrollea por dentro, con
+   data-lenis-prevent para que el scroll con inercia de la página no
+   le pelee la rueda.
+   ============================================================ */
+.case-layer {
+  position: fixed; inset: 0; z-index: 70;
+  overflow-y: auto; overscroll-behavior: contain;
+  background: var(--color-canvas);
+  animation: case-in .45s cubic-bezier(.16,1,.3,1);
+}
+@keyframes case-in { from { opacity: 0; } to { opacity: 1; } }
+
+.case-bar {
+  position: sticky; top: 0; z-index: 2;
+  display: flex; align-items: center;
+  height: 56px;
+  background: color-mix(in oklab, var(--color-canvas) 78%, transparent);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border-bottom: 1px solid transparent;
+}
+
+.case-back {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-btn);
+  padding: 7px 12px;
+  font-size: 13px; font-weight: 500; color: var(--color-ash);
+  background: transparent; cursor: pointer;
+  transition: color .2s, border-color .2s, background-color .2s;
+}
+.case-back:hover { color: #fff; border-color: var(--color-edge); background: rgba(255,255,255,.03); }
+.case-back svg { transition: transform .25s cubic-bezier(.16,1,.3,1); }
+.case-back:hover svg { transform: translateX(-2px); }
+
+/* La pista de "Ver el caso" se enciende con la tarjeta, no antes. */
+.work-detail { transition: color .25s, transform .25s cubic-bezier(.16,1,.3,1); }
+.fine .work:hover .work-detail { color: #fff; transform: translateX(3px); }
+
+/* ============================================================
+   LA TRANSICIÓN
+   La portada viaja de la tarjeta al caso. El resto de la página se
+   funde por debajo, más rápido, para que el ojo siga a la imagen y
+   no al fondo.
+   ============================================================ */
+::view-transition-group(*) {
+  animation-duration: .58s;
+  animation-timing-function: cubic-bezier(.16,1,.3,1);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: .38s;
+  animation-timing-function: cubic-bezier(.16,1,.3,1);
+}
+::view-transition-image-pair(root) { isolation: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  .case-layer { animation: none !important; }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) { animation: none !important; }
+}
+
+/* ============================================================
+   SUPERFICIES DEL NAVEGADOR
+   Las partes que no dibujé también son parte del diseño: si la barra
+   de scroll y el cursor de texto llegan con el gris del sistema, la
+   página se delata como armada y no construida.
+   ============================================================ */
+* { scrollbar-color: #2f3031 transparent; scrollbar-width: thin; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: #26272a;
+  border: 3px solid var(--color-canvas);
+  border-radius: 9999px;
+}
+*::-webkit-scrollbar-thumb:hover { background: #3a3b3f; }
+*::-webkit-scrollbar-corner { background: transparent; }
+
+.case-layer { scrollbar-color: #2f3031 transparent; }
+
+/* el cursor de texto toma el acento, y los números de datos se alinean */
+input, textarea, select { caret-color: var(--color-pink); }
+.badge, dd, .font-mono { font-variant-numeric: tabular-nums; }
 
 /* ==========================================================
    MOVIMIENTO REDUCIDO: se apaga entero, no se hace más lento.
