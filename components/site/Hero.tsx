@@ -1,27 +1,39 @@
-import { Mark3D } from "@/components/brand/Mark3D";
+"use client";
+
+import { useCallback, useState } from "react";
+import { Mark3D, LIGHTS, type LightColor } from "@/components/brand/Mark3D";
 import { hero, capabilities } from "@/lib/content";
 
-/* El hero es el único lugar donde el sistema se rompe: color,
-   desenfoque y escala al máximo. Debajo, la página vuelve a la
-   superficie austera. */
+/* El hero es un set de rodaje. La escenografía CSS toma el color de la
+   luz que la persona elige, así el cambio no queda encerrado en el
+   canvas: se contagia a toda la sección. */
 export function Hero() {
+  const [color, setColor] = useState<LightColor>("violeta");
+  const [touched, setTouched] = useState(false);
+  const onFirstTouch = useCallback(() => setTouched(true), []);
+  const rgb = LIGHTS[color].css;
+
   return (
-    <section className="relative overflow-hidden pb-16 pt-28 text-center md:pb-24 md:pt-32" id="top">
+    <section
+      className="relative overflow-hidden pb-16 pt-28 text-center md:pb-24 md:pt-32"
+      id="top"
+      style={{ ["--luz" as string]: rgb, ["--lx" as string]: "50%", ["--ly" as string]: "34%" }}
+    >
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(58% 46% at 50% 24%, rgba(139,92,246,.42), rgba(26,11,51,.22) 58%, transparent 78%)",
+              "radial-gradient(52% 44% at var(--lx) var(--ly), rgba(var(--luz), .4), rgba(26,11,51,.18) 56%, transparent 76%)",
           }}
         />
         <span
           className="animate-drift-a absolute left-[-8vw] top-[16%] h-28 w-[74vw] rounded-full opacity-55 blur-[46px]"
-          style={{ background: "linear-gradient(90deg,transparent,rgba(236,72,153,.85),transparent)" }}
+          style={{ background: "linear-gradient(90deg,transparent,rgba(var(--luz),.8),transparent)" }}
         />
         <span
-          className="animate-drift-b absolute right-[-10vw] top-[34%] h-24 w-[62vw] rounded-full opacity-55 blur-[46px]"
-          style={{ background: "linear-gradient(90deg,transparent,rgba(139,92,246,.8),transparent)" }}
+          className="animate-drift-b absolute right-[-10vw] top-[34%] h-24 w-[62vw] rounded-full opacity-45 blur-[46px]"
+          style={{ background: "linear-gradient(90deg,transparent,rgba(139,92,246,.55),transparent)" }}
         />
         <div
           className="absolute inset-0"
@@ -30,7 +42,33 @@ export function Hero() {
       </div>
 
       <div className="relative mx-auto w-full max-w-[1200px] px-4 md:px-10">
-        <Mark3D className="animate-rise relative mx-auto mb-4 grid aspect-video w-[min(340px,66vw)] place-items-center md:mb-6 md:w-[min(470px,74vw)]" />
+        <Mark3D
+          className="studio animate-rise relative mx-auto grid aspect-video w-[min(360px,72vw)] place-items-center md:w-[min(520px,78vw)]"
+          color={color}
+          onFirstTouch={onFirstTouch}
+        />
+
+        {/* La mesa de luces. Son controles reales, no decoración: se
+            alcanzan con el tabulador y dicen qué hacen. */}
+        <div className="animate-rise mb-4 mt-3 flex items-center justify-center gap-3 md:mb-6">
+          <div className="flex items-center gap-1.5" role="group" aria-label="Color de la luz">
+            {(Object.keys(LIGHTS) as LightColor[]).map((k) => (
+              <button
+                key={k}
+                type="button"
+                className={`swatch ${color === k ? "is-on" : ""}`}
+                style={{ ["--sw" as string]: LIGHTS[k].css }}
+                aria-pressed={color === k}
+                onClick={() => setColor(k)}
+              >
+                <span className="sr-only">Luz {LIGHTS[k].label.toLowerCase()}</span>
+              </button>
+            ))}
+          </div>
+          <p className={`hint font-mono text-[11px] tracking-[.6px] ${touched ? "is-done" : ""}`}>
+            Mové la luz
+          </p>
+        </div>
 
         <h1
           className="animate-rise mx-auto max-w-[22ch] text-balance text-[clamp(34px,5.2vw,56px)] font-normal leading-[1.17] tracking-[.22px] text-white"

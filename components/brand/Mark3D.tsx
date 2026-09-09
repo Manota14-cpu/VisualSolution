@@ -1,12 +1,15 @@
 "use client";
 
 /* ============================================================
-   MARCA EN 3D
-   Las tres piezas del trazado del logo se extruyen con bisel y se
-   iluminan con una luz violeta y una rosa, más un mapa de entorno
-   procedural para que el metal tenga reflejo real.
-   Sin WebGL queda la marca plana que este componente recibe como
-   children, y el 3D nunca llega a montarse.
+   EL ESTUDIO
+   El hero es un set de rodaje: el símbolo VS colgado frente a un
+   ciclorama, y una luz que la persona mueve con el puntero. Lo que
+   la vuelve creíble no es que la luz se mueva, sino lo que arrastra
+   con ella: el brillo especular recorre el bisel, la sombra proyectada
+   sobre el fondo barre en sentido contrario, y el contraluz cambia de
+   lado. Eso es lo que hace un director de fotografía, y es el servicio
+   que se vende dos secciones más abajo.
+   Sin WebGL queda la marca plana y no se monta nada de esto.
    ============================================================ */
 
 import { useEffect, useRef, useState } from "react";
@@ -53,16 +56,14 @@ function markShapes(THREE: typeof THREE_NS) {
   return [a, b, c];
 }
 
-/* Entorno procedural: un degradado equirectangular dibujado en canvas.
-   Da reflejos reales sin bajar ningún HDR. */
+/* Entorno neutro: grises y una banda blanca arriba. El color lo ponen
+   las luces. Si el entorno fuera de marca, el metal saldría teñido
+   entero y el cambio de luz no se notaría. */
 function envTexture(THREE: typeof THREE_NS) {
   const c = document.createElement("canvas");
   c.width = 256;
   c.height = 128;
   const g = c.getContext("2d")!;
-  /* Estudio neutro: grises y una banda blanca arriba. El color de marca
-     lo ponen las luces, no el entorno. Si el entorno fuera rosa y violeta
-     el metal saldría teñido entero y se perdería el brillo claro. */
   const grad = g.createLinearGradient(0, 0, 256, 128);
   grad.addColorStop(0.0, "#0e0e14");
   grad.addColorStop(0.3, "#8f8fa0");
@@ -71,31 +72,46 @@ function envTexture(THREE: typeof THREE_NS) {
   grad.addColorStop(1.0, "#0d0d12");
   g.fillStyle = grad;
   g.fillRect(0, 0, 256, 128);
-
-  // banda superior clara: hace de cielo y marca el filo del bisel
   const top = g.createLinearGradient(0, 0, 0, 62);
   top.addColorStop(0, "rgba(255,255,255,.85)");
   top.addColorStop(1, "rgba(255,255,255,0)");
   g.fillStyle = top;
   g.fillRect(0, 0, 256, 62);
-
-  // apenas un recuerdo de la marca en los extremos
-  g.globalAlpha = 0.16;
-  g.fillStyle = "#8B5CF6";
-  g.fillRect(0, 62, 96, 66);
-  g.fillStyle = "#EC4899";
-  g.fillRect(170, 62, 86, 66);
-  g.globalAlpha = 1;
   const tex = new THREE.CanvasTexture(c);
   tex.mapping = THREE.EquirectangularReflectionMapping;
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
 }
 
-export function Mark3D({ className }: { className?: string }) {
+export type LightColor = "violeta" | "rosa" | "blanca";
+
+export const LIGHTS: Record<LightColor, { hex: number; css: string; label: string }> = {
+  violeta: { hex: 0x8b5cf6, css: "139,92,246", label: "Violeta" },
+  rosa: { hex: 0xec4899, css: "236,72,153", label: "Rosa" },
+  blanca: { hex: 0xf2f0ff, css: "226,224,255", label: "Blanca" },
+};
+
+/* La posición de reposo es un key clásico: arriba y a la izquierda.
+   Cuando el puntero se va, la luz vuelve ahí sola. */
+const REST = { x: -0.55, y: 0.42 };
+
+export function Mark3D({
+  className,
+  color,
+  onFirstTouch,
+}: {
+  className?: string;
+  color: LightColor;
+  onFirstTouch?: () => void;
+}) {
   const host = useRef<HTMLDivElement>(null);
   const [live, setLive] = useState(false);
   const { reduce, fine, lite } = useMotionEnv();
+
+  /* El color viaja por un ref para que cambiarlo no vuelva a montar la
+     escena entera: el bucle lo lee en el cuadro siguiente. */
+  const colorRef = useRef(color);
+  colorRef.current = color;
 
   useEffect(() => {
     const el = host.current;
@@ -123,11 +139,22 @@ export function Mark3D({ className }: { className?: string }) {
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, lite ? 1.5 : 2));
         renderer.setClearAlpha(0);
         renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+        /* La sombra proyectada es lo que convierte "una luz que se mueve"
+           en "un objeto iluminado". En equipos modestos se apaga: cuesta
+           un mapa de profundidad por cuadro. */
+        const shadows = !lite;
+        if (shadows) {
+          renderer.shadowMap.enabled = true;
+          renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        }
+
         const cv = renderer.domElement;
         cv.style.width = "100%";
         cv.style.height = "100%";
         cv.style.display = "block";
         cv.style.cursor = "grab";
+        cv.style.touchAction = "none";
         el.appendChild(cv);
         setLive(true);
 
@@ -160,29 +187,26 @@ export function Mark3D({ className }: { className?: string }) {
           metalness: envMap ? 0.58 : 0.32,
           roughness: envMap ? 0.2 : 0.24,
           envMap,
-          // el entorno da el reflejo; bajo para que el metal siga leyendose
-          // claro y no se tina entero de rosa
           envMapIntensity: 0.9,
         });
 
         const group = new THREE.Group();
         const geometries: THREE_NS.ExtrudeGeometry[] = [];
 
-        // El logo ya trae su propia inclinación en el trazado: acá sólo
-        // se centra la caja de 143.5 x 76 en el origen.
         for (const shape of markShapes(THREE)) {
           const g = new THREE.ExtrudeGeometry(shape, extrude);
           g.translate(-71.75, -38, -extrude.depth / 2);
           geometries.push(g);
-          group.add(new THREE.Mesh(g, material));
+          const m = new THREE.Mesh(g, material);
+          m.castShadow = shadows;
+          group.add(m);
         }
 
-        // halo: copia agrandada con material aditivo. Es el equivalente
-        // barato de un bloom, sin cargar post-proceso.
+        // halo aditivo: el bloom barato. No proyecta sombra.
         let glowMat: THREE_NS.MeshBasicMaterial | null = null;
         if (!lite) {
           glowMat = new THREE.MeshBasicMaterial({
-            color: 0xec4899,
+            color: LIGHTS[colorRef.current].hex,
             transparent: true,
             opacity: 0.13,
             blending: THREE.AdditiveBlending,
@@ -198,7 +222,24 @@ export function Mark3D({ className }: { className?: string }) {
         }
         scene.add(group);
 
-        // campo de puntos detrás del logo
+        /* El ciclorama. Es el fondo infinito de un estudio de fotos, y
+           acá cumple la función real de recibir la sombra: sin una
+           superficie donde caiga, la luz no tiene consecuencia visible. */
+        let backdrop: THREE_NS.Mesh | null = null;
+        let shadowMat: THREE_NS.ShadowMaterial | null = null;
+        if (shadows) {
+          /* ShadowMaterial dibuja únicamente la sombra: el plano queda
+             invisible en todo lo demás. Con un material opaco, el canvas
+             tapaba el resplandor de la página que hay detrás y el hero
+             se leía como un recuadro oscuro pegado encima. */
+          shadowMat = new THREE.ShadowMaterial({ opacity: 0.55 });
+          backdrop = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1100), shadowMat);
+          backdrop.position.z = -210;
+          backdrop.receiveShadow = true;
+          scene.add(backdrop);
+        }
+
+        // campo de puntos, sólo profundidad
         let dots: THREE_NS.Points | null = null;
         if (!lite) {
           const N = 220;
@@ -206,7 +247,7 @@ export function Mark3D({ className }: { className?: string }) {
           for (let i = 0; i < N; i++) {
             pos[i * 3] = (Math.random() - 0.5) * 460;
             pos[i * 3 + 1] = (Math.random() - 0.5) * 300;
-            pos[i * 3 + 2] = -60 - Math.random() * 320;
+            pos[i * 3 + 2] = -60 - Math.random() * 140;
           }
           const pg = new THREE.BufferGeometry();
           pg.setAttribute("position", new THREE.BufferAttribute(pos, 3));
@@ -224,16 +265,53 @@ export function Mark3D({ className }: { className?: string }) {
           scene.add(dots);
         }
 
-        scene.add(new THREE.AmbientLight(0x14101f, envMap ? 0.6 : 1.1));
-        const key = new THREE.DirectionalLight(0x8b5cf6, envMap ? 1.9 : 2.8);
-        key.position.set(-150, 120, 160);
-        const fill = new THREE.DirectionalLight(0xec4899, envMap ? 1.8 : 2.5);
+        /* ---- el aparejo de luces ---- */
+        scene.add(new THREE.AmbientLight(0x14101f, envMap ? 0.45 : 0.9));
+
+        // LA luz: la que mueve la persona. Un spot para que tenga
+        // penumbra y proyecte una sombra con borde blando.
+        const key = new THREE.SpotLight(LIGHTS[colorRef.current].hex, 900, 1400, 0.62, 0.75, 1.4);
+        key.castShadow = shadows;
+        if (shadows) {
+          key.shadow.mapSize.set(1024, 1024);
+          key.shadow.bias = -0.0006;
+          key.shadow.normalBias = 1.4;
+          key.shadow.camera.near = 40;
+          key.shadow.camera.far = 900;
+        }
+        key.position.set(-260, 190, 260);
+        key.target.position.set(0, 0, 0);
+        scene.add(key, key.target);
+
+        // relleno fijo del lado opuesto, para que la cara oscura no se
+        // vaya a negro absoluto y el volumen se siga leyendo
+        const fill = new THREE.DirectionalLight(0xec4899, envMap ? 0.5 : 0.8);
         fill.position.set(170, -70, 120);
-        const rim = new THREE.DirectionalLight(0xffffff, 1.0);
+        scene.add(fill);
+
+        const rim = new THREE.DirectionalLight(0xffffff, 0.55);
         rim.position.set(30, 140, -180);
-        const spark = new THREE.PointLight(0xffffff, 0.6, 900);
-        spark.position.set(-40, 60, 220);
-        scene.add(key, fill, rim, spark);
+        scene.add(rim);
+
+        /* El cuerpo visible de la luz. Sin esto la persona mueve algo
+           invisible y no entiende qué está haciendo. */
+        const bulbMat = new THREE.MeshBasicMaterial({
+          color: LIGHTS[colorRef.current].hex,
+          transparent: true,
+          opacity: 0.95,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        });
+        const bulb = new THREE.Mesh(new THREE.SphereGeometry(5.5, 16, 16), bulbMat);
+        const haloMat = new THREE.MeshBasicMaterial({
+          color: LIGHTS[colorRef.current].hex,
+          transparent: true,
+          opacity: 0.16,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        });
+        const bulbHalo = new THREE.Mesh(new THREE.SphereGeometry(22, 16, 16), haloMat);
+        scene.add(bulb, bulbHalo);
 
         const HALF_W = 76;
         const HALF_H = 42;
@@ -255,37 +333,94 @@ export function Mark3D({ className }: { className?: string }) {
         const ro = new ResizeObserver(resize);
         ro.observe(el);
 
-        /* puntero: el objeto se orienta hacia el cursor y, al soltarlo,
-           sigue girando con decaimiento en vez de volver de golpe */
-        let aimX = 0, aimY = 0, curX = 0, curY = 0, velX = 0, velY = 0, free = false;
+        /* ---- la interacción ----
+           El puntero no mueve el logo: mueve la luz. El objeto se queda
+           quieto, como en un set. La luz llega con retardo elástico
+           porque un aparejo real tiene peso. */
+        let aimX = REST.x;
+        let aimY = REST.y;
+        let curX = REST.x;
+        let curY = REST.y;
+        let grabbing = false;
+        let touched = false;
 
-        const onMove = (e: PointerEvent) => {
+        const setAim = (e: PointerEvent) => {
           const r = el.getBoundingClientRect();
-          const ny = ((e.clientX - (r.left + r.width / 2)) / r.width) * 1.1;
-          const nx = ((e.clientY - (r.top + r.height / 2)) / r.height) * 0.65;
-          velX = nx - aimX;
-          velY = ny - aimY;
-          aimX = nx;
-          aimY = ny;
-          free = false;
+          aimX = ((e.clientX - r.left) / r.width) * 2 - 1;
+          aimY = -(((e.clientY - r.top) / r.height) * 2 - 1);
+          if (!touched) {
+            touched = true;
+            onFirstTouch?.();
+          }
+        };
+
+        const onDown = (e: PointerEvent) => {
+          grabbing = true;
+          cv.style.cursor = "grabbing";
+          cv.setPointerCapture?.(e.pointerId);
+          setAim(e);
+        };
+        const onMove = (e: PointerEvent) => {
+          // con puntero fino basta pasar por encima; en táctil hay que arrastrar
+          if (e.pointerType === "touch" && !grabbing) return;
+          setAim(e);
+        };
+        const onUp = (e: PointerEvent) => {
+          grabbing = false;
+          cv.style.cursor = "grab";
+          cv.releasePointerCapture?.(e.pointerId);
         };
         const onLeave = () => {
-          free = true;
-          velX *= 6;
-          velY *= 6;
+          if (grabbing) return;
+          aimX = REST.x;
+          aimY = REST.y;
         };
-        if (fine) {
-          el.addEventListener("pointermove", onMove);
-          el.addEventListener("pointerleave", onLeave);
-        }
 
+        el.addEventListener("pointerdown", onDown);
+        el.addEventListener("pointermove", onMove);
+        el.addEventListener("pointerup", onUp);
+        el.addEventListener("pointercancel", onUp);
+        el.addEventListener("pointerleave", onLeave);
+
+        // el logo apenas se orienta hacia la luz: da vida sin robar
+        // el protagonismo, que acá lo tiene la iluminación
         group.rotation.set(-0.1, -0.45, 0);
 
+        let currentHex = LIGHTS[colorRef.current].hex;
+        const applyColor = () => {
+          const next = LIGHTS[colorRef.current].hex;
+          if (next === currentHex) return;
+          currentHex = next;
+          key.color.setHex(next);
+          bulbMat.color.setHex(next);
+          haloMat.color.setHex(next);
+          glowMat?.color.setHex(next);
+        };
+
+        const section = el.closest("section");
+        const place = () => {
+          key.position.set(curX * 300, curY * 210, 250);
+          bulb.position.copy(key.position);
+          bulbHalo.position.copy(key.position);
+          /* La escenografía CSS sigue a la luz: el resplandor barre la
+             sección entera, no sólo el recuadro del canvas. Son dos
+             escrituras de variable por cuadro, sin recalcular layout. */
+          if (section) {
+            section.style.setProperty("--lx", (50 + curX * 26).toFixed(1) + "%");
+            section.style.setProperty("--ly", (34 - curY * 20).toFixed(1) + "%");
+          }
+        };
+
         if (reduce) {
+          applyColor();
+          place();
           renderer.render(scene, camera);
           cleanup = () => {
             ro.disconnect();
+            el.removeEventListener("pointerdown", onDown);
             el.removeEventListener("pointermove", onMove);
+            el.removeEventListener("pointerup", onUp);
+            el.removeEventListener("pointercancel", onUp);
             el.removeEventListener("pointerleave", onLeave);
             geometries.forEach((g) => g.dispose());
             material.dispose();
@@ -295,8 +430,7 @@ export function Mark3D({ className }: { className?: string }) {
           return;
         }
 
-        /* respuesta al scroll: al salir del hero gira más rápido,
-           se achica y se aleja en vez de cortar en seco */
+        /* al salir del hero el objeto se aleja y se desvanece */
         let heroProgress = 0;
         const offScroll = onScroll(() => {
           const r = el.getBoundingClientRect();
@@ -309,29 +443,27 @@ export function Mark3D({ className }: { className?: string }) {
 
         const frame = () => {
           t += 0.006;
-          if (free) {
-            aimX += velX * 0.02;
-            aimY += velY * 0.02;
-            velX *= 0.94;
-            velY *= 0.94;
-            if (Math.abs(velX) < 0.0004 && Math.abs(velY) < 0.0004) {
-              aimX = lerp(aimX, 0, 0.03);
-              aimY = lerp(aimY, 0, 0.03);
-            }
-          }
-          curX = lerp(curX, aimX, 0.06);
-          curY = lerp(curY, aimY, 0.06);
+          applyColor();
 
-          const spin = heroProgress * 2.6;
-          group.rotation.y = -0.45 + Math.sin(t) * 0.4 + curY + spin;
-          group.rotation.x = -0.1 + Math.cos(t * 0.75) * 0.1 + curX;
-          group.position.y = Math.sin(t * 1.15) * 2 - heroProgress * 26;
+          // el aparejo tiene peso: llega con retardo
+          curX = lerp(curX, aimX, grabbing ? 0.14 : 0.07);
+          curY = lerp(curY, aimY, grabbing ? 0.14 : 0.07);
+          place();
+
+          // respiración mínima del bulbo, para que la luz se sienta encendida
+          const pulse = 1 + Math.sin(t * 5) * 0.05;
+          bulbHalo.scale.setScalar(pulse);
+
+          // el objeto se orienta apenas hacia donde está la luz
+          group.rotation.y = -0.45 + curX * 0.26 + Math.sin(t) * 0.06 + heroProgress * 2.2;
+          group.rotation.x = -0.1 - curY * 0.14 + Math.cos(t * 0.75) * 0.04;
+          group.position.y = Math.sin(t * 1.15) * 1.6 - heroProgress * 26;
           group.scale.setScalar(1 - heroProgress * 0.18);
           camera.position.z = baseZ * (1 + heroProgress * 0.35);
 
           if (dots) {
             dots.rotation.y += 0.0006;
-            dots.rotation.x = curX * 0.15;
+            dots.rotation.x = curY * 0.08;
           }
 
           renderer.render(scene, camera);
@@ -352,7 +484,6 @@ export function Mark3D({ className }: { className?: string }) {
           }
         };
 
-        // se detiene fuera de pantalla y con la pestaña oculta
         const io = new IntersectionObserver(
           (entries) => (entries[0].isIntersecting ? resume() : pause()),
           { threshold: 0 }
@@ -367,12 +498,21 @@ export function Mark3D({ className }: { className?: string }) {
           ro.disconnect();
           offScroll();
           document.removeEventListener("visibilitychange", onVis);
+          el.removeEventListener("pointerdown", onDown);
           el.removeEventListener("pointermove", onMove);
+          el.removeEventListener("pointerup", onUp);
+          el.removeEventListener("pointercancel", onUp);
           el.removeEventListener("pointerleave", onLeave);
           geometries.forEach((g) => g.dispose());
           dots?.geometry.dispose();
+          backdrop?.geometry.dispose();
+          shadowMat?.dispose();
+          bulb.geometry.dispose();
+          bulbHalo.geometry.dispose();
           material.dispose();
           glowMat?.dispose();
+          bulbMat.dispose();
+          haloMat.dispose();
           envMap?.dispose();
           renderer.dispose();
           cv.remove();
@@ -386,15 +526,14 @@ export function Mark3D({ className }: { className?: string }) {
       disposed = true;
       cleanup?.();
     };
-  }, [reduce, fine, lite]);
+  }, [reduce, fine, lite, onFirstTouch]);
 
   return (
     <div
       ref={host}
       className={className}
       role="img"
-      aria-label="Símbolo de Visual Solution en tres dimensiones, girando lentamente"
-      style={{ touchAction: "pan-y" }}
+      aria-label="Símbolo de Visual Solution en un estudio: se puede mover la luz que lo ilumina"
     >
       {/* respaldo: se ve mientras carga el 3D y si no hay WebGL */}
       {!live && <Mark className="absolute w-[44%] max-w-[230px]" />}
