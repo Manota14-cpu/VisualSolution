@@ -369,55 +369,6 @@ body {
     color: var(--color-obsidian);
   }
 
-  /* Tarjeta: carbón sobre el negro. Sin borde y sin sombra — la
-     separación figura/fondo la hace el color, nada más. */
-  .card {
-    position: relative;
-    display: flex; flex-direction: column;
-    overflow: hidden;
-    border-radius: var(--radius-cards);
-    background-color: var(--color-carbon);
-    /* la luz violeta sangra desde el borde de abajo al pasar el cursor.
-       Es luz, no sombra: vive adentro de la tarjeta, y el sistema
-       reserva el violeta justamente para esto. */
-    background-image: radial-gradient(124% 92% at 50% 122%, rgb(139 92 246 / var(--luz)), transparent 64%);
-    transition:
-      transform .25s cubic-bezier(.16,1,.3,1),
-      background-color .25s,
-      --luz .45s ease;
-  }
-  .card:hover,
-  .card:focus-within { transform: translateY(-4px); --luz: .55; }
-
-  /* La única superficie violeta del sitio, con la trama encima. */
-  .violet-card {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    background-color: var(--color-violet);
-    color: var(--color-obsidian);
-    transition: transform .25s cubic-bezier(.16,1,.3,1);
-  }
-  .violet-card::before {
-    content: "";
-    position: absolute;
-    inset: -12px;
-    z-index: -1;
-    background-image: radial-gradient(circle at center, rgb(255 255 255 / .32) 1.6px, transparent 1.7px);
-    background-size: 10px 10px;
-    animation: deriva-lenta 34s linear infinite;
-  }
-  .violet-card:hover { transform: translateY(-4px); }
-  @keyframes deriva-lenta {
-    from { transform: translate3d(0, 0, 0); }
-    to   { transform: translate3d(10px, -10px, 0); }
-  }
-  .violet-card h3,
-  .violet-card p,
-  .violet-card .text-chalk,
-  .violet-card [class*="text-chalk"] { color: var(--color-obsidian); }
-  .violet-card .badge { background: var(--color-obsidian); color: var(--color-violet-mist); }
-  .violet-card .token { background: var(--color-obsidian); color: var(--color-violet-mist); }
 
   .shot { overflow: hidden; background: var(--color-carbon); }
   .shot img { width: 100%; height: 100%; object-fit: cover; }
@@ -786,6 +737,134 @@ body {
 .case-back svg { transition: transform .25s cubic-bezier(.16,1,.3,1); }
 .case-back:hover svg { transform: translateX(-2px); }
 /* ==========================================================
+   LOS PLIEGOS
+   Cinco bandas a todo el ancho en lugar de cinco tarjetas del
+   mismo tamaño. Cerrado, un pliego es una línea de titular en
+   display sobre el negro; abierto, se inunda con la plancha y
+   el texto se da vuelta a obsidiana, que es el único uso válido
+   de ese negro: encima de un relleno brillante.
+   ========================================================== */
+.pliegos { border-top: 1.5px dotted rgb(255 255 255 / .25); }
+
+.pliego {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-bottom: 1.5px dotted rgb(255 255 255 / .25);
+}
+/* la inundación: la misma plancha del hero, encendida por opacidad
+   para que el cambio de estado se pueda animar */
+.pliego::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--color-violet);
+  background-image:
+    radial-gradient(circle at center, var(--color-magenta) 1.7px, transparent 1.8px),
+    linear-gradient(42deg, var(--color-violet) 6%, var(--color-magenta) 94%);
+  background-size: 11px 11px, 100% 100%;
+  opacity: 0;
+  transition: opacity .45s ease;
+}
+.pliego.is-open::before { opacity: 1; }
+
+.pliego-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(16px, 4vw, 48px);
+  width: 100%;
+  padding: clamp(18px, 2.2vw, 30px) clamp(14px, 2.4vw, 30px);
+  text-align: left;
+  cursor: pointer;
+  background: none;
+}
+.pliego-titulo {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  line-height: .98;
+  font-size: clamp(26px, 4.6vw, 62px);
+  color: var(--color-chalk);
+  transition: color .3s ease .16s, transform .45s cubic-bezier(.16,1,.3,1);
+}
+.pliego:hover .pliego-titulo { transform: translateX(14px); }
+.pliego.is-open .pliego-titulo { color: var(--color-obsidian); transform: none; }
+.pliego:not(.is-open) .pliego-titulo { transition-delay: 0s; }
+.pliego:not(.is-open) .pliego-dentro { transition-delay: 0s; }
+
+.pliego-mas {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px; height: 34px;
+  border-radius: var(--radius-pills);
+  border: 1.5px solid rgb(255 255 255 / .3);
+  font-size: 18px;
+  color: rgb(255 255 255 / .7);
+  transition: transform .4s cubic-bezier(.16,1,.3,1), background-color .35s, border-color .35s, color .35s;
+}
+.pliego:hover .pliego-mas { border-color: var(--color-magenta); color: var(--color-magenta); }
+.pliego.is-open .pliego-mas {
+  transform: rotate(135deg);
+  background: var(--color-obsidian);
+  border-color: var(--color-obsidian);
+  color: var(--color-violet-mist);
+}
+
+.pliego-cuerpo {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .5s cubic-bezier(.16,1,.3,1);
+}
+.pliego-cuerpo > div { overflow: hidden; }
+.pliego.is-open .pliego-cuerpo { grid-template-rows: 1fr; }
+
+.pliego-dentro {
+  display: grid;
+  gap: clamp(20px, 3vw, 40px);
+  padding: 0 clamp(14px, 2.4vw, 30px) clamp(24px, 3vw, 40px);
+  /* el contenido sube apenas después de que abre el pliego: primero se
+     hace el lugar, después entra lo que va adentro */
+  transform: translateY(-12px);
+  opacity: 0;
+  transition: transform .45s cubic-bezier(.16,1,.3,1) .2s, opacity .35s ease .2s;
+}
+.pliego.is-open .pliego-dentro { transform: none; opacity: 1; }
+
+@media (min-width: 900px) {
+  .pliego-dentro { grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
+  .pliego-foto { grid-column: 1 / -1; }
+}
+
+.pliego-texto {
+  max-width: 56ch;
+  font-size: clamp(17px, 1.5vw, 20px);
+  line-height: 1.45;
+  color: var(--color-obsidian);
+}
+.pliego-lado { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.pliego .badge,
+.pliego .token { background: var(--color-obsidian); color: var(--color-violet-mist); }
+
+.pliego-foto {
+  position: relative;
+  aspect-ratio: 16 / 6;
+  overflow: hidden;
+  border-radius: 40px 4px 40px 4px;
+}
+/* la trama de la marca se apoya encima del material real */
+.pliego-foto::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, var(--color-obsidian) 2px, transparent 2.1px) 0 0 / 11px 11px;
+  opacity: .5;
+}
+
+/* ==========================================================
    EL ÍNDICE
    Una grilla de fichas iguales —foto, título, año, "ver más"— es
    la estructura que sale sola y se nota. Acá el catálogo es un
@@ -1010,7 +1089,6 @@ input, textarea, select { caret-color: var(--color-magenta); }
 
   /* los bucles, apagados */
   .halftone::after,
-  .violet-card::before,
   .animate-marquee,
   .step-token.on,
   .token.pulsed { animation: none; }
@@ -1025,10 +1103,10 @@ input, textarea, select { caret-color: var(--color-magenta); }
   .display-md::after { transform: scaleX(1); }
 
   /* los hovers pierden el desplazamiento y conservan el color */
-  .card:hover, .card:focus-within,
-  .violet-card:hover,
   .chip:hover,
   .plancha .tinta,
+  .pliego:hover .pliego-titulo,
+  .pliego-dentro,
   .faq-row:hover .q,
   .fila:hover .titulo, .fila:focus-visible .titulo,
   .fila:hover .flecha { transform: none; }
