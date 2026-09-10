@@ -161,6 +161,34 @@ sobre cualquier componente que fije `display`. Ya pasó dos veces.
 2. **El titular a 189px**, con interlineado 0.94.
 3. **El sistema de tres radios**, que da redondez sin monotonía.
 
+## Compartir y ser encontrado
+
+Lo que se ve cuando alguien pega el enlace en WhatsApp, en un DM de Instagram
+o en LinkedIn. Es lo primero que ve la mayoría de la gente que llega al sitio,
+y para un estudio que vende que las cosas se vean bien, una tarjeta vacía
+resta.
+
+- **La tarjeta se genera de la misma plancha que el hero**
+  ( y ): el degradado, el monograma fuera
+  de registro y el reclamo en Anton. Compartir el sitio es compartir un afiche.
+- **Una tarjeta por proyecto** ().
+  Antes se compartía , que hoy es una foto de relleno de picsum: el
+  enlace mostraba una imagen que no era del proyecto.
+- **La trama de puntos NO va en la tarjeta.** Se ve casi siempre a unos 300px
+  de ancho en un chat, y a esa escala una retícula de 16px se vuelve papilla
+  gris. El motivo firma no sobrevive al medio; el degradado, el monograma y el
+  titular sí.
+- Las dos caras se bajan de Google en build. Si el pedido falla, la tarjeta se
+  arma igual con la tipografía que trae el generador: vale más una tarjeta con
+  otra tipografía que ninguna.
+- , canónicas,  para X,  y
+   generados desde el contenido, y datos estructurados
+  ( con el catálogo de servicios) para que un buscador
+  entienda que esto es un estudio y no un blog. Sólo se afirma lo que es
+  verdad: nada de dirección, teléfono ni reseñas inventadas.
+- **La URL pública** sale de ; en Vercel se toma sola del
+  dominio de producción. El respaldo está marcado con TODO en .
+
 ## Animación
 
 El movimiento acompaña, no protagoniza: el sistema es plano y editorial.

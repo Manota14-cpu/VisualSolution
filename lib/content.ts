@@ -20,6 +20,18 @@ export const site = {
   formEndpoint: "",
 } as const;
 
+/* La URL pública. Hace falta para que las tarjetas de compartir, el
+   sitemap y los datos estructurados apunten a algún lado. En Vercel la
+   toma sola del dominio de producción; si usás dominio propio, poné
+   NEXT_PUBLIC_SITE_URL en las variables de entorno.
+   TODO: reemplazar el respaldo por el dominio real. */
+export const siteUrl = (
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "https://visualsolution.vercel.app")
+).replace(/[/]$/, "");
+
 export const nav = [
   { href: "#servicios", label: "Servicios" },
   { href: "#trabajos", label: "Trabajos" },

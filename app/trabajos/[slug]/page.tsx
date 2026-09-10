@@ -24,13 +24,17 @@ export async function generateMetadata({
 
   const description = work.summary ?? `${work.kind}, ${work.year}. Un trabajo de ${site.name}.`;
   return {
-    title: `${work.title} — ${site.name}`,
+    title: work.title,
     description,
+    alternates: { canonical: `/trabajos/${work.id}` },
     openGraph: {
       title: `${work.title} — ${site.name}`,
       description,
+      url: `/trabajos/${work.id}`,
       type: "article",
-      images: [{ url: work.full, alt: work.alt }],
+      /* La imagen la genera opengraph-image.tsx de esta misma carpeta.
+         Antes se compartía work.full, que hoy es una foto de relleno de
+         picsum: el enlace mostraba una imagen que no era del proyecto. */
     },
   };
 }
