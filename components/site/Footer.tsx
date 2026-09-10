@@ -4,13 +4,16 @@ import { hero, nav, site } from "@/lib/content";
 
 export function Closer() {
   return (
-    <section className="bg-onyx py-24 text-center md:py-32">
+    /* La página abre con una plancha y cierra con otra: el último
+       bloque antes del pie es el mismo material que el hero, para que
+       el remate no sea un párrafo más sobre negro. */
+    <section className="inundado py-24 text-center md:py-32">
       <div className="relative mx-auto w-full max-w-[1200px] px-4 md:px-10">
         <SplitHeading
           text="Tu marca merece verse tan bien como funciona."
           className="mx-auto max-w-[18ch] display display-lg"
         />
-        <Reveal as="p" delay={1} className="mx-auto mt-4 max-w-[52ch] text-base leading-relaxed text-chalk/70">
+        <Reveal as="p" delay={1} className="mx-auto mt-5 max-w-[52ch] text-[17px] leading-relaxed text-obsidian/75">
           Contanos la idea. La primera propuesta no se cobra.
         </Reveal>
         <Reveal as="a" delay={2} className="btn btn-solid mt-8" href="#contacto">

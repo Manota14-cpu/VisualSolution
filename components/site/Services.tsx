@@ -60,7 +60,10 @@ function Pliego({
           </button>
         </h3>
 
-        <div className="pliego-cuerpo" id={id} role="region">
+        {/* inert saca el cuerpo cerrado del arbol de accesibilidad y del
+            tabulador, sin sacarlo del layout: la apertura se sigue
+            pudiendo animar. */}
+        <div className="pliego-cuerpo" id={id} role="region" inert={!abierto}>
           <div>
             <div className="pliego-dentro">
               <p className="pliego-texto">{service.body}</p>

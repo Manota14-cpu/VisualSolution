@@ -241,8 +241,7 @@ protagonista y el resto en voz baja.
   sangre, de borde a borde de la pantalla, y el reclamo la muerde desde
   abajo, contra el margen izquierdo y con las líneas escalonadas. Imagen y
   tipografía se traban en vez de apilarse: es lo único que separa una
-  composición de una plantilla. El sello rotado es la marca de mano que
-  ninguna grilla saca sola.
+  composición de una plantilla.
 - **El giro es una plancha de impresión** (`components/brand/Plate.tsx'):
   el degradado con la trama encima y el monograma VS calado en negro a
   escala arquitectónica. Debajo del negro hay dos copias del mismo

@@ -34,7 +34,9 @@ export function Process() {
       const a = fichas[0].getBoundingClientRect();
       const z = fichas[fichas.length - 1].getBoundingClientRect();
       const centro = (r: DOMRect) => r.top + r.height / 2 - base.top;
-      riel.style.left = `${a.left + a.width / 2 - base.left}px`;
+      /* el riel va en su propia calle, a la izquierda: dentro de los
+         numerales se colaría por los huecos de los dígitos */
+      riel.style.left = "7px";
       riel.style.top = `${centro(a)}px`;
       riel.style.bottom = "auto";
       riel.style.height = `${centro(z) - centro(a)}px`;
@@ -89,7 +91,7 @@ export function Process() {
               key={step.n}
               as="article"
               delay={i}
-              className={`flex gap-5 ${
+              className={`flex items-start gap-5 pl-7 md:gap-8 ${
                 i === 0
                   ? "pb-8"
                   : i === steps.length - 1
@@ -97,9 +99,11 @@ export function Process() {
                     : "border-t border-dotted border-chalk/30 py-8"
               }`}
             >
-              <span className="token step-token">{step.n}</span>
-              <div>
-                <h3 className="text-lg font-medium leading-snug text-chalk">{step.title}</h3>
+              <span className="step-token">{step.n}</span>
+              <div className="pt-1">
+                <h3 className="text-[clamp(19px,2vw,26px)] font-medium leading-snug text-chalk">
+                  {step.title}
+                </h3>
                 <p className="mt-2 max-w-[52ch] text-base leading-relaxed text-chalk/70">{step.body}</p>
               </div>
             </Reveal>

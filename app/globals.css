@@ -158,27 +158,6 @@ body {
 /* a sangre no hay esquinas que redondear */
 .banda .plancha { height: 100%; border-radius: 0; }
 
-/* El sello. Una pieza rotada, pegada al borde de la banda: es la
-   marca de mano que ninguna grilla produce sola. */
-.sello {
-  position: absolute;
-  top: 31%;
-  right: clamp(16px, 4vw, 56px);
-  z-index: 3;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 11px 20px;
-  border-radius: var(--radius-pills);
-  background: var(--color-magenta);
-  color: var(--color-obsidian);
-  font-size: 14px;
-  font-weight: 500;
-  white-space: nowrap;
-  transform: rotate(-7deg);
-  transition: transform .4s cubic-bezier(.16,1,.3,1);
-}
-.sello:hover { transform: rotate(0deg) scale(1.04); }
 
 /* El reclamo muerde la banda desde abajo y se va contra el margen
    izquierdo. La segunda línea entra: el bloque deja de ser un
@@ -275,6 +254,42 @@ body {
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+
+/* ==========================================================
+   LA SUPERFICIE INUNDADA
+   Cualquier bloque que quiera ser plancha. El texto que va encima
+   se da vuelta a obsidiana, que es el único uso válido de ese
+   negro: sobre un relleno brillante. Los controles se invierten
+   solos — un botón magenta sobre magenta no se ve.
+   Vive fuera de @layer a propósito: .display también está afuera, y
+   el orden de capas le gana a la especificidad. Adentro, un
+   .inundado .display no podría cambiarle el color.
+   ========================================================== */
+.inundado {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--color-violet);
+  background-image:
+    radial-gradient(circle at center, var(--color-magenta) 1.7px, transparent 1.8px),
+    linear-gradient(42deg, var(--color-violet) 6%, var(--color-magenta) 94%);
+  background-size: 11px 11px, 100% 100%;
+  color: var(--color-obsidian);
+}
+.inundado .display,
+.inundado h1, .inundado h2, .inundado h3,
+.inundado [class*="text-chalk"] { color: var(--color-obsidian); }
+.inundado .display-md::after { background: var(--color-obsidian); }
+
+/* la acción se invierte: negro relleno con la marca en magenta */
+.inundado .btn-solid { background: var(--color-obsidian); color: var(--color-chalk); }
+.inundado .btn-solid:hover { background: #241f2e; }
+.inundado .btn-solid .diamond { background: var(--color-magenta); }
+.inundado .btn-solid::after { display: none; }
+.inundado .btn-ghost { border-color: var(--color-obsidian); color: var(--color-obsidian); }
+.inundado .btn-ghost:hover { background: var(--color-obsidian); color: var(--color-chalk); }
+.inundado .btn-ghost .diamond { background: var(--color-obsidian); }
+.inundado .badge,
+.inundado .token { background: var(--color-obsidian); color: var(--color-violet-mist); }
 
 @layer components {
 
@@ -698,21 +713,32 @@ body {
   transition: transform .45s cubic-bezier(.16,1,.3,1);
 }
 
-/* Los pasos que la linea todavia no alcanzo son marcadores vacios.
-   El que alcanza se rellena de magenta, y la linea termina siempre
-   sobre uno: nunca en el aire entre dos. */
+/* El número del paso deja de ser un monograma en un círculo y pasa a
+   ser un numeral a escala de afiche. Apagado es casi invisible; el que
+   la línea alcanza salta a magenta, y la línea termina siempre sobre
+   uno: nunca en el aire entre dos. */
 .step-token {
-  background: transparent;
-  border: 1.5px solid rgb(255 255 255 / .28);
-  color: rgb(255 255 255 / .55);
-  transition: background-color .35s, border-color .35s, color .35s;
+  display: block;
+  width: auto; height: auto;
+  flex: none;
+  background: none;
+  border: none;
+  border-radius: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(40px, 5.2vw, 86px);
+  line-height: .84;
+  letter-spacing: .02em;
+  color: rgb(255 255 255 / .22);
+  transition: color .4s ease;
 }
-.step-token.on {
-  background: var(--color-magenta);
-  border-color: var(--color-magenta);
-  color: var(--color-obsidian);
-  outline: 1.5px solid transparent;
-  animation: anillo .85s cubic-bezier(.16,1,.3,1);
+.step-token.on { color: var(--color-magenta); animation: golpe .55s cubic-bezier(.16,1,.3,1); }
+/* el número que la línea alcanza da un golpe seco y se queda: no
+   necesita un anillo, el salto de color ya lo dice todo */
+@keyframes golpe {
+  0%   { transform: scale(1); }
+  38%  { transform: scale(1.13); }
+  100% { transform: scale(1); }
 }
 
 .faq-row { border-bottom: 1.5px dotted rgb(255 255 255 / .25); transition: background-color .25s; }
@@ -802,6 +828,8 @@ body {
   opacity: 0;
   transition: opacity .45s ease;
 }
+/* el pliego abierto también invierte sus controles */
+.pliego.is-open { color: var(--color-obsidian); }
 .pliego.is-open::before { opacity: 1; }
 
 .pliego-btn {
