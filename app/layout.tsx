@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, Anton } from "next/font/google";
 import "./globals.css";
-import { MarkGradient } from "@/components/brand/Mark";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { BackToTop, Grain, Preloader, ScrollProgress } from "@/components/motion/Chrome";
 import { site } from "@/lib/content";
@@ -48,7 +47,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" className={`${dmSans.variable} ${anton.variable}`}>
       <body>
-        <MarkGradient />
         <Preloader />
         <ScrollProgress />
         <Grain />

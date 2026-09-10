@@ -15,15 +15,16 @@ export function Nav() {
   const links = useRef<HTMLElement>(null);
   const { reduce } = useMotionEnv();
 
-  /* Los seis enlaces comparten una sola luz, que se desliza hasta el
-     que tiene el cursor o el foco. Se escribe la posición y el ancho
-     como custom properties del contenedor: un render por hover para
-     mover una píldora no tiene sentido. */
+  /* Los enlaces comparten una sola luz. Se desliza hasta el que tiene
+     el cursor, y cuando nadie apunta a nada vuelve sola a la sección en
+     la que estás: la barra deja de ser un menú y pasa a decirte dónde
+     estás parado. Posición y ancho van como custom properties del
+     contenedor — un render por movimiento no tiene sentido. */
   const iluminar = useCallback((el: HTMLElement | null) => {
     const nav = links.current;
     if (!nav) return;
     if (!el) {
-      nav.classList.remove("on");
+      nav.classList.add("is-idle");
       return;
     }
     const base = nav.getBoundingClientRect();
@@ -31,7 +32,43 @@ export function Nav() {
     nav.style.setProperty("--nx", `${r.left - base.left}px`);
     nav.style.setProperty("--nw", `${r.width}px`);
     nav.classList.add("on");
+    nav.classList.remove("is-idle");
   }, []);
+
+  /* La sección activa. Se mira una franja angosta en el medio de la
+     pantalla: así sólo hay una activa por vez, sin importar cuánto mida
+     cada sección. */
+  const [activa, setActiva] = useState<string | null>(null);
+  useEffect(() => {
+    if (!("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(
+      (entradas) => {
+        for (const e of entradas) if (e.isIntersecting) setActiva(`#${e.target.id}`);
+      },
+      { rootMargin: "-48% 0px -48% 0px", threshold: 0 }
+    );
+    const vistas = nav
+      .map((n) => document.querySelector(n.href))
+      .filter((el): el is Element => !!el);
+    vistas.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
+  /* Volver a la sección activa es lo mismo que iluminar su enlace: el
+     hover simplemente la pisa mientras dura. */
+  const alaActiva = useCallback(() => {
+    const cont = links.current;
+    if (!cont) return;
+    if (!activa) {
+      iluminar(null);
+      return;
+    }
+    iluminar(cont.querySelector<HTMLElement>(`a[href="${activa}"]`));
+  }, [activa, iluminar]);
+
+  useEffect(() => {
+    if (!links.current?.matches(":hover")) alaActiva();
+  }, [alaActiva]);
 
   /* Centinela más IntersectionObserver, sin listener de scroll. */
   useEffect(() => {
@@ -80,7 +117,7 @@ export function Nav() {
         }`}
       >
         <a className="inline-flex items-center gap-2" href="#top" aria-label="Visual Solution, inicio">
-          <Mark className={`block h-auto w-[26px] ${pop ? "nav-pop" : ""}`} />
+          <Mark className={`block h-auto w-[26px] text-magenta ${pop ? "nav-pop" : ""}`} />
           <span className="whitespace-nowrap text-sm font-medium text-chalk">
             Visual <span className="text-chalk/55">Solution</span>
           </span>
@@ -88,11 +125,11 @@ export function Nav() {
 
         <nav
           ref={links as React.RefObject<HTMLElement>}
-          className="nav-links hidden items-center gap-1 lg:flex"
+          className="nav-links is-idle hidden items-center gap-1 lg:flex"
           aria-label="Principal"
-          onPointerLeave={() => iluminar(null)}
+          onPointerLeave={alaActiva}
           onBlur={(e) => {
-            if (!e.currentTarget.contains(e.relatedTarget as Node)) iluminar(null);
+            if (!e.currentTarget.contains(e.relatedTarget as Node)) alaActiva();
           }}
         >
           <i className="nav-glow" aria-hidden="true" />
@@ -101,6 +138,7 @@ export function Nav() {
               key={item.href}
               className="nav-link"
               href={item.href}
+              aria-current={activa === item.href ? "true" : undefined}
               onPointerEnter={(e) => iluminar(e.currentTarget)}
               onFocus={(e) => iluminar(e.currentTarget)}
             >

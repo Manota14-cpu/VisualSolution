@@ -476,6 +476,23 @@ body {
 }
 .plancha .tinta-negra { fill: var(--color-obsidian); }
 
+/* La marca deriva mientras la banda cruza la pantalla. Lo maneja el
+   scroll directamente, sin JS y sin listeners: donde el navegador no
+   soporta la línea de tiempo, no pasa nada y la marca queda quieta. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .plancha .marca {
+      animation: deriva-marca linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+  }
+}
+@keyframes deriva-marca {
+  from { transform: translateY(7%)  scale(1.06); }
+  to   { transform: translateY(-7%) scale(1.06); }
+}
+
 /* El puntero arrastra un disco de luz por debajo de la marca, y donde
    pasa la trama se abre y deja ver más puntos. La máscara viaja con el
    disco, así que moverlo es una transformación y no repinta nada. */
@@ -631,6 +648,9 @@ body {
     opacity .2s ease;
 }
 .nav-links.on .nav-glow { opacity: 1; }
+/* apagada cuando no hay ni sección activa ni cursor: arriba de todo la
+   barra no tiene por qué afirmar nada */
+.nav-links.is-idle .nav-glow { opacity: 0; }
 .nav-link {
   position: relative;
   z-index: 1;
@@ -991,6 +1011,12 @@ body {
    y entonces md:hidden deja de funcionar sobre cualquier componente
    que fije display. Ya pasó dos veces. */
 
+/* Una línea: cada navegación real del sitio —entrar a un caso desde
+   una URL, volver con el botón atrás, el mapa del sitio— deja de ser un
+   corte y pasa a ser una transición. Donde el navegador no la soporta
+   simplemente navega como siempre. */
+@view-transition { navigation: auto; }
+
 ::view-transition-group(*) { animation-duration: .5s; animation-timing-function: cubic-bezier(.16,1,.3,1); }
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .34s; }
 
@@ -1037,10 +1063,28 @@ body {
   transition: opacity .45s cubic-bezier(.16,1,.3,1), visibility .45s;
 }
 #boot.done { opacity: 0; visibility: hidden; }
-#boot svg { width: min(190px, 42vw); height: auto; overflow: visible; }
-#boot path {
-  stroke-dasharray: 1; stroke-dashoffset: 1; fill-opacity: 0;
-  animation: draw .7s cubic-bezier(.6,0,.2,1) forwards, fill-in .4s ease .4s forwards;
+#boot svg { width: min(220px, 46vw); height: auto; overflow: visible; }
+
+/* La intro imprime la marca: las dos tintas entran fuera de registro,
+   desde lejos y en direcciones opuestas, y recién cuando cierran cae
+   la plancha de tiza encima. Es la misma idea que sostiene el hero,
+   contada en un segundo. */
+#boot .b-a { fill: var(--color-magenta); animation: tinta-a .9s cubic-bezier(.16,1,.3,1) both; }
+#boot .b-b { fill: var(--color-violet-mist); animation: tinta-b .9s cubic-bezier(.16,1,.3,1) both; }
+#boot .b-k { fill: var(--color-chalk); animation: plancha-cae .5s cubic-bezier(.16,1,.3,1) .42s both; }
+@keyframes tinta-a {
+  from { transform: translate(26px, -20px); opacity: 0; }
+  60%  { opacity: 1; }
+  to   { transform: translate(3.2px, -2.6px); opacity: 1; }
+}
+@keyframes tinta-b {
+  from { transform: translate(-26px, 20px); opacity: 0; }
+  60%  { opacity: 1; }
+  to   { transform: translate(-3.2px, 2.6px); opacity: 1; }
+}
+@keyframes plancha-cae {
+  from { transform: scale(1.14); opacity: 0; }
+  to   { transform: none; opacity: 1; }
 }
 
 #btt {

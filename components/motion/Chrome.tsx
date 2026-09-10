@@ -10,10 +10,10 @@ import { MARK_PATH, MARK_VIEWBOX, Mark } from "@/components/brand/Mark";
 import { onScroll, useMotionEnv } from "@/lib/motion";
 import { lockScroll, scrollToTop } from "@/components/motion/MotionProvider";
 
-/* El símbolo se dibuja trazo por trazo y se funde al hero.
-   pathLength="1" normaliza el largo real de la ruta, así el dibujado
-   funciona sin medirla a mano. Se saltea con movimiento reducido y en
-   visitas posteriores de la misma sesión. */
+/* La intro imprime la marca: las dos tintas entran fuera de registro y
+   recién cuando cierran cae la plancha de tiza encima. Es la misma idea
+   que sostiene el hero, contada en un segundo. Se saltea con movimiento
+   reducido y en visitas posteriores de la misma sesión. */
 export function Preloader() {
   const { reduce, ready } = useMotionEnv();
   const [show, setShow] = useState(false);
@@ -52,14 +52,9 @@ export function Preloader() {
   return (
     <div id="boot" className={done ? "done" : undefined} aria-hidden="true">
       <svg viewBox={MARK_VIEWBOX}>
-        <path
-          pathLength={1}
-          fill="url(#vsGrad)"
-          fillRule="nonzero"
-          stroke="url(#vsGrad)"
-          strokeWidth={1.4}
-          d={MARK_PATH}
-        />
+        <path className="b-a" d={MARK_PATH} fillRule="nonzero" />
+        <path className="b-b" d={MARK_PATH} fillRule="nonzero" />
+        <path className="b-k" d={MARK_PATH} fillRule="nonzero" />
       </svg>
     </div>
   );

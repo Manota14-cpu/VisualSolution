@@ -13,24 +13,10 @@ export const MARK_PATH =
 
 export const MARK_VIEWBOX = "0 0 143.5 76";
 
-/** Degradado de marca. Se declara una sola vez en el layout. */
-export function MarkGradient() {
-  return (
-    <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true" focusable="false">
-      <defs>
-        <linearGradient id="vsGrad" x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0%" stopColor="#8B5CF6" />
-          <stop offset="100%" stopColor="#EC4899" />
-        </linearGradient>
-      </defs>
-    </svg>
-  );
-}
-
 export function Mark({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox={MARK_VIEWBOX} aria-hidden="true">
-      <path fill="url(#vsGrad)" fillRule="nonzero" d={MARK_PATH} />
+      <path fill="currentColor" fillRule="nonzero" d={MARK_PATH} />
     </svg>
   );
 }
