@@ -168,26 +168,30 @@ o en LinkedIn. Es lo primero que ve la mayoría de la gente que llega al sitio,
 y para un estudio que vende que las cosas se vean bien, una tarjeta vacía
 resta.
 
-- **La tarjeta se genera de la misma plancha que el hero**
-  ( y ): el degradado, el monograma fuera
-  de registro y el reclamo en Anton. Compartir el sitio es compartir un afiche.
-- **Una tarjeta por proyecto** ().
-  Antes se compartía , que hoy es una foto de relleno de picsum: el
-  enlace mostraba una imagen que no era del proyecto.
-- **La trama de puntos NO va en la tarjeta.** Se ve casi siempre a unos 300px
-  de ancho en un chat, y a esa escala una retícula de 16px se vuelve papilla
-  gris. El motivo firma no sobrevive al medio; el degradado, el monograma y el
-  titular sí.
-- Las dos caras se bajan de Google en build. Si el pedido falla, la tarjeta se
-  arma igual con la tipografía que trae el generador: vale más una tarjeta con
-  otra tipografía que ninguna.
-- , canónicas,  para X,  y
-   generados desde el contenido, y datos estructurados
-  ( con el catálogo de servicios) para que un buscador
-  entienda que esto es un estudio y no un blog. Sólo se afirma lo que es
-  verdad: nada de dirección, teléfono ni reseñas inventadas.
-- **La URL pública** sale de ; en Vercel se toma sola del
-  dominio de producción. El respaldo está marcado con TODO en .
+- **La tarjeta se genera de la misma plancha que el hero** (`app/opengraph-image.tsx`
+  y `lib/og.ts`): el degradado, el monograma fuera de registro y el reclamo en
+  Anton, armados con `ImageResponse` en build. Compartir el sitio es compartir
+  un afiche.
+- **Una tarjeta por proyecto** (`app/trabajos/[slug]/opengraph-image.tsx`). Antes
+  se compartía `work.full`, que hoy es una foto de relleno de picsum: el enlace
+  mostraba una imagen que no era del proyecto.
+- **La trama de puntos NO va en la tarjeta.** Se ve casi siempre a unos 300px de
+  ancho en un chat, y a esa escala una retícula de 16px se vuelve papilla gris.
+  El motivo firma no sobrevive al medio; el degradado, el monograma y el titular
+  sí.
+- **El sello va en obsidiana y no en magenta**: arriba a la derecha la plancha ya
+  *es* magenta, y un sello magenta sobre magenta no se ve.
+- Las dos caras del sistema se bajan de Google en build. Si el pedido falla, la
+  tarjeta se arma igual con la tipografía que trae el generador: vale más una
+  tarjeta con otra tipografía que ninguna.
+- `metadataBase` —sin él, cualquier ruta relativa de las tarjetas queda sin
+  resolver—, canónicas, `summary_large_image` para X, plantilla de título,
+  `sitemap.xml` y `robots.txt` generados desde el contenido, y datos
+  estructurados (`ProfessionalService` con el catálogo de servicios) para que un
+  buscador entienda que esto es un estudio y no un blog. Sólo se afirma lo que
+  es verdad: nada de dirección, teléfono ni reseñas inventadas.
+- **La URL pública** sale de `NEXT_PUBLIC_SITE_URL`; en Vercel se toma sola del
+  dominio de producción. El respaldo está marcado con TODO en `lib/content.ts`.
 
 ## Animación
 
