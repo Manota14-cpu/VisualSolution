@@ -143,6 +143,90 @@ body {
 }
 .display-xl { font-size: clamp(56px, 13.5vw, 189px); line-height: 0.94; }  /* la firma del hero */
 
+/* ==========================================================
+   EL AFICHE
+   Un hero centrado con la imagen adentro de una tarjeta es la
+   composición que arma cualquiera. Acá la banda va a sangre, de
+   borde a borde, y el reclamo la muerde desde abajo: imagen y
+   tipografía se traban en vez de apilarse.
+   ========================================================== */
+.banda {
+  position: relative;
+  width: 100%;
+  height: clamp(300px, 54vh, 540px);
+}
+/* a sangre no hay esquinas que redondear */
+.banda .hands { height: 100%; border-radius: 0; }
+
+/* El sello. Una pieza rotada, pegada al borde de la banda: es la
+   marca de mano que ninguna grilla produce sola. */
+.sello {
+  position: absolute;
+  top: 31%;
+  right: clamp(16px, 4vw, 56px);
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border-radius: var(--radius-pills);
+  background: var(--color-magenta);
+  color: var(--color-obsidian);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transform: rotate(-7deg);
+  transition: transform .4s cubic-bezier(.16,1,.3,1);
+}
+.sello:hover { transform: rotate(0deg) scale(1.04); }
+
+/* La barra negra que cruza el pie de la banda con las fichas. Es el
+   mismo negro del lienzo: corta la imagen en seco, sin degradado. */
+.tira {
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px clamp(16px, 4vw, 40px);
+  background: var(--color-onyx);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tira::-webkit-scrollbar { display: none; }
+.tira > * { flex: none; }
+
+/* El reclamo muerde la banda desde abajo y se va contra el margen
+   izquierdo. La segunda línea entra: el bloque deja de ser un
+   rectángulo centrado y pasa a ser una composición. */
+.claim {
+  position: relative;
+  z-index: 2;
+  margin-top: clamp(-72px, -5.2vw, -26px);
+  text-align: left;
+}
+.claim-line:nth-child(2) { padding-left: clamp(24px, 9vw, 150px); }
+.claim-line:nth-child(3) { padding-left: clamp(12px, 4vw, 68px); }
+
+/* El cierre: el subtítulo a la izquierda y las acciones a la derecha,
+   sobre la misma línea. Nada centrado. */
+.cierre {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-top: clamp(28px, 4vw, 52px);
+}
+@media (min-width: 900px) {
+  .cierre {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 48px;
+  }
+  .cierre .tagline { max-width: 44ch; }
+}
+
 /* El momento del sitio. Cada línea del reclamo entra desde abajo de su
    propia ventana, y la arrastra un filo de magenta que sube con ella y
    se apaga arriba. No es un fundido: es la luz descubriendo el texto. */
@@ -774,44 +858,125 @@ body {
 .case-back:hover { background: var(--color-chalk); color: var(--color-obsidian); }
 .case-back svg { transition: transform .25s cubic-bezier(.16,1,.3,1); }
 .case-back:hover svg { transform: translateX(-2px); }
-.work-detail {
-  font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
-  transition: color .25s, transform .35s cubic-bezier(.16,1,.3,1);
+/* ==========================================================
+   EL ÍNDICE
+   Una grilla de fichas iguales —foto, título, año, "ver más"— es
+   la estructura que sale sola y se nota. Acá el catálogo es un
+   índice editorial: filas a todo el ancho separadas por el
+   punteado del sistema, con el año a la izquierda y el título en
+   display. La foto no vive en un marco: aparece recortada y
+   siguiendo al puntero, flotando sobre el texto.
+   ========================================================== */
+.indice { border-top: 1.5px dotted rgb(255 255 255 / .25); }
+
+.fila {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 22px 0;
+  border-bottom: 1.5px dotted rgb(255 255 255 / .25);
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  background: none;
+  transition: background-color .3s ease;
+}
+@media (min-width: 860px) {
+  .fila {
+    grid-template-columns: 5rem 1fr 14rem 2rem;
+    align-items: center;
+    gap: clamp(16px, 3vw, 48px);
+    padding: clamp(20px, 2.2vw, 32px) 0;
+  }
+}
+.fila:hover { background-color: rgb(24 21 30 / .5); }
+
+.fila .anio {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  letter-spacing: .06em;
+  color: rgb(255 255 255 / .55);
+  transition: color .3s ease;
+}
+.fila:hover .anio { color: var(--color-magenta); }
+
+.fila .titulo {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  line-height: .96;
+  font-size: clamp(30px, 5.4vw, 76px);
+  color: var(--color-chalk);
+  transition: color .3s ease, transform .45s cubic-bezier(.16,1,.3,1);
+}
+.fila:hover .titulo,
+.fila:focus-visible .titulo { color: var(--color-magenta); transform: translateX(18px); }
+
+.fila .tipo { font-size: 14px; color: rgb(255 255 255 / .55); }
+
+/* Debajo del corte de la grilla no hay puntero al que seguir: se va la
+   flecha y entra la tira de foto, que es lo que se mira con el dedo. */
+@media (max-width: 859px) {
+  .fila .flecha { display: none; }
+  .fila-tira { display: block; margin-top: 6px; }
+}
+@media (min-width: 860px) {
+  .fila-tira { display: none; }
+}
+.fila .flecha {
+  justify-self: end;
+  color: rgb(255 255 255 / .55);
+  transition: transform .4s cubic-bezier(.16,1,.3,1), color .3s ease;
+}
+.fila:hover .flecha { transform: translateX(9px); color: var(--color-magenta); }
+.fila[hidden] { display: none; }
+
+/* La tira de foto que ven los dedos, donde no hay puntero que seguir. */
+.fila-tira {
+  position: relative;
+  aspect-ratio: 16 / 7;
+  overflow: hidden;
+  border-radius: 28px 4px 28px 4px;
 }
 
-/* Al pasar por una ficha, la trama del sistema florece sobre la foto y
-   el título se subraya solo. La foto se acerca apenas: es la única
-   pieza del sitio que tiene profundidad real, y se nota. */
-.work .shot img { transition: transform .7s cubic-bezier(.16,1,.3,1); }
-.work .shot::after {
+/* El recorte que flota. Uno solo para toda la lista: cambia de foto al
+   pasar de fila. La forma no es un rectángulo redondeado más — dos
+   esquinas abiertas y dos al ras, girada. */
+.recorte {
+  position: fixed;
+  left: 0; top: 0;
+  z-index: 30;
+  width: clamp(230px, 23vw, 360px);
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: 44px 4px 44px 4px;
+  transform:
+    translate3d(var(--cx, -50vw), var(--cy, -50vh), 0)
+    translate(-50%, -50%)
+    rotate(var(--cr, -5deg))
+    scale(var(--cs, .82));
+  opacity: 0;
+  transition: opacity .28s ease, transform .2s cubic-bezier(.22,1,.36,1);
+}
+.indice.is-hover .recorte { opacity: 1; --cs: 1; }
+.recorte img { width: 100%; height: 100%; object-fit: cover; }
+
+/* La trama del sistema florece sobre la foto del recorte y de la tira:
+   la textura de la marca se apoya encima del material real. */
+.fila-tira::after,
+.recorte::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   background: radial-gradient(circle at center, var(--color-magenta) 2px, transparent 2.1px) 0 0 / 11px 11px;
   mix-blend-mode: screen;
-  opacity: 0;
-  transition: opacity .45s ease;
+  opacity: .55;
 }
-.work h3 { position: relative; display: inline-block; }
-.work h3::after {
-  content: "";
-  position: absolute;
-  left: 0; right: 0; bottom: -5px;
-  height: 1.5px;
-  background: var(--color-magenta);
-  transform: scaleX(0);
-  transform-origin: 0 50%;
-  transition: transform .45s cubic-bezier(.16,1,.3,1);
-}
-.work:hover .shot img,
-.work:focus-within .shot img { transform: scale(1.05); }
-.work:hover .shot::after,
-.work:focus-within .shot::after { opacity: .8; }
-.work:hover h3::after,
-.work:focus-within h3::after { transform: scaleX(1); }
-.work:hover .work-detail,
-.work:focus-within .work-detail { color: var(--color-magenta); transform: translateX(5px); }
 .work-open { display: block; width: 100%; border-radius: var(--radius-cards); }
 .work-open:focus-visible { outline: 2px solid var(--color-magenta); outline-offset: 4px; }
 }
@@ -835,7 +1000,13 @@ body {
   transition-delay: calc(var(--i, 0) * 55ms);
 }
 
-.w { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: .08em; }
+.w {
+  display: inline-block; overflow: hidden; vertical-align: bottom;
+  /* aire arriba y abajo: sin el de arriba, la mascara le come la tilde
+     a las mayusculas acentuadas (CATALOGO, COMO, MAQUINA) */
+  padding: .16em 0 .08em;
+  margin-top: -.16em;
+}
 .w > i {
   display: inline-block; font-style: normal;
   transform: translateY(108%);
@@ -932,8 +1103,9 @@ input, textarea, select { caret-color: var(--color-magenta); }
   .violet-card:hover,
   .chip:hover,
   .faq-row:hover .q,
-  .work:hover .shot img, .work:focus-within .shot img,
-  .work:hover .work-detail, .work:focus-within .work-detail { transform: none; }
+  .fila:hover .titulo, .fila:focus-visible .titulo,
+  .fila:hover .flecha { transform: none; }
+  .recorte { display: none; }
   .btn-solid::after { display: none; }
 
   *, *::before, *::after {

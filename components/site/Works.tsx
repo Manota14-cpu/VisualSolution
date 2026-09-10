@@ -3,117 +3,84 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { flushSync } from "react-dom";
-import { Reveal, SplitHeading, useReveal } from "@/components/motion/Reveal";
+import { Reveal, SplitHeading } from "@/components/motion/Reveal";
 import { CaseLayer } from "@/components/site/CaseLayer";
 import { scrollToId } from "@/components/motion/MotionProvider";
-import { askAbout } from "@/lib/consult";
 import { useMotionEnv, withTransition } from "@/lib/motion";
 import { workFilters, works, type Work } from "@/lib/content";
 
+/* ============================================================
+   EL CATÁLOGO
+   Un índice editorial, no una grilla de fichas. Cada trabajo es
+   una fila a todo el ancho: el año a la izquierda, el título en
+   display y el tipo a la derecha, separadas por el punteado del
+   sistema.
+
+   La foto no vive adentro de un marco. Hay un solo recorte para
+   toda la lista, que sigue al puntero y cambia de imagen al
+   pasar de fila: la imagen flota sobre el texto en vez de estar
+   encajada al lado. Donde no hay puntero que seguir, cada fila
+   muestra su propia tira recortada.
+   ============================================================ */
+
 /* El nombre de transición tiene que ser único en todo el documento, así
-   que sólo lo lleva la ficha que se está abriendo. */
+   que sólo lo lleva la pieza que se está abriendo. Y sólo una: si el
+   recorte y la tira lo llevaran a la vez, la transición falla. */
 const morphNameFor = (id: string) => `caso-${id}`;
 
-/* Inclinación con el origen en el punto del cursor, con el trabajo por
-   cuadro limitado a un rAF. */
-function useTilt<T extends HTMLElement>(strength = 7) {
-  const host = useRef<T>(null);
-  const { fine, reduce } = useMotionEnv();
-
-  useEffect(() => {
-    const el = host.current;
-    if (!el || !fine || reduce) return;
-    const plate = el.querySelector<HTMLElement>(".tilt");
-    if (!plate) return;
-    let queued = false;
-    let px = 0;
-    let py = 0;
-
-    const onMove = (e: PointerEvent) => {
-      const r = el.getBoundingClientRect();
-      px = (e.clientX - r.left) / r.width;
-      py = (e.clientY - r.top) / r.height;
-      if (queued) return;
-      queued = true;
-      requestAnimationFrame(() => {
-        queued = false;
-        plate.style.transformOrigin = `${(px * 100).toFixed(1)}% ${(py * 100).toFixed(1)}%`;
-        plate.style.setProperty("--ry", `${((px - 0.5) * strength).toFixed(2)}deg`);
-        plate.style.setProperty("--rx", `${((py - 0.5) * -strength * 0.86).toFixed(2)}deg`);
-      });
-    };
-    const onLeave = () => {
-      plate.style.transformOrigin = "";
-      plate.style.setProperty("--ry", "0deg");
-      plate.style.setProperty("--rx", "0deg");
-    };
-
-    el.addEventListener("pointermove", onMove);
-    el.addEventListener("pointerleave", onLeave);
-    return () => {
-      el.removeEventListener("pointermove", onMove);
-      el.removeEventListener("pointerleave", onLeave);
-      onLeave();
-    };
-  }, [fine, reduce, strength]);
-
-  return host;
-}
-
-function WorkCard({
+function Fila({
   work,
   hidden,
   morphing,
   onOpen,
+  onEnter,
 }: {
   work: Work;
   hidden: boolean;
   morphing: boolean;
   onOpen: (w: Work) => void;
+  onEnter: (w: Work) => void;
 }) {
-  const host = useTilt<HTMLElement>();
-  // el <article> lleva .rv: hay que registrarlo aunque el ref sea del tilt
-  useReveal<HTMLElement>(host);
-  const wipe = useReveal<HTMLDivElement>();
-  const detail = work.chapters?.length ? "Ver el caso" : "Ver ficha";
-
   return (
-    <article ref={host} className={`work group rv ${work.span} ${hidden ? "is-out" : ""}`} hidden={hidden}>
-      <a
-        className="work-open block w-full text-left"
-        href={`/trabajos/${work.id}`}
-        aria-label={`Abrir el caso ${work.title}`}
-        onClick={(e) => {
-          // Es un enlace real para que se pueda abrir en otra pestaña y
-          // los buscadores lo sigan. El clic normal lo intercepta la capa.
-          if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
-          e.preventDefault();
-          onOpen(work);
-        }}
-      >
-        <div
-          ref={wipe}
-          className={`tilt shot wipe relative rounded-cards ${work.ratio}`}
+    <button
+      type="button"
+      className="fila"
+      hidden={hidden}
+      onPointerEnter={() => onEnter(work)}
+      onFocus={() => onEnter(work)}
+      onClick={() => onOpen(work)}
+      aria-label={`Abrir el caso ${work.title}`}
+    >
+      <span className="anio">{work.year}</span>
+
+      <span>
+        <span className="titulo">{work.title}</span>
+      </span>
+
+      <span className="tipo">{work.kind}</span>
+
+      <svg className="flecha" width="26" height="14" viewBox="0 0 26 14" fill="none" aria-hidden="true">
+        <path
+          d="M1 7h23M18 1l6 6-6 6"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+
+      {/* La tira: es lo que se ve donde el puntero no existe. */}
+      <span className="fila-tira" aria-hidden="true">
+        <Image
+          src={work.thumb}
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover"
           style={morphing ? ({ viewTransitionName: morphNameFor(work.id) } as React.CSSProperties) : undefined}
-        >
-          <Image
-            src={work.thumb}
-            alt={work.alt}
-            fill
-            sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover"
-          />
-        </div>
-      </a>
-      <div className="mt-4 flex items-baseline justify-between gap-4">
-        <div>
-          <h3 className="text-lg font-medium leading-snug text-chalk">{work.title}</h3>
-          <p className="mt-1 text-xs text-chalk/55">{work.kind}</p>
-        </div>
-        <span className="badge">{work.year}</span>
-      </div>
-      <p className="work-detail mt-2 label text-chalk/55">{detail}</p>
-    </article>
+        />
+      </span>
+    </button>
   );
 }
 
@@ -121,13 +88,37 @@ export function Works() {
   const [filter, setFilter] = useState("todos");
   const [open, setOpen] = useState<Work | null>(null);
   /* Se separa del abierto: el nombre de transición debe estar puesto en
-     la tarjeta ANTES de que empiece la captura, y seguir puesto hasta
-     que la vuelta termine. */
+     la pieza ANTES de que empiece la captura, y seguir puesto hasta que
+     la vuelta termine. */
   const [morphId, setMorphId] = useState<string | null>(null);
-  const { reduce } = useMotionEnv();
+  const [activo, setActivo] = useState<Work>(works[0]);
+  const { reduce, fine } = useMotionEnv();
   const pushedUrl = useRef(false);
+  const lista = useRef<HTMLDivElement>(null);
 
   const visible = works.filter((w) => filter === "todos" || w.category === filter);
+
+  /* El recorte sigue al puntero. Posición y escala son custom
+     properties del contenedor: mover una imagen no puede costar un
+     render de React por cada movimiento del mouse. */
+  useEffect(() => {
+    const el = lista.current;
+    if (!el || !fine || reduce) return;
+    const move = (e: PointerEvent) => {
+      el.style.setProperty("--cx", `${e.clientX.toFixed(1)}px`);
+      el.style.setProperty("--cy", `${e.clientY.toFixed(1)}px`);
+    };
+    const entra = () => el.classList.add("is-hover");
+    const sale = () => el.classList.remove("is-hover");
+    el.addEventListener("pointermove", move, { passive: true });
+    el.addEventListener("pointerenter", entra);
+    el.addEventListener("pointerleave", sale);
+    return () => {
+      el.removeEventListener("pointermove", move);
+      el.removeEventListener("pointerenter", entra);
+      el.removeEventListener("pointerleave", sale);
+    };
+  }, [fine, reduce]);
 
   const pick = useCallback(
     (id: string) => withTransition(() => flushSync(() => setFilter(id)), reduce),
@@ -156,7 +147,7 @@ export function Works() {
 
   const show = useCallback(
     (work: Work) => {
-      // 1. la tarjeta recibe el nombre y se pinta antes de la captura
+      // 1. la pieza recibe el nombre y se pinta antes de la captura
       flushSync(() => setMorphId(work.id));
       // 2. la transición captura el estado viejo y aplica el nuevo
       withTransition(() => flushSync(() => setOpen(work)), reduce);
@@ -188,10 +179,7 @@ export function Works() {
       <div className="mx-auto w-full max-w-[1200px] px-4 md:px-10">
         <div className="mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <Reveal>
-            <SplitHeading
-              text="Catálogo"
-              className="display display-md"
-            />
+            <SplitHeading text="Catálogo" className="display display-md" />
           </Reveal>
           <Reveal as="a" delay={1} className="link" href="#contacto">
             Pedir el catálogo completo
@@ -212,17 +200,40 @@ export function Works() {
           ))}
         </Reveal>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-12">
-          {works.map((w) => (
-            <WorkCard
-              key={w.id}
-              work={w}
-              hidden={filter !== "todos" && w.category !== filter}
-              morphing={morphId === w.id}
-              onOpen={show}
-            />
-          ))}
-        </div>
+        <Reveal>
+          <div className="indice" ref={lista}>
+            {works.map((w) => (
+              <Fila
+                key={w.id}
+                work={w}
+                hidden={filter !== "todos" && w.category !== filter}
+                morphing={morphId === w.id && !fine}
+                onOpen={show}
+                onEnter={setActivo}
+              />
+            ))}
+
+            {/* Un solo recorte para toda la lista: cambia de foto al pasar
+                de fila en vez de existir cinco veces. */}
+            {fine && !reduce && (
+              <span className="recorte" aria-hidden="true">
+                <Image
+                  key={activo.id}
+                  src={activo.thumb}
+                  alt=""
+                  width={360}
+                  height={270}
+                  className="h-full w-full object-cover"
+                  style={
+                    morphId === activo.id
+                      ? ({ viewTransitionName: morphNameFor(activo.id) } as React.CSSProperties)
+                      : undefined
+                  }
+                />
+              </span>
+            )}
+          </div>
+        </Reveal>
 
         {visible.length === 0 && (
           <p className="mt-8 label text-chalk/55">No hay trabajos de ese tipo todavía.</p>

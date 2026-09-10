@@ -8,23 +8,17 @@ import { hero, capabilities, heroServices, type HeroService } from "@/lib/conten
 
 /* ============================================================
    EL HERO
-   El bloque de trama a escala de hero —puntos magenta sobre el
-   degradado violeta→magenta, que es la firma del sistema— con las
-   dos manos apoyadas encima a punto de tocarse. Debajo, el titular
-   a 189px, que es la otra firma.
-   Las fichas de servicio se arrastran al hueco entre las manos y
-   arman la consulta. Si nadie toca nada, el afiche se lee igual.
-   ============================================================ */
+   Un afiche, no una tarjeta. La banda de trama va a sangre, de
+   borde a borde de la pantalla, con las dos manos cortadas por
+   los márgenes; el reclamo la muerde desde abajo y se apoya
+   contra el margen izquierdo con las líneas escalonadas.
+   Imagen y tipografía se traban en vez de apilarse: es lo único
+   que separa una composición de una plantilla.
 
-/* Las fichas se apoyan en los bordes del bloque, nunca encima del
-   punto de contacto, que es lo único que no se puede tapar. */
-const ARC: React.CSSProperties[] = [
-  { top: "-5%", left: "1%" },
-  { top: "31%", left: "-6%" },
-  { top: "74%", left: "3%" },
-  { top: "-3%", right: "2%" },
-  { top: "35%", right: "-6%" },
-];
+   Las fichas de servicio viven en una barra negra que cruza el
+   pie de la banda, y se arrastran al hueco entre las manos.
+   Si nadie toca nada, el afiche se lee igual.
+   ============================================================ */
 
 function Chip({
   service,
@@ -113,36 +107,22 @@ export function Hero() {
   }, [elegidos]);
 
   return (
-    <section className="relative overflow-hidden bg-onyx pb-16 pt-28 md:pb-24 md:pt-32" id="top">
-      <div className="relative mx-auto w-full max-w-[1440px] px-4 md:px-10">
-        {/* El bloque de trama con las manos encima. Las fichas se apoyan
-            en sus bordes. */}
-        <div className="relative mx-auto w-full max-w-[1040px]">
-          <div ref={stage} className={`stage relative ${over ? "is-over" : ""}`}>
-            <Hands
-              className="halftone aspect-[6/5] w-full md:aspect-[15/7]"
-              services={taken}
-            />
-          </div>
+    <section className="relative overflow-hidden bg-onyx pb-16 pt-24 md:pb-24 md:pt-28" id="top">
+      {/* La banda, a sangre. El puntero que entra acá acerca las manos,
+          y es también la zona donde se sueltan las fichas. */}
+      <div ref={stage} className={`banda stage ${over ? "is-over" : ""}`}>
+        <Hands className="halftone h-full w-full" services={taken} />
 
-          <div className="pointer-events-none absolute inset-0 hidden md:block">
-            {heroServices.map((s, i) => (
-              <div key={s.id} className="pointer-events-auto absolute" style={ARC[i]}>
-                <Chip
-                  service={s}
-                  taken={taken.includes(s.id)}
-                  dragging={dragging === s.id}
-                  onToggle={() => toggle(s.id)}
-                  onDragStart={startDrag}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
+        <span className="sello" aria-hidden="true">
+          <i className="diamond" />
+          Web + video
+        </span>
 
-        {/* En angosto van en una tira que se desliza, para no empujar el
-            titular fuera de la primera pantalla. */}
-        <div className="chip-strip fade-x mt-4 md:hidden">
+        <div className="tira fade-x">
+          <p className={`hint ${taken.length ? "is-done" : ""}`}>
+            <span className="hidden md:inline">Arrastrá al punto de contacto</span>
+            <span className="md:hidden">Tocá lo que necesitás</span>
+          </p>
           {heroServices.map((s) => (
             <Chip
               key={s.id}
@@ -154,46 +134,50 @@ export function Hero() {
             />
           ))}
         </div>
+      </div>
 
-        <p className={`hint mt-5 text-center ${taken.length ? "is-done" : ""}`}>
-          <span className="hidden md:inline">Arrastrá un servicio al punto de contacto</span>
-          <span className="md:hidden">Tocá lo que necesitás</span>
-        </p>
-
-        {/* El momento del sitio: cada línea la descubre un filo de luz
-            que sube con ella. El texto está entero en el DOM desde el
-            servidor, así que se lee igual si el CSS no llega. */}
-        <h1 className="display display-xl mt-6 text-center">
+      <div className="relative mx-auto w-full max-w-[1440px] px-4 md:px-10">
+        {/* Cada línea la descubre un filo de luz que sube con ella. El
+            texto está entero en el DOM desde el servidor, así que se
+            lee igual si el CSS no llega. */}
+        <h1 className="display display-xl claim">
           {hero.claim.map((linea, i) => (
             <span
               key={linea}
               className="claim-line"
-              style={{ ["--d" as string]: `${480 + i * 130}ms` } as React.CSSProperties}
+              style={{ ["--d" as string]: `${420 + i * 120}ms` } as React.CSSProperties}
             >
               <i>{linea}</i>
             </span>
           ))}
         </h1>
 
-        <p
-          className="tagline animate-rise mx-auto mt-7 max-w-[46ch] text-center"
-          style={{ animationDelay: ".2s" }}
-        >
-          {hero.sub}
-        </p>
+        <div className="cierre">
+          <p className="tagline animate-rise" style={{ animationDelay: ".8s" }}>
+            {hero.sub}
+          </p>
+
+          <div className="animate-rise flex flex-wrap items-center gap-3" style={{ animationDelay: ".9s" }}>
+            <button className="btn btn-solid" type="button" onClick={empezar}>
+              <i className="diamond" aria-hidden="true" />
+              <span key={ctaLabel} className="cta-label">
+                {ctaLabel}
+              </span>
+            </button>
+            <a className="btn btn-ghost" href="#trabajos">
+              {hero.secondaryCta}
+            </a>
+          </div>
+        </div>
 
         {/* Lo armado. Cada pieza se saca desde acá. */}
         {elegidos.length > 0 && (
-          <div className="mt-8 text-center">
+          <div className="mt-8">
             <p className="label text-chalk/55">Tu proyecto</p>
-            <ul className="mt-3 flex flex-wrap justify-center gap-2">
+            <ul className="mt-3 flex flex-wrap gap-2">
               {elegidos.map((s) => (
                 <li key={s.id}>
-                  <button
-                    type="button"
-                    className="taken"
-                    onClick={() => toggle(s.id)}
-                  >
+                  <button type="button" className="taken" onClick={() => toggle(s.id)}>
                     {s.label}
                     <span aria-hidden="true">×</span>
                     <span className="sr-only">Sacar {s.label}</span>
@@ -203,21 +187,6 @@ export function Hero() {
             </ul>
           </div>
         )}
-
-        <div
-          className="animate-rise mt-9 flex flex-wrap justify-center gap-3"
-          style={{ animationDelay: ".3s" }}
-        >
-          <button className="btn btn-solid" type="button" onClick={empezar}>
-            <i className="diamond" aria-hidden="true" />
-            <span key={ctaLabel} className="cta-label">
-              {ctaLabel}
-            </span>
-          </button>
-          <a className="btn btn-ghost" href="#trabajos">
-            {hero.secondaryCta}
-          </a>
-        </div>
       </div>
     </section>
   );

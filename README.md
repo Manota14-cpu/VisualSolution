@@ -206,6 +206,14 @@ desde abajo de la superficie. Eso es todo el movimiento del sitio: **nada se
 desliza, las cosas se encienden**. Una sola idea material, con un momento
 protagonista y el resto en voz baja.
 
+- **La composición del hero es un afiche, no una tarjeta.** La banda de
+  trama va a sangre, de borde a borde de la pantalla, con las manos cortadas
+  por los márgenes; una barra negra le cruza el borde de arriba con las
+  fichas de servicio, y el reclamo la muerde desde abajo, contra el margen
+  izquierdo y con las líneas escalonadas. Imagen y tipografía se traban en
+  vez de apilarse: es lo único que separa una composición de una plantilla.
+  El sello rotado sobre la mano es la marca de mano que ninguna grilla saca
+  sola.
 - **El momento** es la llegada del hero. El bloque arranca negro y la luz sube
   por debajo (`@keyframes subir`, un `clip-path` que se abre desde el borde de
   abajo); cuando termina se encienden los puntos de la trama. Después cada
@@ -227,9 +235,16 @@ protagonista y el resto en voz baja.
 - Servicios: la tarjeta violeta respira su propia trama; las de carbón sangran
   luz violeta desde el borde de abajo al pasar el cursor. Es luz, no sombra:
   vive adentro de la tarjeta. El monograma suelta un anillo al entrar.
-- Trabajos: la trama del sistema florece sobre la foto en `mix-blend-mode:
-  screen`, el título se subraya solo y la foto se acerca apenas. Filtros por
-  tipo con `View Transitions` y visor de caso con foco atrapado y `Esc`.
+- Trabajos: **un índice editorial, no una grilla de fichas**. Una grilla de
+  tarjetas iguales —foto, título, año, "ver más"— es la estructura que sale
+  sola y se nota. Acá cada trabajo es una fila a todo el ancho, con el año a
+  la izquierda y el título en display, separadas por el punteado del sistema.
+  La foto no vive adentro de un marco: hay **un solo recorte** para toda la
+  lista que sigue al puntero y cambia de imagen al pasar de fila, con dos
+  esquinas abiertas y dos al ras. Donde no hay puntero que seguir, cada fila
+  muestra su propia tira recortada. La trama del sistema florece sobre la
+  foto en `mix-blend-mode: screen`. Filtros con `View Transitions` y visor de
+  caso con foco atrapado y `Esc`.
 - Proceso: la línea se dibuja en magenta y termina siempre sobre un número; el
   que alcanza suelta el mismo anillo que el monograma.
 - Preguntas: la pregunta se corre, el chevrón se enciende y la respuesta sube
@@ -256,7 +271,19 @@ El sangrado de luz de una superficie se anima con `--luz`, declarada con
 - El hero es SVG y CSS: no hay WebGL, no hay canvas y no hay nada que pueda
   fallar en un equipo viejo. Three.js se fue del proyecto con el logo 3D.
 
-### Una trampa que ya está resuelta
+### Dos trampas que ya están resueltas
+
+El nombre de una transición de vista tiene que ser **único en el documento**.
+En el catálogo hay dos piezas con la misma foto —el recorte que sigue al
+puntero y la tira de cada fila— y sólo una puede llevar el nombre: se lo
+asigna la que está visible según haya o no puntero fino. Si lo llevan las
+dos, la transición falla entera.
+
+La máscara de `SplitHeading` sólo tenía aire abajo, así que a las mayúsculas
+acentuadas les comía la tilde: se leía CATALOGO y COMO. Ahora tiene aire
+arriba también, compensado con un margen negativo para no mover el texto.
+
+
 
 Dentro de `document.startViewTransition`, un `setState` normal de React no se
 aplica a tiempo y la transición captura el DOM viejo: el filtro y el visor
