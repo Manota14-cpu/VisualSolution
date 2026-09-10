@@ -5,9 +5,8 @@ Sitio del estudio. Next.js 15 (App Router) + React 19 + Tailwind v4.
 El sistema visual es **Caldera**, definido en `DESIGN.md` y en `design/`:
 negro total, magenta y violeta como únicas luces, tipografía comprimida
 ultrabold hasta 189px y cero sombras. En el hero, el bloque de trama de
-puntos con dos manos apoyadas encima a punto de tocarse —la de la máquina y
-la de la persona— dibujadas en SVG, y las fichas de servicio que se arrastran
-al hueco entre las dos.
+puntos con el monograma VS calado en negro a escala arquitectónica y fuera
+de registro: dos tintas corridas que el puntero abre y cierra.
 
 ```
 app/
@@ -15,7 +14,7 @@ app/
   page.tsx          compone las secciones
   globals.css       tokens de Tailwind, componentes y capa de movimiento
 components/
-  brand/            el símbolo VS y la escena de las manos
+  brand/            el símbolo VS, plano y como plancha de impresión
 DESIGN.md           el sistema de diseño, tal como lo mandó el cliente
 design/             sus tokens: variables.css, theme.css y tokens.json
   motion/           capa global de movimiento, revelados, elementos fijos
@@ -178,26 +177,26 @@ El movimiento acompaña, no protagoniza: el sistema es plano y editorial.
 
 **Hero**
 
-- El bloque de trama a escala de hero, con dos manos apoyadas encima a punto
-  de tocarse: la de la máquina en obsidiana, la de la persona en tiza. Las dos
-  siluetas leen a máximo contraste contra el degradado, y obsidiana solo se usa
-  así, sobre un relleno brillante.
-- Están dibujadas en SVG (`components/brand/Hands.tsx`). Cada mano se arma en
-  dos pasadas: primero todas las piezas rellenas **y** trazadas del mismo
-  color, que al pisarse dejan una silueta sin costuras, y después las mismas
-  piezas sin trazo, que tapan lo que haya quedado adentro.
-- Las falanges no están escritas a mano: `seg()` arma una cápsula y `finger()`
-  las encadena. Para mover un dedo se tocan tres números —ángulos, largos y
-  anchos— y no quince paths.
-- Las manos se acercan al puntero. Todo el acercamiento cuelga de una sola
-  custom property, `--reach` (0 lejos, 1 a punto de tocarse), que el puntero
-  escribe sobre el contenedor: ni un solo render de React por movimiento.
-  Sin puntero fino, o con movimiento reducido, se quedan quietas y ya cerca.
-- **Nunca llegan a tocarse.** El hueco es el tema del afiche.
-- Cinco fichas de servicio que se arrastran a ese hueco y arman la consulta:
-  cada una que entra se queda orbitando el punto de contacto y cambia la
-  etiqueta del botón. El clic seco hace lo mismo que el arrastre.
-- Si nadie toca nada, el afiche se lee igual.
+- El giro es una **plancha de impresión** (`components/brand/Plate.tsx`): el
+  degradado con la trama encima y el monograma VS calado en negro a escala
+  arquitectónica. Es el único lugar del sitio donde la marca aparece a este
+  tamaño.
+- Debajo del negro hay dos copias del mismo monograma, una magenta y una
+  violeta, corridas en direcciones opuestas. Eso es un **fuera de registro**:
+  el error clásico de la impresión en varias tintas, cuando las planchas no
+  se alinean y los colores asoman por los bordes.
+- El corrimiento lo maneja el puntero —cuanto más lejos del centro, más se
+  abren las tintas— y cada servicio elegido lo abre un poco más. Todo cuelga
+  de tres custom properties del contenedor: ni un render de React por
+  movimiento. Sin puntero fino, o con movimiento reducido, el registro queda
+  apenas abierto y quieto, porque la plancha tiene que leerse sin que nadie
+  mueva nada.
+- **El corrimiento va en unidades del `viewBox`**, que se escalan con la
+  marca: cinco unidades sobre 143.5 son más de veinte píxeles en pantalla.
+  Si algún día se cambia el tamaño del monograma, los números de `Plate.tsx`
+  se mueven con él y no hay que retocarlos.
+- Las etiquetas de servicio viven **debajo del titular**, que es donde alguien
+  las busca. Si nadie toca nada, el afiche se lee igual.
 
 **La tesis: la luz sube desde abajo del negro**
 
@@ -206,14 +205,25 @@ desde abajo de la superficie. Eso es todo el movimiento del sitio: **nada se
 desliza, las cosas se encienden**. Una sola idea material, con un momento
 protagonista y el resto en voz baja.
 
-- **La composición del hero es un afiche, no una tarjeta.** La banda de
-  trama va a sangre, de borde a borde de la pantalla, con las manos cortadas
-  por los márgenes; una barra negra le cruza el borde de arriba con las
-  fichas de servicio, y el reclamo la muerde desde abajo, contra el margen
-  izquierdo y con las líneas escalonadas. Imagen y tipografía se traban en
-  vez de apilarse: es lo único que separa una composición de una plantilla.
-  El sello rotado sobre la mano es la marca de mano que ninguna grilla saca
-  sola.
+- **La composición del hero es un afiche, no una tarjeta.** La plancha va a
+  sangre, de borde a borde de la pantalla, y el reclamo la muerde desde
+  abajo, contra el margen izquierdo y con las líneas escalonadas. Imagen y
+  tipografía se traban en vez de apilarse: es lo único que separa una
+  composición de una plantilla. El sello rotado es la marca de mano que
+  ninguna grilla saca sola.
+- **El giro es una plancha de impresión** (`components/brand/Plate.tsx'):
+  el degradado con la trama encima y el monograma VS calado en negro a
+  escala arquitectónica. Debajo del negro hay dos copias del mismo
+  monograma, una magenta y una violeta, corridas en direcciones opuestas:
+  eso es un **fuera de registro**, el error clásico de la impresión en
+  varias tintas cuando las planchas no se alinean. Acá es deliberado, lo
+  maneja el puntero —cuanto más lejos del centro, más se abren— y cada
+  servicio elegido lo abre un poco más. Es el único lugar del sitio donde
+  la marca aparece a este tamaño.
+- **Las etiquetas van justo debajo del titular**, que es donde alguien las
+  busca: son lo que arma la consulta y lo que cambia el botón. Apagada es
+  una píldora de carbón; elegida se rellena de magenta, igual que el filtro
+  activo del catálogo y el paso alcanzado del proceso.
 - **El momento** es la llegada del hero. El bloque arranca negro y la luz sube
   por debajo (`@keyframes subir`, un `clip-path` que se abre desde el borde de
   abajo); cuando termina se encienden los puntos de la trama. Después cada
@@ -221,9 +231,9 @@ protagonista y el resto en voz baja.
   filo de magenta que sube con ella y se apaga arriba.
 - **La trama está viva.** Deriva un mosaico completo cada veintiséis segundos:
   no se ve moverse, se ve viva. Se frena sola al salir de pantalla.
-- **La luz sigue al puntero.** Sobre la escena de las manos, un disco arrastra
-  más puntos y más brillo. La máscara viaja con el disco, así que moverlo es
-  una transformación y no repinta. Son dos custom properties, no estado.
+- **La luz sigue al puntero.** Sobre la plancha, un disco arrastra más puntos
+  y más brillo. La máscara viaja con el disco, así que moverlo es una
+  transformación y no repinta. Son dos custom properties, no estado.
 
 **Por sección**
 

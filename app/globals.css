@@ -156,7 +156,7 @@ body {
   height: clamp(300px, 54vh, 540px);
 }
 /* a sangre no hay esquinas que redondear */
-.banda .hands { height: 100%; border-radius: 0; }
+.banda .plancha { height: 100%; border-radius: 0; }
 
 /* El sello. Una pieza rotada, pegada al borde de la banda: es la
    marca de mano que ninguna grilla produce sola. */
@@ -179,23 +179,6 @@ body {
   transition: transform .4s cubic-bezier(.16,1,.3,1);
 }
 .sello:hover { transform: rotate(0deg) scale(1.04); }
-
-/* La barra negra que cruza el pie de la banda con las fichas. Es el
-   mismo negro del lienzo: corta la imagen en seco, sin degradado. */
-.tira {
-  position: absolute;
-  left: 0; right: 0; top: 0;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px clamp(16px, 4vw, 40px);
-  background: var(--color-onyx);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.tira::-webkit-scrollbar { display: none; }
-.tira > * { flex: none; }
 
 /* El reclamo muerde la banda desde abajo y se va contra el margen
    izquierdo. La segunda línea entra: el bloque deja de ser un
@@ -499,34 +482,60 @@ body {
   }
 
 /* ==========================================================
-   EL ENCUENTRO
-   Las dos manos, apoyadas sobre el bloque de trama del hero.
-   La máquina va en obsidiana y la persona en tiza: las dos
-   siluetas leen a máximo contraste contra el degradado, y
-   obsidiana solo se usa así, sobre un relleno brillante.
-   Todo el acercamiento cuelga de --reach (0 lejos, 1 a punto
-   de tocarse), que escribe el puntero sobre el contenedor.
+   LA PLANCHA
+   El giro del hero. El degradado con la trama encima y el
+   monograma calado en negro a escala arquitectónica, con dos
+   tintas corridas por debajo: un fuera de registro deliberado,
+   que es el error clásico de la impresión en varias tintas.
+   El puntero lo maneja y cada servicio elegido lo abre más.
    ========================================================== */
-.hands {
-  --reach: 0;
+.plancha {
+  --rx: 5px;
+  --ry: -4px;
+  --tintas: 1;
   position: relative;
   width: 100%;
   overflow: hidden;
-  border-radius: var(--radius-cards);
+  display: grid;
+  place-items: center;
 }
-.hands svg { display: block; width: 100%; height: 100%; }
 
-/* El puntero arrastra un disco de luz por debajo de las manos, y donde
+.plancha .marca {
+  position: relative;
+  z-index: 1;
+  width: min(84%, 900px);
+  max-height: 76%;
+  height: auto;
+  overflow: visible;
+}
+.plancha .tinta,
+.plancha .tinta-negra {
+  transition: transform .45s cubic-bezier(.16,1,.3,1);
+}
+/* las dos tintas asoman por los bordes del negro, en direcciones
+   opuestas: es lo que hace que se lea como un registro corrido y no
+   como una sombra de color */
+.plancha .tinta-a {
+  fill: var(--color-magenta);
+  transform: translate(calc(var(--rx) * var(--tintas)), calc(var(--ry) * var(--tintas)));
+}
+.plancha .tinta-b {
+  fill: var(--color-violet-mist);
+  transform: translate(calc(var(--rx) * var(--tintas) * -1), calc(var(--ry) * var(--tintas) * -1));
+}
+.plancha .tinta-negra { fill: var(--color-obsidian); }
+
+/* El puntero arrastra un disco de luz por debajo de la marca, y donde
    pasa la trama se abre y deja ver más puntos. La máscara viaja con el
    disco, así que moverlo es una transformación y no repinta nada. */
-.hands .luz {
+.plancha .luz {
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   overflow: hidden;
   pointer-events: none;
 }
-.hands .luz > i {
+.plancha .luz > i {
   position: absolute;
   left: 0;
   top: 0;
@@ -542,85 +551,22 @@ body {
   opacity: 0;
   transition: opacity .4s ease, transform .14s linear;
 }
-.hands.is-near .luz > i { opacity: 1; }
-
-/* Primera pasada: relleno y trazo del mismo color, que al pisarse
-   dejan una silueta sin costuras. Segunda pasada: el mismo dibujo
-   sin trazo, que tapa lo que haya quedado adentro. */
-.hands .ink path {
-  stroke-width: 5; stroke-linejoin: round; stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-}
-.hand-robot .ink path { fill: var(--color-obsidian); stroke: var(--color-obsidian); }
-.hand-human .ink path { fill: var(--color-chalk); stroke: var(--color-chalk); }
-.hands .piel-robot path { fill: var(--color-obsidian); stroke: none; }
-.hands .piel-humana path { fill: var(--color-chalk); stroke: none; }
-
-/* Las chapas del brazo, en tiza tenue sobre la silueta oscura. */
-.hands .detalle path {
-  fill: none;
-  stroke: rgb(255 255 255 / .38);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-}
-/* Los pliegues de la mano, al revés: oscuros sobre la tiza. */
-.hand-human .detalle path { stroke: rgb(7 6 7 / .3); }
-.hands .unas ellipse { fill: var(--color-violet-mist); stroke: none; }
-.hands .perno circle { fill: var(--color-violet-mist); stroke: none; }
-
-/* El acercamiento. Nunca llegan a tocarse: el hueco es el tema. */
-.hands .hand { transition: transform .5s cubic-bezier(.16,1,.3,1); }
-.hand-robot { transform: translateX(calc(var(--reach) * 26px)); }
-.hand-human { transform: translateX(calc(var(--reach) * -26px)); }
-
-/* La chispa vive en el hueco y crece con el acercamiento. */
-.hands .chispa {
-  transform: scale(calc(.18 + var(--reach) * .82)) rotate(calc(var(--reach) * 45deg));
-  opacity: calc(.2 + var(--reach) * .8);
-  transition: transform .5s cubic-bezier(.16,1,.3,1), opacity .4s;
-}
-.hands .rayos path { fill: var(--color-chalk); stroke: none; }
-.hands .nucleo {
-  fill: var(--color-obsidian); stroke: var(--color-chalk);
-  stroke-width: 3; vector-effect: non-scaling-stroke;
-}
-
-/* Con un servicio adentro el contacto queda hecho. */
-.hands.is-linked .hand-robot { transform: translateX(30px); }
-.hands.is-linked .hand-human { transform: translateX(-30px); }
-.hands.is-linked .chispa { opacity: 1; animation: latido 1.9s cubic-bezier(.16,1,.3,1) infinite; }
-@keyframes latido {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  50%      { transform: scale(1.16) rotate(22deg); }
-}
-
-/* Los servicios elegidos, orbitando el punto de contacto. */
-.hands .orbita circle { fill: var(--color-obsidian); stroke: none; }
-.hands .orbita text {
-  fill: var(--color-chalk);
-  font-family: var(--font-ui);
-  font-size: 15px;
-  font-weight: 500;
-  text-anchor: middle;
-}
-.hands .orbita > g {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: aterrizar .45s cubic-bezier(.16,1,.3,1) backwards;
-}
-@keyframes aterrizar {
-  from { transform: scale(0); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
-}
+.plancha.is-near .luz > i { opacity: 1; }
 
 /* ==========================================================
-   LAS FICHAS DE SERVICIO
-   Píldoras de carbón que se arrastran al hueco entre las manos.
+   LAS ETIQUETAS
+   Van justo debajo del titular, que es donde alguien las busca:
+   son lo que arma la consulta. Apagada es una píldora de carbón;
+   elegida se rellena de magenta, igual que el filtro activo del
+   catálogo y el paso alcanzado del proceso. Una sola idea de
+   "esto está encendido" en todo el sitio.
    ========================================================== */
-.stage { position: relative; transition: transform .25s cubic-bezier(.16,1,.3,1); }
-.stage.is-over { transform: scale(1.02); }
+.etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
 
 .chip {
   display: inline-flex; align-items: center; gap: 10px;
@@ -642,21 +588,10 @@ body {
 }
 .chip-label { font-size: 16px; font-weight: 500; color: var(--color-chalk); }
 
-.chip.is-taken { opacity: .4; }
-.chip.is-taken .chip-code { background: var(--color-magenta); }
-.chip.is-dragging { opacity: .5; }
-
-.taken {
-  display: inline-flex; align-items: center; gap: 10px;
-  border-radius: var(--radius-pills);
-  padding: 8px 16px;
-  font-size: 14px; font-weight: 500;
-  color: var(--color-obsidian);
-  background: var(--color-violet-mist);
-  cursor: pointer;
-  transition: background-color .2s;
-}
-.taken:hover { background: var(--color-magenta); }
+.chip.is-taken { background: var(--color-magenta); color: var(--color-obsidian); }
+.chip.is-taken:hover { background: #f261a9; }
+.chip.is-taken .chip-label { color: var(--color-obsidian); }
+.chip.is-taken .chip-code { background: var(--color-obsidian); color: var(--color-violet-mist); }
 
 .cta-label { display: inline-block; animation: rise .35s cubic-bezier(.16,1,.3,1); }
 
@@ -667,14 +602,6 @@ body {
 }
 .hint.is-done { opacity: 0; pointer-events: none; }
 
-.chip-strip {
-  display: flex; gap: 10px;
-  overflow-x: auto; scroll-snap-type: x proximity;
-  padding: 6px 16px; margin-inline: -16px;
-  scrollbar-width: none;
-}
-.chip-strip::-webkit-scrollbar { display: none; }
-.chip-strip > * { scroll-snap-align: center; flex: none; }
 
 /* ==========================================================
    LA MARQUESINA
@@ -1085,7 +1012,6 @@ input, textarea, select { caret-color: var(--color-magenta); }
   .halftone::after,
   .violet-card::before,
   .animate-marquee,
-  .hands.is-linked .chispa,
   .step-token.on,
   .token.pulsed { animation: none; }
 
@@ -1102,6 +1028,7 @@ input, textarea, select { caret-color: var(--color-magenta); }
   .card:hover, .card:focus-within,
   .violet-card:hover,
   .chip:hover,
+  .plancha .tinta,
   .faq-row:hover .q,
   .fila:hover .titulo, .fila:focus-visible .titulo,
   .fila:hover .flecha { transform: none; }

@@ -33,6 +33,7 @@ export const hero = {
   /* El reclamo del hero, partido en las dos lineas del afiche. */
   claim: ["Donde la idea", "toca la", "máquina."],
   sub: "Estudio de desarrollo web y producción audiovisual. Un solo equipo para toda tu presencia digital.",
+  pick: "Elegí lo que necesitás",
   primaryCta: "Empezar proyecto",
   secondaryCta: "Ver trabajos",
   meta: ["Sitios y tiendas", "Video y fotografía", "Identidad y automatización"],
