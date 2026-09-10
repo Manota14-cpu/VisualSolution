@@ -229,8 +229,23 @@ protagonista y el resto en voz baja.
   abajo); cuando termina se encienden los puntos de la trama. Después cada
   línea del reclamo entra desde abajo de su propia ventana, arrastrada por un
   filo de magenta que sube con ella y se apaga arriba.
-- **La trama está viva.** Deriva un mosaico completo cada veintiséis segundos:
-  no se ve moverse, se ve viva. Se frena sola al salir de pantalla.
+- **La trama es una serigrafía de verdad** (`components/brand/Press.tsx`).
+  Un cuadrilátero y un shader, en WebGL crudo: sin una sola dependencia
+  nueva y 0,3 kB de bundle. Cada tinta tiene su propio **ángulo de
+  pantalla** —15° el magenta, 75° el violeta— que es exactamente lo que
+  hace un taller de serigrafía para que las dos retículas no formen muaré
+  al superponerse. Los puntos crecen y se achican con la densidad de
+  tinta, se abren donde pasa el puntero, y **la velocidad del scroll corre
+  una plancha contra la otra**: el fuera de registro del monograma, pero
+  en la tinta misma.
+- Se imprime un cuadro **antes** de enganchar cualquier bucle: con
+  `alpha: false` el lienzo arranca negro opaco y tapa la trama en CSS que
+  hay debajo, así que si la primera pintada esperara al primer tick, la
+  plancha parpadearía en negro.
+- Degrada solo: sin WebGL no se monta nada, y en equipos de cuatro núcleos
+  o menos y en pantallas de menos de 768px tampoco. Queda la trama en CSS,
+  que deriva un mosaico completo cada veintiséis segundos y se frena sola
+  al salir de pantalla. En un celular el costo de GPU es cero.
 - **La luz sigue al puntero.** Sobre la plancha, un disco arrastra más puntos
   y más brillo. La máscara viaja con el disco, así que moverlo es una
   transformación y no repinta. Son dos custom properties, no estado.

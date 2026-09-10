@@ -21,6 +21,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { MARK_PATH, MARK_VIEWBOX } from "@/components/brand/Mark";
+import { Press } from "@/components/brand/Press";
 import { useMotionEnv } from "@/lib/motion";
 
 export function Plate({ className, services = [] }: { className?: string; services?: string[] }) {
@@ -100,6 +101,11 @@ export function Plate({ className, services = [] }: { className?: string; servic
 
   return (
     <div ref={box} className={`plancha ${className ?? ""}`}>
+      {/* La prensa se monta encima de la trama en CSS y la tapa. Si el
+          navegador no da WebGL no se monta nada y queda la de CSS, que
+          ya estaba y se ve bien. */}
+      <Press host={box} tintas={1 + services.length * 0.4} />
+
       <span className="luz" aria-hidden="true">
         <i />
       </span>

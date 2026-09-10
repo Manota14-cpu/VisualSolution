@@ -451,6 +451,21 @@ body {
   place-items: center;
 }
 
+/* La prensa tapa la trama en CSS cuando arranca. Va debajo del
+   monograma y encima de las capas de fondo. */
+.prensa {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* sin contexto no hay nada que mostrar: el lienzo se saca del medio */
+.plancha:not(.is-gpu) .prensa { display: none; }
+/* con la prensa andando, el disco de luz lo hace el shader */
+.plancha.is-gpu .luz { display: none; }
+
 .plancha .marca {
   position: relative;
   z-index: 1;
