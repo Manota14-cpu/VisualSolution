@@ -1,6 +1,6 @@
 import { Mark } from "@/components/brand/Mark";
 import { Reveal, SplitHeading } from "@/components/motion/Reveal";
-import { hero, nav, site } from "@/lib/content";
+import { hero, legal, nav, site, siteHost, siteUrl } from "@/lib/content";
 
 export function Closer() {
   return (
@@ -83,13 +83,24 @@ export function Footer() {
           </div>
         </div>
 
-        <p className="mt-10 flex flex-wrap justify-center gap-2 border-t border-dotted border-chalk/30 pt-6 label text-chalk/60">
-          <span>{site.name}</span>
-          <span className="text-chalk/30">|</span>
-          <span>Estudio de web y contenido</span>
-          <span className="text-chalk/30">|</span>
-          <span>{new Date().getFullYear()}</span>
-        </p>
+        {/* El aviso legal. Va en un <small> porque eso es exactamente lo
+            que el elemento significa: letra chica de derechos y
+            atribución, no un párrafo más. */}
+        <small className="mt-10 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 border-t border-dotted border-chalk/30 pt-6 text-center label text-chalk/60">
+          <span>
+            © {legal.year} {legal.holder}. {legal.rights}.
+          </span>
+          <span className="text-chalk/30" aria-hidden="true">
+            |
+          </span>
+          <span>{legal.credit}</span>
+          <span className="text-chalk/30" aria-hidden="true">
+            |
+          </span>
+          <a className="foot-link transition-colors duration-200 hover:text-chalk" href={siteUrl}>
+            {siteHost}
+          </a>
+        </small>
       </div>
     </footer>
   );

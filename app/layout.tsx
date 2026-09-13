@@ -3,7 +3,7 @@ import { DM_Sans, Anton } from "next/font/google";
 import "./globals.css";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { BackToTop, Grain, Preloader, ScrollProgress } from "@/components/motion/Chrome";
-import { services, site, siteUrl } from "@/lib/content";
+import { legal, services, site, siteUrl } from "@/lib/content";
 
 /* next/font descarga y sirve las tipografías desde el propio dominio:
    sin pedido a Google en runtime y sin salto de layout al cargar. */
@@ -36,6 +36,10 @@ export const metadata: Metadata = {
     template: `%s — ${site.name}`,
   },
   description: site.description,
+  applicationName: site.name,
+  authors: [{ name: site.name, url: siteUrl }],
+  creator: site.name,
+  publisher: site.name,
   alternates: { canonical: "/" },
   openGraph: {
     title: site.title,
@@ -65,6 +69,8 @@ const datosDelEstudio = {
   email: site.email,
   image: `${siteUrl}/opengraph-image`,
   sameAs: [site.instagram.url, site.linkedin, site.youtube],
+  copyrightHolder: { "@type": "Organization", name: legal.holder, url: siteUrl },
+  copyrightYear: legal.year,
   areaServed: "AR",
   knowsLanguage: "es",
   hasOfferCatalog: {

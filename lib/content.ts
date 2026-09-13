@@ -22,15 +22,33 @@ export const site = {
 
 /* La URL pública. Hace falta para que las tarjetas de compartir, el
    sitemap y los datos estructurados apunten a algún lado. En Vercel la
-   toma sola del dominio de producción; si usás dominio propio, poné
-   NEXT_PUBLIC_SITE_URL en las variables de entorno.
-   TODO: reemplazar el respaldo por el dominio real. */
+   toma sola del dominio de producción; el día que haya dominio propio,
+   se pone NEXT_PUBLIC_SITE_URL en las variables de entorno y no hay que
+   tocar nada más. */
 export const siteUrl = (
   process.env.NEXT_PUBLIC_SITE_URL ??
   (process.env.VERCEL_PROJECT_PRODUCTION_URL
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : "https://visualsolution.vercel.app")
+    : "https://visual-solution.vercel.app")
 ).replace(/[/]$/, "");
+
+/* El dominio sin protocolo, para mostrarlo escrito. */
+export const siteHost = siteUrl.replace(/^https?:[/][/]/, "");
+
+/* ============================================================
+   LOS DERECHOS
+   El año sale del momento de la compilación, no del reloj de quien
+   mira: la página es estática, así que si se calculara en el cliente
+   habría una diferencia entre lo que sirve el servidor y lo que pinta
+   el navegador. Un aviso de copyright marca el año de publicación,
+   así que quedar fijo al último deploy es lo correcto.
+   ============================================================ */
+export const legal = {
+  year: new Date().getFullYear(),
+  holder: "Visual Solution",
+  rights: "Todos los derechos reservados",
+  credit: "Diseño y desarrollo propio",
+} as const;
 
 export const nav = [
   { href: "#servicios", label: "Servicios" },

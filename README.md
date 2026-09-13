@@ -190,8 +190,16 @@ resta.
   estructurados (`ProfessionalService` con el catálogo de servicios) para que un
   buscador entienda que esto es un estudio y no un blog. Sólo se afirma lo que
   es verdad: nada de dirección, teléfono ni reseñas inventadas.
-- **La URL pública** sale de `NEXT_PUBLIC_SITE_URL`; en Vercel se toma sola del
-  dominio de producción. El respaldo está marcado con TODO en `lib/content.ts`.
+- **La URL pública** es `https://visual-solution.vercel.app`. Sale de
+  `NEXT_PUBLIC_SITE_URL`; en Vercel se toma sola del dominio de producción, así
+  que el día que haya dominio propio no hay que tocar código.
+- **Los derechos** viven en `legal` dentro de `lib/content.ts`: el aviso del pie,
+  `copyrightHolder` y `copyrightYear` en los datos estructurados, y `author`,
+  `creator` y `publisher` en los metadatos salen todos de ahí. El año se calcula
+  en la compilación y no en el reloj de quien mira: la página es estática, y un
+  aviso de copyright marca el año de publicación, así que quedar fijo al último
+  deploy es lo correcto. El `LICENSE` de la raíz reserva todos los derechos
+  sobre el código, los textos y la identidad.
 
 ## Animación
 
