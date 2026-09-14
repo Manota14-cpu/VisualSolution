@@ -11,10 +11,11 @@ import { workFilters, works, type Work } from "@/lib/content";
 
 /* ============================================================
    EL CATÁLOGO
-   Tres trabajos, tres tarjetas. Con esta cantidad no tiene sentido
-   una grilla de piezas iguales: el primero ocupa el ancho completo
-   y los otros dos van a la par, así la sección tiene una entrada
-   clara en vez de tres cosas del mismo peso compitiendo.
+   Con pocos trabajos, una grilla de piezas iguales no ayuda: cuando
+   el número es impar el primero ocupa el ancho completo y el resto
+   va de a dos, así la sección tiene una entrada clara en vez de
+   varias cosas del mismo peso compitiendo. Con número par la grilla
+   de dos columnas cierra sola y no hace falta.
 
    Cada tarjeta muestra el proyecto adentro de una ventana de
    navegador: es lo que dice, sin explicarlo, que esto es un sitio
@@ -80,6 +81,9 @@ function Tarjeta({
 }) {
   const ref = useReveal<HTMLDivElement>();
   const externo = !!work.url;
+  /* Sin sitio en vivo la acción lleva a la ficha, y la etiqueta dice lo
+     que es cada cosa: una app se conoce, un sitio se mira. */
+  const etiquetaFicha = work.category === "software" ? "Conocer la app" : "Ver ficha del proyecto";
 
   return (
     <div ref={ref} className={`rv ${ancha ? "md:col-span-2" : ""}`} hidden={hidden}>
@@ -119,7 +123,7 @@ function Tarjeta({
             ) : (
               <button className="btn btn-solid btn-sm" type="button" onClick={() => onOpen(work)}>
                 <i className="diamond" aria-hidden="true" />
-                Conocer la app
+                {etiquetaFicha}
               </button>
             )}
           </div>
@@ -140,6 +144,10 @@ export function Works() {
   const pushedUrl = useRef(false);
 
   const visible = works.filter((w) => filter === "todos" || w.category === filter);
+  /* La primera tarjeta ocupa el ancho completo sólo cuando quedan
+     impares: con un número par la grilla de dos columnas cierra sola, y
+     una ancha dejaría la última suelta a media fila. */
+  const impar = visible.length % 2 === 1;
 
   const pick = useCallback(
     (id: string) => withTransition(() => flushSync(() => setFilter(id)), reduce),
@@ -196,8 +204,8 @@ export function Works() {
           <Reveal>
             <SplitHeading text="Trabajos" className="display display-md" />
             <p className="mt-6 max-w-[54ch] text-base leading-relaxed text-chalk/70">
-              Sitios web, tiendas online y software a medida. Cada proyecto está en línea y se puede
-              recorrer: preferimos mostrarlos funcionando antes que contarlos.
+              Sitios web, tiendas online y software a medida. Los que están publicados se pueden
+              recorrer desde acá: preferimos mostrarlos funcionando antes que contarlos.
             </p>
           </Reveal>
           <Reveal as="a" delay={1} className="link shrink-0" href="#contacto">
@@ -219,8 +227,9 @@ export function Works() {
           ))}
         </Reveal>
 
-        {/* El primero ocupa el ancho completo; los otros dos van a la
-            par. Con el filtro puesto, el que quede primero manda. */}
+        {/* Con un número impar de trabajos el primero ocupa el ancho
+            completo y el resto va de a dos. Con el filtro puesto, el que
+            quede primero manda. */}
         <div className="obras">
           {works.map((w) => {
             const oculto = filter !== "todos" && w.category !== filter;
@@ -228,7 +237,7 @@ export function Works() {
               <Tarjeta
                 key={w.id}
                 work={w}
-                ancha={visible[0]?.id === w.id}
+                ancha={impar && visible[0]?.id === w.id}
                 hidden={oculto}
                 morphing={morphId === w.id}
                 onOpen={show}

@@ -10,9 +10,12 @@ export const site = {
   description:
     "Visual Solution es un estudio de desarrollo web y producción de contenido. Sitios, tiendas online, video e identidad visual para marcas que quieren vender mejor.",
   shortDescription: "Estudio de desarrollo web y producción de contenido.",
-  // TODO: reemplazar por los datos reales de contacto
-  email: "hola@visualsolution.com",
-  instagram: { handle: "@visualsolution", url: "https://instagram.com/" },
+  email: "visualsolutionn@gmail.com",
+  instagram: {
+    handle: "@visualsolution.com.ar",
+    url: "https://www.instagram.com/visualsolution.com.ar/",
+  },
+  // TODO: LinkedIn y YouTube siguen apuntando a la portada de cada red.
   linkedin: "https://www.linkedin.com/",
   youtube: "https://www.youtube.com/",
   /* Para que el formulario envíe de verdad, poner acá la URL de
@@ -275,6 +278,34 @@ export const works: Work[] = [
         title: "Cómo está hecho",
         body: "Next.js con Turbopack. Todo el diseño está orientado a la venta: la ruta desde que alguien entra hasta que encuentra lo que busca es lo más corta posible, y el sitio funciona igual de bien en el mostrador que en un teléfono.",
       },
+    ],
+  },
+  {
+    id: "noir-studio",
+    title: "Noir Studio",
+    kind: "Sitio web",
+    year: "2026",
+    category: "web",
+    /* La URL que me pasaste —https://noir-studio-one.vercel.app— devuelve
+       404 DEPLOYMENT_NOT_FOUND: el deploy no existe en Vercel. Un botón
+       que lleva a un 404 en un portfolio es peor que no tener botón, así
+       que hasta que haya una dirección viva la tarjeta lleva a la ficha.
+       Con la URL correcta, esto es descomentar una línea. */
+    // url: "https://noir-studio-one.vercel.app",
+    /* Captura: public/trabajos/noir-studio.webp */
+    // preview: "/trabajos/noir-studio.webp",
+    alt: "Noir Studio, sitio desarrollado por Visual Solution",
+    /* PENDIENTE. No se afirma nada del proyecto porque no se pudo ver:
+       el enlace no responde. Cuando esté en línea hay que completar
+       short, summary, tech, facts y chapters con lo que muestre el
+       sitio, igual que se hizo con los otros dos. */
+    pending: true,
+    short: "Sitio desarrollado por el estudio. Ficha en preparación.",
+    summary: "Ficha en preparación.",
+    facts: [
+      { label: "Tipo", value: "Sitio web" },
+      { label: "Desarrollo", value: "Visual Solution" },
+      { label: "Estado", value: "Ficha en preparación" },
     ],
   },
   {
