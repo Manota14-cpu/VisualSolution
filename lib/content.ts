@@ -281,31 +281,44 @@ export const works: Work[] = [
     ],
   },
   {
-    id: "noir-studio",
-    title: "Noir Studio",
-    kind: "Sitio web",
+    /* OJO CON EL NOMBRE. El deploy se llama noir-studio-seven, pero el
+       sitio que hay ahí se titula "Recuperar el planeta". Se usa el
+       nombre real: una tarjeta que dice una cosa y abre otra confunde a
+       quien hace clic. Si el proyecto tiene que figurar como Noir
+       Studio, es cambiar title. */
+    id: "recuperar-el-planeta",
+    title: "Recuperar el planeta",
+    kind: "Sitio editorial / Infografía",
     year: "2026",
     category: "web",
-    /* La URL que me pasaste —https://noir-studio-one.vercel.app— devuelve
-       404 DEPLOYMENT_NOT_FOUND: el deploy no existe en Vercel. Un botón
-       que lleva a un 404 en un portfolio es peor que no tener botón, así
-       que hasta que haya una dirección viva la tarjeta lleva a la ficha.
-       Con la URL correcta, esto es descomentar una línea. */
-    // url: "https://noir-studio-one.vercel.app",
-    /* Captura: public/trabajos/noir-studio.webp */
-    // preview: "/trabajos/noir-studio.webp",
-    alt: "Noir Studio, sitio desarrollado por Visual Solution",
-    /* PENDIENTE. No se afirma nada del proyecto porque no se pudo ver:
-       el enlace no responde. Cuando esté en línea hay que completar
-       short, summary, tech, facts y chapters con lo que muestre el
-       sitio, igual que se hizo con los otros dos. */
-    pending: true,
-    short: "Sitio desarrollado por el estudio. Ficha en preparación.",
-    summary: "Ficha en preparación.",
+    url: "https://noir-studio-seven.vercel.app",
+    /* Captura: public/trabajos/recuperar-el-planeta.webp */
+    // preview: "/trabajos/recuperar-el-planeta.webp",
+    alt: "Recuperar el planeta, infografía web sobre informática y medio ambiente",
+    tech: ["Three.js", "Vanta.js", "Lenis", "Sitio estático"],
+    short:
+      "Infografía web sobre cómo la informática interviene en la recuperación ambiental: medir, predecir, optimizar y restaurar, con cada cifra citando su fuente y su año.",
+    summary:
+      "Una pieza editorial de una sola página, construida alrededor de un argumento y no de un listado: cuatro capacidades concretas, tres mediciones con fuente y un circuito que se cierra sobre sí mismo.",
     facts: [
-      { label: "Tipo", value: "Sitio web" },
-      { label: "Desarrollo", value: "Visual Solution" },
-      { label: "Estado", value: "Ficha en preparación" },
+      { label: "Tipo", value: "Infografía editorial" },
+      { label: "Stack", value: "Three.js · Vanta · Lenis" },
+      { label: "Rigor", value: "Datos con fuente y año" },
+      { label: "Estado", value: "En línea" },
+    ],
+    chapters: [
+      {
+        title: "El argumento",
+        body: "El sitio abre descartando lo obvio —“no se trata de apps ecológicas”— y propone cuatro capacidades concretas: medir, predecir, optimizar y restaurar. Todo lo que sigue sostiene esa tesis en vez de enumerar temas sueltos.",
+      },
+      {
+        title: "Cómo está armado",
+        body: "Cuatro frentes desplegados, con tecnologías en uso y mediciones publicadas; tres mediciones que son mediciones y no proyecciones, cada una con el organismo que la publicó y el año; las cuatro fases del circuito; el costo de la propia herramienta, que el sitio no esquiva; y seis preguntas frecuentes que responden las objeciones reales.",
+      },
+      {
+        title: "Cómo está hecho",
+        body: "Sitio estático con un fondo animado en Three.js a través de Vanta y scroll con inercia por Lenis. Sin framework: el peso está puesto en que la pieza cargue rápido y se lea de un tirón.",
+      },
     ],
   },
   {
