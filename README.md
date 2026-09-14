@@ -299,16 +299,19 @@ protagonista y el resto en voz baja.
 - Servicios: la tarjeta violeta respira su propia trama; las de carbón sangran
   luz violeta desde el borde de abajo al pasar el cursor. Es luz, no sombra:
   vive adentro de la tarjeta. El monograma suelta un anillo al entrar.
-- Trabajos: **un índice editorial, no una grilla de fichas**. Una grilla de
-  tarjetas iguales —foto, título, año, "ver más"— es la estructura que sale
-  sola y se nota. Acá cada trabajo es una fila a todo el ancho, con el año a
-  la izquierda y el título en display, separadas por el punteado del sistema.
-  La foto no vive adentro de un marco: hay **un solo recorte** para toda la
-  lista que sigue al puntero y cambia de imagen al pasar de fila, con dos
-  esquinas abiertas y dos al ras. Donde no hay puntero que seguir, cada fila
-  muestra su propia tira recortada. La trama del sistema florece sobre la
-  foto en `mix-blend-mode: screen`. Filtros con `View Transitions` y visor de
-  caso con foco atrapado y `Esc`.
+- Trabajos: **tres tarjetas, no una grilla de piezas iguales**. Con esta
+  cantidad el primero ocupa el ancho completo y los otros dos van a la par,
+  así la sección tiene una entrada clara. Cada trabajo se muestra adentro de
+  una **ventana de navegador** con su URL real: es lo que dice, sin
+  explicarlo, que esto es un sitio que funciona y no una maqueta. La acción
+  principal abre el proyecto en vivo en una pestaña nueva; la ficha —con
+  capítulos y transición de vista— sigue siendo la segunda puerta, y la
+  propia ficha también lleva al sitio, porque quien llega desde un buscador
+  no tiene otra forma de alcanzarlo.
+- **Las capturas son opcionales a propósito.** Sin archivo en
+  , la ventana dibuja la plancha del sistema con el nombre
+  del proyecto: material de marca, nunca una imagen rota. Poner la captura es
+  dejar el archivo y descomentar una línea en .
 - Proceso: la línea se dibuja en magenta y termina siempre sobre un número; el
   que alcanza suelta el mismo anillo que el monograma.
 - Preguntas: la pregunta se corre, el chevrón se enciende y la respuesta sube

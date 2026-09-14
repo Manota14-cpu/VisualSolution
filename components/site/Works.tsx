@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { flushSync } from "react-dom";
-import { Reveal, SplitHeading } from "@/components/motion/Reveal";
+import { Reveal, SplitHeading, useReveal } from "@/components/motion/Reveal";
 import { CaseLayer } from "@/components/site/CaseLayer";
 import { scrollToId } from "@/components/motion/MotionProvider";
 import { useMotionEnv, withTransition } from "@/lib/motion";
@@ -11,76 +11,121 @@ import { workFilters, works, type Work } from "@/lib/content";
 
 /* ============================================================
    EL CATÁLOGO
-   Un índice editorial, no una grilla de fichas. Cada trabajo es
-   una fila a todo el ancho: el año a la izquierda, el título en
-   display y el tipo a la derecha, separadas por el punteado del
-   sistema.
+   Tres trabajos, tres tarjetas. Con esta cantidad no tiene sentido
+   una grilla de piezas iguales: el primero ocupa el ancho completo
+   y los otros dos van a la par, así la sección tiene una entrada
+   clara en vez de tres cosas del mismo peso compitiendo.
 
-   La foto no vive adentro de un marco. Hay un solo recorte para
-   toda la lista, que sigue al puntero y cambia de imagen al
-   pasar de fila: la imagen flota sobre el texto en vez de estar
-   encajada al lado. Donde no hay puntero que seguir, cada fila
-   muestra su propia tira recortada.
+   Cada tarjeta muestra el proyecto adentro de una ventana de
+   navegador: es lo que dice, sin explicarlo, que esto es un sitio
+   que funciona y no una maqueta. Si todavía no hay captura, la
+   ventana se llena con la plancha del sistema y el nombre del
+   proyecto — nunca una imagen rota.
+
+   La acción principal abre el sitio en vivo en una pestaña nueva.
+   La ficha —la que existía antes, con capítulos y transición de
+   vista— sigue estando, como segunda puerta.
    ============================================================ */
 
-/* El nombre de transición tiene que ser único en todo el documento, así
-   que sólo lo lleva la pieza que se está abriendo. Y sólo una: si el
-   recorte y la tira lo llevaran a la vez, la transición falla. */
 const morphNameFor = (id: string) => `caso-${id}`;
 
-function Fila({
+/* La ventana: el marco de navegador con la captura adentro. */
+function Ventana({ work, morphing }: { work: Work; morphing: boolean }) {
+  const morph = morphing
+    ? ({ viewTransitionName: morphNameFor(work.id) } as React.CSSProperties)
+    : undefined;
+
+  return (
+    <div className="ventana" aria-hidden="true">
+      <div className="ventana-barra">
+        <span />
+        <span />
+        <span />
+        {work.url && <p className="ventana-url">{work.url.replace(/^https?:[/][/]/, "")}</p>}
+      </div>
+
+      <div className="ventana-vista" style={morph}>
+        {work.preview ? (
+          <Image
+            src={work.preview}
+            alt=""
+            fill
+            sizes="(max-width: 900px) 100vw, 60vw"
+            className="object-cover object-top"
+          />
+        ) : (
+          /* Sin captura, la ventana no queda vacía ni rota: se llena
+             con la plancha y el nombre, que es material del sistema. */
+          <div className="ventana-plancha">
+            <span>{work.title}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Tarjeta({
   work,
+  ancha,
   hidden,
   morphing,
   onOpen,
-  onEnter,
 }: {
   work: Work;
+  ancha: boolean;
   hidden: boolean;
   morphing: boolean;
   onOpen: (w: Work) => void;
-  onEnter: (w: Work) => void;
 }) {
+  const ref = useReveal<HTMLDivElement>();
+  const externo = !!work.url;
+
   return (
-    <button
-      type="button"
-      className="fila"
-      hidden={hidden}
-      onPointerEnter={() => onEnter(work)}
-      onFocus={() => onEnter(work)}
-      onClick={() => onOpen(work)}
-      aria-label={`Abrir el caso ${work.title}`}
-    >
-      <span className="anio">{work.year}</span>
+    <div ref={ref} className={`rv ${ancha ? "md:col-span-2" : ""}`} hidden={hidden}>
+      <article className={`obra ${ancha ? "es-ancha" : ""} ${work.pending ? "es-pendiente" : ""}`}>
+        <Ventana work={work} morphing={morphing} />
 
-      <span>
-        <span className="titulo">{work.title}</span>
-      </span>
+        <div className="obra-cuerpo">
+          <div className="obra-meta">
+            <span className="badge">{work.kind}</span>
+            {work.pending && <span className="badge obra-espera">En preparación</span>}
+            <span className="obra-anio">{work.year}</span>
+          </div>
 
-      <span className="tipo">{work.kind}</span>
+          <h3 className="obra-titulo">{work.title}</h3>
+          {work.short && <p className="obra-texto">{work.short}</p>}
 
-      <svg className="flecha" width="26" height="14" viewBox="0 0 26 14" fill="none" aria-hidden="true">
-        <path
-          d="M1 7h23M18 1l6 6-6 6"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+          {work.tech && (
+            <ul className="obra-tech">
+              {work.tech.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ul>
+          )}
 
-      {/* La tira: es lo que se ve donde el puntero no existe. */}
-      <span className="fila-tira" aria-hidden="true">
-        <Image
-          src={work.thumb}
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover"
-          style={morphing ? ({ viewTransitionName: morphNameFor(work.id) } as React.CSSProperties) : undefined}
-        />
-      </span>
-    </button>
+          <div className="obra-acciones">
+            {externo ? (
+              <>
+                <a className="btn btn-solid btn-sm" href={work.url} target="_blank" rel="noopener noreferrer">
+                  <i className="diamond" aria-hidden="true" />
+                  Explorar proyecto
+                  <span className="sr-only"> (se abre en una pestaña nueva)</span>
+                </a>
+                <button className="obra-ficha" type="button" onClick={() => onOpen(work)}>
+                  Ver ficha
+                </button>
+              </>
+            ) : (
+              <button className="btn btn-solid btn-sm" type="button" onClick={() => onOpen(work)}>
+                <i className="diamond" aria-hidden="true" />
+                Conocer la app
+              </button>
+            )}
+          </div>
+        </div>
+      </article>
+    </div>
   );
 }
 
@@ -91,34 +136,10 @@ export function Works() {
      la pieza ANTES de que empiece la captura, y seguir puesto hasta que
      la vuelta termine. */
   const [morphId, setMorphId] = useState<string | null>(null);
-  const [activo, setActivo] = useState<Work>(works[0]);
-  const { reduce, fine } = useMotionEnv();
+  const { reduce } = useMotionEnv();
   const pushedUrl = useRef(false);
-  const lista = useRef<HTMLDivElement>(null);
 
   const visible = works.filter((w) => filter === "todos" || w.category === filter);
-
-  /* El recorte sigue al puntero. Posición y escala son custom
-     properties del contenedor: mover una imagen no puede costar un
-     render de React por cada movimiento del mouse. */
-  useEffect(() => {
-    const el = lista.current;
-    if (!el || !fine || reduce) return;
-    const move = (e: PointerEvent) => {
-      el.style.setProperty("--cx", `${e.clientX.toFixed(1)}px`);
-      el.style.setProperty("--cy", `${e.clientY.toFixed(1)}px`);
-    };
-    const entra = () => el.classList.add("is-hover");
-    const sale = () => el.classList.remove("is-hover");
-    el.addEventListener("pointermove", move, { passive: true });
-    el.addEventListener("pointerenter", entra);
-    el.addEventListener("pointerleave", sale);
-    return () => {
-      el.removeEventListener("pointermove", move);
-      el.removeEventListener("pointerenter", entra);
-      el.removeEventListener("pointerleave", sale);
-    };
-  }, [fine, reduce]);
 
   const pick = useCallback(
     (id: string) => withTransition(() => flushSync(() => setFilter(id)), reduce),
@@ -131,7 +152,6 @@ export function Works() {
      pisarían, dejando la capa en un estado inconsistente. */
   const closeNow = useCallback(() => {
     withTransition(() => flushSync(() => setOpen(null)), reduce);
-    // el nombre se suelta recién cuando la transición terminó
     window.setTimeout(() => setMorphId(null), 700);
   }, [reduce]);
 
@@ -147,19 +167,14 @@ export function Works() {
 
   const show = useCallback(
     (work: Work) => {
-      // 1. la pieza recibe el nombre y se pinta antes de la captura
       flushSync(() => setMorphId(work.id));
-      // 2. la transición captura el estado viejo y aplica el nuevo
       withTransition(() => flushSync(() => setOpen(work)), reduce);
-      // 3. la URL queda compartible y el botón atrás cierra el caso
       history.pushState({ caso: work.id }, "", `/trabajos/${work.id}`);
       pushedUrl.current = true;
     },
     [reduce]
   );
 
-  /* El botón atrás del navegador cierra el caso en vez de sacarte del
-     sitio. Como la URL ya volvió sola, no hay que tocarla de nuevo. */
   useEffect(() => {
     const onPop = () => {
       pushedUrl.current = false;
@@ -179,10 +194,14 @@ export function Works() {
       <div className="mx-auto w-full max-w-[1200px] px-4 md:px-10">
         <div className="mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <Reveal>
-            <SplitHeading text="Catálogo" className="display display-md" />
+            <SplitHeading text="Trabajos" className="display display-md" />
+            <p className="mt-6 max-w-[54ch] text-base leading-relaxed text-chalk/70">
+              Sitios web, tiendas online y software a medida. Cada proyecto está en línea y se puede
+              recorrer: preferimos mostrarlos funcionando antes que contarlos.
+            </p>
           </Reveal>
-          <Reveal as="a" delay={1} className="link" href="#contacto">
-            Pedir el catálogo completo
+          <Reveal as="a" delay={1} className="link shrink-0" href="#contacto">
+            Contanos tu proyecto
           </Reveal>
         </div>
 
@@ -200,40 +219,23 @@ export function Works() {
           ))}
         </Reveal>
 
-        <Reveal>
-          <div className="indice" ref={lista}>
-            {works.map((w) => (
-              <Fila
+        {/* El primero ocupa el ancho completo; los otros dos van a la
+            par. Con el filtro puesto, el que quede primero manda. */}
+        <div className="obras">
+          {works.map((w) => {
+            const oculto = filter !== "todos" && w.category !== filter;
+            return (
+              <Tarjeta
                 key={w.id}
                 work={w}
-                hidden={filter !== "todos" && w.category !== filter}
-                morphing={morphId === w.id && !fine}
+                ancha={visible[0]?.id === w.id}
+                hidden={oculto}
+                morphing={morphId === w.id}
                 onOpen={show}
-                onEnter={setActivo}
               />
-            ))}
-
-            {/* Un solo recorte para toda la lista: cambia de foto al pasar
-                de fila en vez de existir cinco veces. */}
-            {fine && !reduce && (
-              <span className="recorte" aria-hidden="true">
-                <Image
-                  key={activo.id}
-                  src={activo.thumb}
-                  alt=""
-                  width={360}
-                  height={270}
-                  className="h-full w-full object-cover"
-                  style={
-                    morphId === activo.id
-                      ? ({ viewTransitionName: morphNameFor(activo.id) } as React.CSSProperties)
-                      : undefined
-                  }
-                />
-              </span>
-            )}
-          </div>
-        </Reveal>
+            );
+          })}
+        </div>
 
         {visible.length === 0 && (
           <p className="mt-8 label text-chalk/55">No hay trabajos de ese tipo todavía.</p>

@@ -23,14 +23,22 @@ export function CaseCover({ work, morphName }: { work: Work; morphName?: string 
       className="shot relative aspect-[16/9] w-full overflow-hidden rounded-cards md:aspect-[21/9]"
       style={morphName ? ({ viewTransitionName: morphName } as React.CSSProperties) : undefined}
     >
-      <Image
-        src={work.full}
-        alt={work.alt}
-        fill
-        priority
-        sizes="(max-width: 1200px) 100vw, 1200px"
-        className="object-cover"
-      />
+      {work.preview ? (
+        <Image
+          src={work.preview}
+          alt={work.alt}
+          fill
+          priority
+          sizes="(max-width: 1200px) 100vw, 1200px"
+          className="object-cover object-top"
+        />
+      ) : (
+        /* Sin captura, la portada se llena con la plancha del sistema y
+           el nombre: nunca una imagen rota. */
+        <div className="ventana-plancha">
+          <span>{work.title}</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -180,6 +188,22 @@ export function CaseStudy({
           </h1>
           {work.summary && (
             <p className="mt-4 max-w-[58ch] text-lg leading-relaxed text-chalk/70">{work.summary}</p>
+          )}
+
+          {/* Quien llega acá desde un buscador o un enlace compartido no
+              tiene otra forma de llegar al proyecto: el sitio en vivo es
+              la mejor prueba de que existe y funciona. */}
+          {work.url && (
+            <a
+              className="btn btn-solid mt-7"
+              href={work.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <i className="diamond" aria-hidden="true" />
+              Explorar proyecto
+              <span className="sr-only"> (se abre en una pestaña nueva)</span>
+            </a>
           )}
         </div>
       </header>

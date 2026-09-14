@@ -151,12 +151,14 @@ export const services: Service[] = [
   },
 ];
 
+/* Las tres disciplinas del estudio. Con pocos proyectos un filtro no
+   sirve para filtrar, pero sí para decir de una qué se hace acá:
+   páginas web, tiendas online y software a medida. */
 export const workFilters = [
-  { id: "todos", label: "Todos" },
-  { id: "sitios", label: "Sitios" },
-  { id: "tiendas", label: "Tiendas" },
-  { id: "contenido", label: "Contenido" },
-  { id: "identidad", label: "Identidad" },
+  { id: "todos", label: "Todo" },
+  { id: "web", label: "Desarrollo web" },
+  { id: "ecommerce", label: "E-commerce" },
+  { id: "software", label: "Software" },
 ] as const;
 
 export type Fact = { label: string; value: string };
@@ -165,14 +167,26 @@ export type Chapter = { title: string; body: string; image?: string };
 export type Work = {
   id: string;
   title: string;
+  /* Qué clase de trabajo es. Se lee debajo del nombre en la tarjeta. */
   kind: string;
   year: string;
   category: string;
-  span: string;
-  ratio: string;
-  thumb: string;
-  full: string;
   alt: string;
+  /* El sitio en vivo. Con url la tarjeta abre el proyecto en una pestaña
+     nueva; sin ella —una app descargable, un trabajo que todavía no está
+     publicado— la acción lleva a la ficha. */
+  url?: string;
+  /* La captura del proyecto, en /public/trabajos. Es opcional a
+     propósito: sin archivo la tarjeta dibuja una plancha con el nombre
+     en vez de una imagen rota. */
+  preview?: string;
+  /* Sólo lo que está confirmado. Un stack que no se verificó no va. */
+  tech?: string[];
+  /* Dos líneas para la tarjeta del catálogo. */
+  short?: string;
+  /* Mientras falte la información real, la ficha se muestra como lo que
+     es: en preparación. Nunca se rellena con datos inventados. */
+  pending?: boolean;
   /* Frase corta. Se lee bajo el título en la portada del caso. */
   summary?: string;
   /* Datos duros del proyecto. Sin esto se arman solos con kind y year. */
@@ -184,114 +198,110 @@ export type Work = {
   gallery?: string[];
 };
 
-/* TODO: reemplazar por proyectos reales. Los nombres, rubros y fotos
-   son de relleno para mostrar la estructura. */
 export const works: Work[] = [
   {
-    id: "casa-ferran",
-    title: "Casa Ferrán",
-    kind: "Sitio web y reservas",
-    year: "2025",
-    category: "sitios",
-    span: "xl:col-span-6",
-    ratio: "aspect-[16/10]",
-    thumb: "https://picsum.photos/seed/visualsolution-work-restaurant/1100/690",
-    full: "https://picsum.photos/seed/visualsolution-work-restaurant/1600/1000",
-    alt: "Sitio web del restaurante Casa Ferrán",
-    /* TODO: todo el contenido de este caso es un esqueleto para que lo
-       completes con la aplicación real que estás desarrollando. La
-       estructura ya está: reemplazá los textos y las imágenes. */
+    id: "neweb",
+    title: "NEWEB",
+    kind: "Web interactiva",
+    year: "2026",
+    category: "web",
+    url: "https://neweb-two.vercel.app",
+    /* Cuando tengas la captura: guardala en public/trabajos/neweb.webp
+       (1600×1000 sirve) y descomentá la línea de abajo. Mientras tanto
+       la tarjeta dibuja la plancha del sistema con el nombre, que es
+       material de marca y no una imagen rota. */
+    // preview: "/trabajos/neweb.webp",
+    alt: "Portada del sitio NEWEB, una experiencia web sobre el sistema solar",
+    /* Lo único que se afirma acá está verificado contra el sitio en
+       vivo: las secciones, las piezas y el stack salen de la página,
+       no de una suposición. */
+    tech: ["Next.js", "React", "Animación", "Diseño responsive"],
+    short:
+      "Una experiencia web inmersiva para recorrer el sistema solar: planetas, comparador, línea de tiempo y datos del universo.",
     summary:
-      "PLACEHOLDER: una frase que diga qué es la aplicación y para quién. Es lo primero que se lee al abrir el caso.",
+      "Un sitio de exploración espacial construido como experiencia: se recorre, se compara y se descubre. Todo el peso está puesto en el diseño, la interacción y el ritmo de lectura.",
     facts: [
-      { label: "Rubro", value: "Gastronomía" },
-      { label: "Trabajo", value: "Sitio web y reservas" },
-      { label: "Año", value: "2025" },
-      { label: "Estado", value: "En desarrollo" },
+      { label: "Tipo", value: "Experiencia web interactiva" },
+      { label: "Stack", value: "Next.js · React" },
+      { label: "Idioma", value: "Español" },
+      { label: "Estado", value: "En línea" },
     ],
     chapters: [
       {
-        title: "El problema",
-        body: "PLACEHOLDER: qué estaba roto antes. Qué le costaba tiempo o plata al negocio, y por qué las soluciones que ya existían no alcanzaban. Cuanto más concreto, mejor: acá es donde el lector se reconoce.",
-        image: "https://picsum.photos/seed/visualsolution-case-problema/1400/900",
+        title: "Qué es",
+        body: "Una web de divulgación sobre el sistema solar y la exploración espacial, pensada como recorrido y no como enciclopedia. La navegación se divide en Planetas, Descubrimientos, Universo y Datos, y cada sección tiene su propia forma de mostrarse.",
       },
       {
-        title: "Qué construimos",
-        body: "PLACEHOLDER: qué hace la aplicación, contado desde lo que la persona puede hacer con ella, no desde la tecnología. Las decisiones técnicas van en el capítulo siguiente.",
-        image: "https://picsum.photos/seed/visualsolution-case-producto/1400/900",
+        title: "Qué se puede hacer",
+        body: "Explorar cada planeta con su ficha de información, compararlos entre sí, recorrer una línea de tiempo de los grandes descubrimientos espaciales y entrar en las secciones de agujeros negros, nebulosas, exoplanetas y galaxias. Hay además datos del universo y una galería de imágenes.",
       },
       {
-        title: "Cómo está hecha",
-        body: "PLACEHOLDER: acá sí va lo técnico. Qué stack, qué decisiones tomaste y por qué. Este capítulo es el que convence a un cliente que sabe de qué habla.",
+        title: "Cómo está hecho",
+        body: "Next.js y React. El trabajo fuerte está en la experiencia: tipografía a escala de cartel, animaciones que acompañan el scroll y una puesta oscura y cinematográfica que sostiene el tema sin tapar la información.",
       },
-      {
-        title: "En qué estado está",
-        body: "PLACEHOLDER: qué funciona hoy, qué falta y cuándo sale. Si querés que te pregunten por la app, este capítulo es el que abre la conversación.",
-        image: "https://picsum.photos/seed/visualsolution-case-estado/1400/900",
-      },
-    ],
-    gallery: [
-      "https://picsum.photos/seed/visualsolution-case-g1/900/1200",
-      "https://picsum.photos/seed/visualsolution-case-g2/900/1200",
-      "https://picsum.photos/seed/visualsolution-case-g3/900/1200",
-      "https://picsum.photos/seed/visualsolution-case-g4/900/1200",
     ],
   },
   {
-    id: "talleres-bravo",
-    title: "Talleres Bravo",
-    kind: "Tienda online",
-    year: "2025",
-    category: "tiendas",
-    span: "xl:col-span-6",
-    ratio: "aspect-[16/10]",
-    thumb: "https://picsum.photos/seed/visualsolution-work-store/1100/690",
-    full: "https://picsum.photos/seed/visualsolution-work-store/1600/1000",
-    alt: "Tienda online de indumentaria",
+    id: "pack-distribuidora",
+    title: "Pack Distribuidora",
+    kind: "E-commerce / Catálogo web",
+    year: "2026",
+    category: "ecommerce",
+    url: "https://packdistribuidoraar.vercel.app",
+    /* Captura: public/trabajos/pack-distribuidora.webp */
+    // preview: "/trabajos/pack-distribuidora.webp",
+    alt: "Portada del sitio de Pack Distribuidora, catálogo de productos descartables",
+    tech: ["Next.js", "Turbopack", "Catálogo", "Carrito"],
+    short:
+      "Catálogo comercial para una distribuidora de descartables: diez categorías, buscador, combos y precios, con la venta minorista y mayorista en el mismo lugar.",
     summary:
-      "PLACEHOLDER: una línea sobre qué se vende y qué resolvió la tienda.",
+      "Un catálogo pensado para vender: encontrar el producto rápido, ver el precio y armar el pedido sin fricción, tanto para un cliente de mostrador como para un mayorista.",
+    facts: [
+      { label: "Rubro", value: "Distribución de descartables" },
+      { label: "Tipo", value: "Catálogo / e-commerce" },
+      { label: "Stack", value: "Next.js · Turbopack" },
+      { label: "Estado", value: "En línea" },
+    ],
+    chapters: [
+      {
+        title: "El encargo",
+        body: "Una distribuidora de productos descartables que necesitaba mostrar su catálogo completo y atender dos públicos a la vez: el comprador minorista y el mayorista, que buscan cosas distintas y compran de forma distinta.",
+      },
+      {
+        title: "Qué resuelve",
+        body: "Diez categorías —bandejas y envases, bolsas, cubiertos, film, platos, limpieza, eventos, gastronomía, servilletas y vasos—, buscador de productos, destacados, ofertas y combos armados con el ahorro a la vista. Suma carrito, información de envíos, preguntas frecuentes y contacto.",
+      },
+      {
+        title: "Cómo está hecho",
+        body: "Next.js con Turbopack. Todo el diseño está orientado a la venta: la ruta desde que alguien entra hasta que encuentra lo que busca es lo más corta posible, y el sitio funciona igual de bien en el mostrador que en un teléfono.",
+      },
+    ],
   },
   {
-    id: "lumen-cafe",
-    title: "Lumen Café",
-    kind: "Contenido mensual",
-    year: "2024",
-    category: "contenido",
-    span: "xl:col-span-4",
-    ratio: "aspect-[4/3]",
-    thumb: "https://picsum.photos/seed/visualsolution-work-coffee/800/600",
-    full: "https://picsum.photos/seed/visualsolution-work-coffee/1400/1050",
-    alt: "Contenido vertical para una cafetería",
-    summary:
-      "PLACEHOLDER: una línea sobre el tipo de contenido y con qué frecuencia sale.",
-  },
-  {
-    id: "nordelta-padel",
-    title: "Nordelta Padel",
-    kind: "App de reservas",
-    year: "2024",
-    category: "sitios",
-    span: "xl:col-span-4",
-    ratio: "aspect-[4/3]",
-    thumb: "https://picsum.photos/seed/visualsolution-work-padel/800/600",
-    full: "https://picsum.photos/seed/visualsolution-work-padel/1400/1050",
-    alt: "Aplicación de reservas de canchas",
-    summary:
-      "PLACEHOLDER: una línea sobre qué reserva la gente y desde dónde.",
-  },
-  {
-    id: "estudio-mirasol",
-    title: "Estudio Mirasol",
-    kind: "Identidad visual",
-    year: "2024",
-    category: "identidad",
-    span: "xl:col-span-4",
-    ratio: "aspect-[4/3]",
-    thumb: "https://picsum.photos/seed/visualsolution-work-studio-brand/800/600",
-    full: "https://picsum.photos/seed/visualsolution-work-studio-brand/1400/1050",
-    alt: "Sistema de identidad visual aplicado a papelería",
-    summary:
-      "PLACEHOLDER: una línea sobre el alcance de la identidad y dónde se aplica.",
+    id: "app-visual",
+    title: "App Visual",
+    kind: "Software / Aplicación",
+    year: "2026",
+    category: "software",
+    /* Sin url: no hay enlace público todavía, así que la tarjeta lleva
+       a la ficha en vez de a un sitio externo. */
+    /* Captura o mockup: public/trabajos/app-visual.webp */
+    // preview: "/trabajos/app-visual.webp",
+    alt: "App Visual, aplicación de escritorio desarrollada por Visual Solution",
+    /* TODO — PENDIENTE DE INFORMACIÓN.
+       Acá NO hay nada inventado a propósito: todavía no se sabe qué
+       hace la aplicación. En cuanto llegue la información hay que
+       completar short, summary, tech, facts y chapters, y agregar
+       `url` o `download` si hay enlace. Mientras tanto la tarjeta se
+       muestra como "en preparación", que es la verdad. */
+    pending: true,
+    short: "Aplicación descargable desarrollada por el estudio. Ficha en preparación.",
+    summary: "Ficha en preparación.",
+    facts: [
+      { label: "Tipo", value: "Aplicación descargable" },
+      { label: "Desarrollo", value: "Visual Solution" },
+      { label: "Estado", value: "Ficha en preparación" },
+    ],
   },
 ];
 

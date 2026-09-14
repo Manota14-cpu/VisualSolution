@@ -928,124 +928,188 @@ body {
 }
 
 /* ==========================================================
-   EL ÍNDICE
-   Una grilla de fichas iguales —foto, título, año, "ver más"— es
-   la estructura que sale sola y se nota. Acá el catálogo es un
-   índice editorial: filas a todo el ancho separadas por el
-   punteado del sistema, con el año a la izquierda y el título en
-   display. La foto no vive en un marco: aparece recortada y
-   siguiendo al puntero, flotando sobre el texto.
-   ========================================================== */
-.indice { border-top: 1.5px dotted rgb(255 255 255 / .25); }
+   EL CATÁLOGO
+   Tres trabajos, tres tarjetas. Con esta cantidad una grilla de
+   piezas iguales no ayuda: el primero ocupa el ancho completo y
+   los otros dos van a la par, para que la sección tenga una
+   entrada clara en vez de tres cosas del mismo peso.
 
-.fila {
-  position: relative;
+   Cada trabajo se muestra adentro de una ventana de navegador.
+   Es lo que dice, sin explicarlo, que esto es un sitio que
+   funciona y no una maqueta.
+   ========================================================== */
+.obras {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 10px;
-  padding: 22px 0;
-  border-bottom: 1.5px dotted rgb(255 255 255 / .25);
-  text-align: left;
-  width: 100%;
-  cursor: pointer;
-  background: none;
-  transition: background-color .3s ease;
+  gap: clamp(20px, 2.6vw, 34px);
 }
-@media (min-width: 860px) {
-  .fila {
-    grid-template-columns: 5rem 1fr 14rem 2rem;
-    align-items: center;
-    gap: clamp(16px, 3vw, 48px);
-    padding: clamp(20px, 2.2vw, 32px) 0;
-  }
+@media (min-width: 820px) {
+  .obras { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-.fila:hover { background-color: rgb(24 21 30 / .5); }
+.obras > [hidden] { display: none; }
 
-.fila .anio {
-  font-family: ui-sans-serif, system-ui, sans-serif;
+.obra {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-cards);
+  background-color: var(--color-carbon);
+  /* la luz violeta sangra desde abajo al pasar el cursor. Es luz y no
+     sombra: vive adentro de la tarjeta, y el sistema reserva el violeta
+     justamente para esto. */
+  background-image: radial-gradient(124% 86% at 50% 118%, rgb(139 92 246 / var(--luz)), transparent 62%);
+  transition: transform .3s cubic-bezier(.16,1,.3,1), --luz .45s ease;
+}
+.obra:hover,
+.obra:focus-within { transform: translateY(-5px); --luz: .5; }
+
+@media (min-width: 820px) {
+  /* La ancha se lee de costado: ventana a la izquierda, texto a la
+     derecha, para que no quede una foto enorme y un párrafo perdido. */
+  .obra.es-ancha { display: grid; grid-template-columns: 1.15fr 1fr; align-items: stretch; }
+  .obra.es-ancha .ventana { height: 100%; }
+  .obra.es-ancha .ventana-vista { aspect-ratio: auto; height: 100%; }
+}
+
+/* ---------------- la ventana ---------------- */
+.ventana {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--color-onyx);
+}
+.ventana-barra {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 14px;
+  background: rgb(255 255 255 / .05);
+}
+.ventana-barra > span {
+  width: 9px; height: 9px;
+  border-radius: var(--radius-pills);
+  background: rgb(255 255 255 / .22);
+}
+.ventana-url {
+  margin-left: 10px;
+  overflow: hidden;
   font-size: 12px;
-  letter-spacing: .06em;
   color: rgb(255 255 255 / .55);
-  transition: color .3s ease;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
-.fila:hover .anio { color: var(--color-magenta); }
-
-.fila .titulo {
-  display: block;
-  font-family: var(--font-display);
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: .02em;
-  line-height: .96;
-  font-size: clamp(30px, 5.4vw, 76px);
-  color: var(--color-chalk);
-  transition: color .3s ease, transform .45s cubic-bezier(.16,1,.3,1);
-}
-.fila:hover .titulo,
-.fila:focus-visible .titulo { color: var(--color-magenta); transform: translateX(18px); }
-
-.fila .tipo { font-size: 14px; color: rgb(255 255 255 / .55); }
-
-/* Debajo del corte de la grilla no hay puntero al que seguir: se va la
-   flecha y entra la tira de foto, que es lo que se mira con el dedo. */
-@media (max-width: 859px) {
-  .fila .flecha { display: none; }
-  .fila-tira { display: block; margin-top: 6px; }
-}
-@media (min-width: 860px) {
-  .fila-tira { display: none; }
-}
-.fila .flecha {
-  justify-self: end;
-  color: rgb(255 255 255 / .55);
-  transition: transform .4s cubic-bezier(.16,1,.3,1), color .3s ease;
-}
-.fila:hover .flecha { transform: translateX(9px); color: var(--color-magenta); }
-.fila[hidden] { display: none; }
-
-/* La tira de foto que ven los dedos, donde no hay puntero que seguir. */
-.fila-tira {
+.ventana-vista {
   position: relative;
-  aspect-ratio: 16 / 7;
+  aspect-ratio: 16 / 10;
   overflow: hidden;
-  border-radius: 28px 4px 28px 4px;
+  background: var(--color-onyx);
 }
+.ventana-vista img { transition: transform .7s cubic-bezier(.16,1,.3,1); }
+.obra:hover .ventana-vista img,
+.obra:focus-within .ventana-vista img { transform: scale(1.035); }
 
-/* El recorte que flota. Uno solo para toda la lista: cambia de foto al
-   pasar de fila. La forma no es un rectángulo redondeado más — dos
-   esquinas abiertas y dos al ras, girada. */
-.recorte {
-  position: fixed;
-  left: 0; top: 0;
-  z-index: 30;
-  width: clamp(230px, 23vw, 360px);
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  pointer-events: none;
-  border-radius: 44px 4px 44px 4px;
-  transform:
-    translate3d(var(--cx, -50vw), var(--cy, -50vh), 0)
-    translate(-50%, -50%)
-    rotate(var(--cr, -5deg))
-    scale(var(--cs, .82));
-  opacity: 0;
-  transition: opacity .28s ease, transform .2s cubic-bezier(.22,1,.36,1);
-}
-.indice.is-hover .recorte { opacity: 1; --cs: 1; }
-.recorte img { width: 100%; height: 100%; object-fit: cover; }
-
-/* La trama del sistema florece sobre la foto del recorte y de la tira:
-   la textura de la marca se apoya encima del material real. */
-.fila-tira::after,
-.recorte::after {
-  content: "";
+/* Sin captura la ventana no queda vacía ni rota: se llena con la
+   plancha del sistema y el nombre del proyecto. */
+.ventana-plancha {
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  background: radial-gradient(circle at center, var(--color-magenta) 2px, transparent 2.1px) 0 0 / 11px 11px;
-  mix-blend-mode: screen;
-  opacity: .55;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background-color: var(--color-violet);
+  background-image:
+    radial-gradient(circle at center, var(--color-magenta) 1.7px, transparent 1.8px),
+    linear-gradient(42deg, var(--color-violet) 6%, var(--color-magenta) 94%);
+  background-size: 11px 11px, 100% 100%;
 }
+.ventana-plancha span {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(26px, 3.4vw, 46px);
+  line-height: .96;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--color-obsidian);
+}
+
+/* ---------------- el cuerpo ---------------- */
+.obra-cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+  padding: clamp(20px, 2.4vw, 32px);
+}
+.obra-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.obra-anio { margin-left: auto; font-size: 12px; letter-spacing: .06em; color: rgb(255 255 255 / .52); }
+.obra-espera { background: var(--color-violet-mist); }
+
+.obra-titulo {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(28px, 3.4vw, 46px);
+  line-height: .98;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--color-chalk);
+  transition: color .3s ease;
+}
+.obra:hover .obra-titulo { color: var(--color-magenta); }
+
+.obra-texto {
+  max-width: 52ch;
+  font-size: 16px;
+  line-height: 1.5;
+  color: rgb(255 255 255 / .7);
+}
+
+.obra-tech { display: flex; flex-wrap: wrap; gap: 6px; }
+.obra-tech li {
+  padding: 4px 11px;
+  border: 1.5px solid rgb(255 255 255 / .22);
+  border-radius: var(--radius-pills);
+  font-size: 12px;
+  letter-spacing: .03em;
+  color: rgb(255 255 255 / .62);
+  transition: border-color .3s ease, color .3s ease;
+}
+.obra:hover .obra-tech li { border-color: rgb(255 255 255 / .34); color: rgb(255 255 255 / .78); }
+
+.obra-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+/* La segunda puerta: la ficha del proyecto. Es un enlace en voz baja,
+   para que no le compita a la acción principal. */
+.obra-ficha {
+  position: relative;
+  font-size: 14px;
+  color: rgb(255 255 255 / .62);
+  cursor: pointer;
+  background: none;
+  transition: color .25s ease;
+}
+.obra-ficha::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -3px;
+  height: 1.5px;
+  background: var(--color-magenta);
+  transform: scaleX(0);
+  transform-origin: 100% 50%;
+  transition: transform .35s cubic-bezier(.16,1,.3,1);
+}
+.obra-ficha:hover,
+.obra-ficha:focus-visible { color: var(--color-chalk); }
+.obra-ficha:hover::after,
+.obra-ficha:focus-visible::after { transform: scaleX(1); transform-origin: 0 50%; }
+
 .work-open { display: block; width: 100%; border-radius: var(--radius-cards); }
 .work-open:focus-visible { outline: 2px solid var(--color-magenta); outline-offset: 4px; }
 }
@@ -1195,9 +1259,8 @@ input, textarea, select { caret-color: var(--color-magenta); }
   .pliego:hover .pliego-titulo,
   .pliego-dentro,
   .faq-row:hover .q,
-  .fila:hover .titulo, .fila:focus-visible .titulo,
-  .fila:hover .flecha { transform: none; }
-  .recorte { display: none; }
+  .obra:hover, .obra:focus-within { transform: none; }
+  .obra:hover .ventana-vista img { transform: none; }
   .btn-solid::after { display: none; }
 
   *, *::before, *::after {
