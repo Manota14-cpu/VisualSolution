@@ -309,9 +309,13 @@ protagonista y el resto en voz baja.
   propia ficha también lleva al sitio, porque quien llega desde un buscador
   no tiene otra forma de alcanzarlo.
 - **Las capturas son opcionales a propósito.** Sin archivo en
-  , la ventana dibuja la plancha del sistema con el nombre
+  `public/trabajos/`, la ventana dibuja la plancha del sistema con el nombre
   del proyecto: material de marca, nunca una imagen rota. Poner la captura es
-  dejar el archivo y descomentar una línea en .
+  dejar el archivo y descomentar una línea en `lib/content.ts`.
+- **Nada sin confirmar.** El stack de cada trabajo —Next.js en los dos, más
+  Turbopack en Pack— salió de mirar el sitio en vivo, no de suponer. La ficha
+  de App Visual se muestra como "en preparación" hasta que haya información
+  real: es preferible a inventarla.
 - Proceso: la línea se dibuja en magenta y termina siempre sobre un número; el
   que alcanza suelta el mismo anillo que el monograma.
 - Preguntas: la pregunta se corre, el chevrón se enciende y la respuesta sube
