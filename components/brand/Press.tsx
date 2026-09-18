@@ -115,13 +115,22 @@ void main() {
   float m = trama(px + corre + arrastre, 0.2618, dM);   /* 15° */
   float v = trama(px - corre - arrastre, 1.3090, dV);   /* 75° */
 
-  /* Base sólida y las dos tramas impresas encima. La plancha tiene que
-     seguir siendo una superficie brillante: el monograma negro se cala
-     sobre ella y necesita algo de donde recortarse. */
-  vec3 col = mix(VIOLETA, MAGENTA, t);
-  col = mix(col, MAGENTA * 1.02, m * 0.80);
-  col = mix(col, VIOLETA * 1.10, v * 0.30);
-  col += halo * 0.10;
+  /* La plancha sin entintar y las dos tramas impresas encima.
+
+     La base va por debajo del color pleno a propósito: son los puntos
+     los que llegan al magenta y al violeta enteros. Si la base ya
+     estuviera al máximo —como estaba— el punto magenta caería sobre un
+     fondo magenta y la trama sería invisible justo en la mitad donde el
+     degradado es magenta, que es exactamente lo que pasaba.
+
+     Con los puntos cubriendo cerca de la mitad de la superficie, el
+     promedio queda alto: la plancha sigue siendo la superficie
+     brillante de donde se cala el monograma negro. */
+  vec3 base = mix(VIOLETA, MAGENTA, t);
+  vec3 col = base * 0.66;
+  col = mix(col, MAGENTA, m * 0.95);
+  col = mix(col, VIOLETA * 1.06, v * 0.45);
+  col += halo * 0.12;
 
   gl_FragColor = vec4(col, 1.0);
 }
@@ -141,14 +150,14 @@ function compilar(gl: WebGLRenderingContext, tipo: number, src: string) {
 
 export function Press({ host, tintas }: { host: React.RefObject<HTMLElement | null>; tintas: number }) {
   const lienzo = useRef<HTMLCanvasElement>(null);
-  const { reduce, lite, ready } = useMotionEnv();
+  const { reduce, ready } = useMotionEnv();
   /* Se lee de un ref y no de las props dentro del bucle: el bucle se
      arma una sola vez y no puede depender de cada render. */
   const ink = useRef(tintas);
   ink.current = tintas;
 
   useEffect(() => {
-    if (!ready || lite) return;
+    if (!ready || reduce) return;
     const cv = lienzo.current;
     const caja = host.current;
     if (!cv || !caja) return;
@@ -206,7 +215,7 @@ export function Press({ host, tintas }: { host: React.RefObject<HTMLElement | nu
 
     /* La resolución se topea: en una pantalla a 3x esto serían nueve
        veces los píxeles por cuadro sin que nadie note la diferencia. */
-    const dpr = () => Math.min(window.devicePixelRatio || 1, 1.5);
+    const dpr = () => Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1 : 1.5);
     let w = 0;
     let h = 0;
     const medir = () => {
@@ -274,13 +283,10 @@ export function Press({ host, tintas }: { host: React.RefObject<HTMLElement | nu
     primerCuadro();
     caja.classList.add("is-gpu");
 
-    let soltarTarea: (() => void) | undefined;
-    /* Con movimiento reducido no se engancha el bucle: queda el cuadro
-       que ya se imprimió. La plancha se ve, pero nada late. */
-    if (!reduce) soltarTarea = addTask(pintar);
+    const soltarTarea = addTask(pintar);
 
     return () => {
-      soltarTarea?.();
+      soltarTarea();
       io.disconnect();
       ro.disconnect();
       window.removeEventListener("pointermove", onMove);
@@ -291,7 +297,7 @@ export function Press({ host, tintas }: { host: React.RefObject<HTMLElement | nu
       gl.deleteShader(fs);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
-  }, [host, lite, reduce, ready]);
+  }, [host, reduce, ready]);
 
   return <canvas ref={lienzo} className="prensa" aria-hidden="true" />;
 }

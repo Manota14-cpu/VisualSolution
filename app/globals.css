@@ -97,7 +97,11 @@ body {
   position: absolute;
   inset: 0;
   z-index: -2;
-  background-image: linear-gradient(42deg, var(--color-violet) 6%, var(--color-magenta) 94%);
+  /* El degradado va por debajo del color pleno para que los puntos de
+     la capa de arriba tengan de dónde recortarse. Con el degradado al
+     máximo, los puntos magenta caían sobre fondo magenta y la trama
+     desaparecía en media plancha. */
+  background-image: linear-gradient(42deg, #6B44BD 6%, #B72572 94%);
   animation: subir 1.15s cubic-bezier(.16,1,.3,1) .1s both;
 }
 @keyframes subir {
@@ -112,8 +116,14 @@ body {
   position: absolute;
   inset: -14px;
   z-index: -1;
-  background-image: radial-gradient(circle at center, var(--color-magenta) 1.7px, transparent 1.8px);
-  background-size: 11px 11px;
+  /* Dos retículas, una por tinta, corridas media celda entre sí como
+     en la plancha de verdad. Los puntos van al color pleno, que es lo
+     que los separa del degradado apagado de abajo. */
+  background-image:
+    radial-gradient(circle at center, var(--color-magenta) 2.1px, transparent 2.2px),
+    radial-gradient(circle at center, var(--color-violet-mist) 1.5px, transparent 1.6px);
+  background-size: 11px 11px, 11px 11px;
+  background-position: 0 0, 5.5px 5.5px;
   /* Cuatro mosaicos en doce segundos: unos cuatro píxeles por segundo.
      Antes era uno cada veintiséis, medio píxel por segundo, que no se
      ve. Quien cae en el respaldo también tiene que ver correr la tinta. */
