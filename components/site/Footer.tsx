@@ -1,6 +1,7 @@
 import { Mark } from "@/components/brand/Mark";
 import { Reveal, SplitHeading } from "@/components/motion/Reveal";
 import { hero, legal, nav, site, siteHost, siteUrl } from "@/lib/content";
+import { MetalFaz } from "@/components/brand/MetalRig";
 
 export function Closer() {
   return (
@@ -16,7 +17,8 @@ export function Closer() {
         <Reveal as="p" delay={1} className="mx-auto mt-5 max-w-[52ch] text-[17px] leading-relaxed text-obsidian/75">
           Contanos la idea. La primera propuesta no se cobra.
         </Reveal>
-        <Reveal as="a" delay={2} className="btn btn-solid mt-8" href="#contacto">
+        <Reveal as="a" delay={2} className="btn btn-metal mt-8" href="#contacto">
+          <MetalFaz />
           <i className="diamond" aria-hidden="true" />
           {hero.primaryCta}
         </Reveal>

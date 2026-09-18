@@ -8,6 +8,15 @@
   initial-value: 0;
 }
 
+/* El ángulo del degradado cónico que hace el canto de los botones de
+   metal. Mismo motivo que --luz: sin declararlo, un @keyframes que lo
+   lleve de 0deg a 360deg saltaría de golpe en vez de interpolar. */
+@property --giro {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
 /* ==========================================================
    TOKENS — CALDERA
    Neón prensado contra obsidiana. El lienzo es negro total y
@@ -354,6 +363,140 @@ body {
   .btn-ghost { transition: background-color .3s .1s, color .3s .1s, border-color .16s, transform .18s; }
   .btn-ghost:hover { background: var(--color-chalk); color: var(--color-obsidian); border-color: var(--color-magenta); }
   .btn-ghost.btn-sm { padding: 11px 18px; }
+
+  /* ---------------- metal líquido ----------------
+     La chapa va oscura y la etiqueta en tiza; el metal es el canto,
+     no el relleno. Es la única forma de que el texto se lea: sobre
+     una superficie que cambia de claro a oscuro mientras corre, no
+     hay color de texto que aguante.
+
+     El canto son dos anillos cónicos girando en sentidos opuestos a
+     velocidades distintas. Uno solo gira y se lee como una rueda;
+     dos batiendo entre sí hacen que las bandas se estiren y se
+     junten, que es lo que parece líquido. Sale gratis: son dos
+     pseudo-elementos y ninguna instancia abre un contexto de video,
+     así que los once botones de la página no cuestan más que uno.
+
+     Las dos capas se recortan con una máscara que vacía el centro:
+     eso deja el degradado sólo en el borde, que es lo que un
+     border-image no permite con esquinas redondeadas. */
+  .btn-metal {
+    --mx: 50%;
+    --my: 50%;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border: 0;
+    background: var(--color-carbon);
+    color: var(--color-chalk);
+    transition: background-color .25s, transform .18s;
+  }
+  .btn-metal:hover { background: #221E2A; }
+
+  .btn-metal::before,
+  .btn-metal .canto {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    padding: 1.7px;
+    pointer-events: none;
+    /* Las paradas van de a pares en varios puntos —un color y el
+       siguiente en el mismo ángulo— para que el salto sea un filo y
+       no un desvanecido. Eso es lo que separa el metal de un
+       degradado bonito: el cromo tiene cortes secos de brillo donde
+       la superficie cambia de plano. */
+    background: conic-gradient(from var(--giro),
+      var(--color-obsidian)     0deg,
+      var(--color-violet)      26deg,
+      var(--color-chalk)       52deg,
+      var(--color-chalk)       60deg,
+      var(--color-obsidian)    62deg,
+      var(--color-magenta)     96deg,
+      var(--color-violet-mist)128deg,
+      var(--color-obsidian)   130deg,
+      var(--color-violet)     168deg,
+      var(--color-chalk)      196deg,
+      var(--color-chalk)      204deg,
+      var(--color-obsidian)   206deg,
+      var(--color-magenta)    242deg,
+      var(--color-chalk)      274deg,
+      var(--color-obsidian)   276deg,
+      var(--color-violet)     312deg,
+      var(--color-magenta)    340deg,
+      var(--color-obsidian)   360deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    animation: metal-giro 7s linear infinite;
+  }
+  /* El segundo anillo, al revés y más lento: el batido entre los dos
+     es lo que hace que las bandas fluyan en vez de girar. */
+  .btn-metal .canto {
+    opacity: .55;
+    mix-blend-mode: overlay;
+    animation: metal-giro 11s linear infinite reverse;
+  }
+  /* Se anima el ángulo del degradado, NO el elemento. Girar el
+     pseudo-elemento giraría también su máscara, y como el anillo no
+     es cuadrado la máscara se saldría de la píldora: el borde se
+     deformaría al dar la vuelta. Con @property el navegador sabe que
+     --giro es un ángulo y lo interpola en la GPU. */
+  @keyframes metal-giro {
+    to { --giro: 360deg; }
+  }
+
+  /* El reflejo sigue al puntero. Un único listener delegado escribe
+     --mx y --my; el resto es composición. */
+  .btn-metal::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(58% 150% at var(--mx) var(--my),
+      rgb(255 255 255 / .34) 0%,
+      rgb(196 181 253 / .18) 36%,
+      transparent 72%);
+    opacity: 0;
+    transition: opacity .3s ease;
+  }
+  .btn-metal:hover::after,
+  .btn-metal:focus-visible::after { opacity: 1; }
+
+  /* El golpe. La onda sale de donde se apretó, no del centro. */
+  .btn-metal .onda {
+    position: absolute;
+    z-index: 0;
+    left: var(--px, 50%);
+    top: var(--py, 50%);
+    width: 10px; height: 10px;
+    margin: -5px 0 0 -5px;
+    border-radius: 800px;
+    pointer-events: none;
+    background: radial-gradient(circle, rgb(255 255 255 / .55), rgb(236 72 153 / .22) 62%, transparent 72%);
+    opacity: 0;
+  }
+  .btn-metal.is-golpe .onda { animation: metal-onda .62s cubic-bezier(.16,1,.3,1); }
+  @keyframes metal-onda {
+    from { opacity: .9; scale: 1; }
+    to   { opacity: 0;  scale: 26; }
+  }
+
+  .btn-metal .diamond { background: var(--color-magenta); }
+  .btn-metal > *:not(.canto):not(.onda) { position: relative; z-index: 2; }
+
+  /* La secundaria: mismo metal, menos voz. La chapa se abre y el
+     canto baja, así el par del hero conserva jerarquía en vez de
+     quedar dos botones idénticos peleando. */
+  .btn-metal.es-suave { background: transparent; }
+  .btn-metal.es-suave:hover { background: rgb(255 255 255 / .05); }
+  .btn-metal.es-suave::before,
+  .btn-metal.es-suave .canto { opacity: .5; }
+  .btn-metal.es-suave .canto { opacity: .28; }
 
   /* El rombo de marca. Sobre el relleno magenta va en obsidiana;
      suelto sobre el lienzo, en magenta. */
@@ -1275,6 +1418,13 @@ input, textarea, select { caret-color: var(--color-magenta); }
   .obra:hover, .obra:focus-within { transform: none; }
   .obra:hover .ventana-vista img { transform: none; }
   .btn-solid::after { display: none; }
+
+  /* El metal se queda quieto pero sigue siendo metal: los anillos
+     frenan en una posición cualquiera y el canto conserva sus
+     bandas. Lo que se apaga es el giro, no la superficie. */
+  .btn-metal::before,
+  .btn-metal .canto { animation: none; }
+  .btn-metal .onda { display: none; }
 
   *, *::before, *::after {
     animation-duration: .001ms;

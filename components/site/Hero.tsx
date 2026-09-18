@@ -5,6 +5,7 @@ import { Plate } from "@/components/brand/Plate";
 import { askForServices } from "@/lib/consult";
 import { scrollToId } from "@/components/motion/MotionProvider";
 import { hero, capabilities, heroServices, type HeroService } from "@/lib/content";
+import { MetalFaz } from "@/components/brand/MetalRig";
 
 /* ============================================================
    EL HERO
@@ -113,13 +114,15 @@ export function Hero() {
           </p>
 
           <div className="animate-rise flex flex-wrap items-center gap-3" style={{ animationDelay: ".95s" }}>
-            <button className="btn btn-solid" type="button" onClick={empezar}>
+            <button className="btn btn-metal" type="button" onClick={empezar}>
+              <MetalFaz />
               <i className="diamond" aria-hidden="true" />
               <span key={ctaLabel} className="cta-label">
                 {ctaLabel}
               </span>
             </button>
-            <a className="btn btn-ghost" href="#trabajos">
+            <a className="btn btn-metal es-suave" href="#trabajos">
+              <MetalFaz />
               {hero.secondaryCta}
             </a>
           </div>

@@ -8,6 +8,7 @@ import { CaseLayer } from "@/components/site/CaseLayer";
 import { scrollToId } from "@/components/motion/MotionProvider";
 import { useMotionEnv, withTransition } from "@/lib/motion";
 import { workFilters, works, type Work } from "@/lib/content";
+import { MetalFaz } from "@/components/brand/MetalRig";
 
 /* ============================================================
    EL CATÁLOGO
@@ -111,7 +112,8 @@ function Tarjeta({
           <div className="obra-acciones">
             {externo ? (
               <>
-                <a className="btn btn-solid btn-sm" href={work.url} target="_blank" rel="noopener noreferrer">
+                <a className="btn btn-metal btn-sm" href={work.url} target="_blank" rel="noopener noreferrer">
+                  <MetalFaz />
                   <i className="diamond" aria-hidden="true" />
                   Explorar proyecto
                   <span className="sr-only"> (se abre en una pestaña nueva)</span>
@@ -121,7 +123,8 @@ function Tarjeta({
                 </button>
               </>
             ) : (
-              <button className="btn btn-solid btn-sm" type="button" onClick={() => onOpen(work)}>
+              <button className="btn btn-metal btn-sm" type="button" onClick={() => onOpen(work)}>
+                <MetalFaz />
                 <i className="diamond" aria-hidden="true" />
                 {etiquetaFicha}
               </button>

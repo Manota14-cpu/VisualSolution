@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { askAbout } from "@/lib/consult";
 import { clamp01 } from "@/lib/motion";
 import type { Work } from "@/lib/content";
+import { MetalFaz } from "@/components/brand/MetalRig";
 
 /* La imagen de portada es la que viaja desde la grilla. El nombre de
    transición tiene que ser único en el documento, por eso lo recibe
@@ -195,11 +196,12 @@ export function CaseStudy({
               la mejor prueba de que existe y funciona. */}
           {work.url && (
             <a
-              className="btn btn-solid mt-7"
+              className="btn btn-metal mt-7"
               href={work.url}
               target="_blank"
               rel="noopener noreferrer"
             >
+              <MetalFaz />
               <i className="diamond" aria-hidden="true" />
               Explorar proyecto
               <span className="sr-only"> (se abre en una pestaña nueva)</span>
@@ -234,13 +236,14 @@ export function CaseStudy({
           ¿Querés algo así para tu negocio?
         </p>
         <button
-          className="btn btn-solid mt-7"
+          className="btn btn-metal mt-7"
           type="button"
           onClick={() => {
             askAbout(work.title);
             onConsult?.();
           }}
         >
+          <MetalFaz />
           <i className="diamond" aria-hidden="true" />
           Consultar por este proyecto
         </button>

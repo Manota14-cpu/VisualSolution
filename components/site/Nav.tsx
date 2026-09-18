@@ -5,6 +5,7 @@ import { Mark } from "@/components/brand/Mark";
 import { lockScroll } from "@/components/motion/MotionProvider";
 import { useMotionEnv } from "@/lib/motion";
 import { hero, nav } from "@/lib/content";
+import { MetalFaz } from "@/components/brand/MetalRig";
 
 export function Nav() {
   const [open, setOpen] = useState(false);
@@ -148,7 +149,8 @@ export function Nav() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <a className="btn btn-solid btn-sm hidden lg:inline-flex" href="#contacto">
+          <a className="btn btn-metal btn-sm hidden lg:inline-flex" href="#contacto">
+            <MetalFaz />
             <i className="diamond" aria-hidden="true" />
             {hero.primaryCta}
           </a>
@@ -211,7 +213,8 @@ export function Nav() {
             {item.label}
           </a>
         ))}
-        <a className="btn btn-solid mt-6 self-start" href="#contacto" onClick={() => setOpen(false)}>
+        <a className="btn btn-metal mt-6 self-start" href="#contacto" onClick={() => setOpen(false)}>
+          <MetalFaz />
           <i className="diamond" aria-hidden="true" />
           {hero.primaryCta}
         </a>

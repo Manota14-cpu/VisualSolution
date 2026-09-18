@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { DM_Sans, Anton } from "next/font/google";
 import "./globals.css";
 import { MotionProvider } from "@/components/motion/MotionProvider";
+import { MetalRig } from "@/components/brand/MetalRig";
 import { BackToTop, Grain, Preloader, ScrollProgress } from "@/components/motion/Chrome";
 import { legal, services, site, siteUrl } from "@/lib/content";
 
@@ -101,6 +102,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ScrollProgress />
         <Grain />
         <MotionProvider />
+        <MetalRig />
 
         <a
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-pills focus:bg-magenta focus:px-5 focus:py-3 focus:text-obsidian"

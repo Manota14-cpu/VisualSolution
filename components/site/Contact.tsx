@@ -5,6 +5,7 @@ import { Reveal, SplitHeading } from "@/components/motion/Reveal";
 import { useMotionEnv } from "@/lib/motion";
 import { onAskAbout, onAskForServices } from "@/lib/consult";
 import { serviceOptions, site } from "@/lib/content";
+import { MetalFaz } from "@/components/brand/MetalRig";
 
 type Fields = { nombre: string; email: string; servicio: string; mensaje: string };
 type Errors = Partial<Record<keyof Fields, string>>;
@@ -173,13 +174,14 @@ export function Contact() {
               <h3 className="display display-sm">Mensaje listo para enviar</h3>
               <p className="mt-2 max-w-[44ch] text-base leading-relaxed text-chalk/70">{sent}</p>
               <button
-                className="btn btn-ghost mt-6"
+                className="btn btn-metal es-suave mt-6"
                 type="button"
                 onClick={() => {
                   setValues(empty);
                   setSent(null);
                 }}
               >
+                <MetalFaz />
                 Escribir otro mensaje
               </button>
             </div>
@@ -285,7 +287,8 @@ export function Contact() {
 
               <div className="mt-2 flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-center">
                 <p className="label text-chalk/55">Usamos estos datos solo para responderte.</p>
-                <button className={`btn btn-solid ${ok ? "ok" : ""}`} type="submit" disabled={sending}>
+                <button className={`btn btn-metal ${ok ? "ok" : ""}`} type="submit" disabled={sending}>
+                  <MetalFaz />
                   <span className="send-label">{sending ? "Enviando" : "Enviar mensaje"}</span>
                   <span className="send-ok" aria-hidden="true">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
