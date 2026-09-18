@@ -16,6 +16,13 @@
    corre una plancha contra la otra: el fuera de registro del
    monograma, pero en la tinta misma.
 
+   Y la tinta corre. Un campo de flujo arrastra la retícula: los
+   puntos no están clavados a una grilla sino que siguen una
+   corriente lenta, y donde la corriente se junta la tinta se
+   espesa. Es la misma idea de un flow field resuelto a través de
+   una matriz de medio tono, pero en las dos tintas del sistema en
+   vez de en un rojo-naranja que la paleta no admite.
+
    Sin dependencias: es un cuadrilátero y un shader, unas ochenta
    líneas de WebGL crudo. Si el navegador no da, no se monta nada
    y queda la trama en CSS, que ya estaba y se ve bien.
@@ -38,6 +45,7 @@ uniform float u_near;   // 1 si el puntero está sobre la plancha
 uniform float u_cell;   // lado de la celda de trama, en píxeles
 uniform float u_slip;   // cuánto se corrió una plancha contra la otra
 uniform float u_ink;    // tintas en juego: sube con cada servicio elegido
+uniform float u_time;   // segundos desde que arrancó la plancha
 
 const vec3 VIOLETA = vec3(0.545, 0.361, 0.965);
 const vec3 MAGENTA = vec3(0.925, 0.282, 0.600);
@@ -45,6 +53,16 @@ const vec3 MAGENTA = vec3(0.925, 0.282, 0.600);
 mat2 giro(float a) {
   float c = cos(a), s = sin(a);
   return mat2(c, -s, s, c);
+}
+
+/* El campo de flujo. Dos octavas de seno cruzado alcanzan para una
+   corriente que nunca se repite a simple vista y que cuesta ocho
+   operaciones por píxel: un ruido de verdad acá sería pagar de más
+   por algo que a esta escala no se distingue. */
+vec2 corriente(vec2 p, float t) {
+  float a = sin(p.y * 0.0041 + t * 0.21) + 0.55 * sin(p.y * 0.0094 - t * 0.14);
+  float b = cos(p.x * 0.0037 - t * 0.17) + 0.55 * cos(p.x * 0.0089 + t * 0.12);
+  return vec2(a, b);
 }
 
 /* Un punto de trama: la celda se recorre girada según el ángulo de
@@ -72,11 +90,21 @@ void main() {
   /* Las dos planchas corridas en direcciones opuestas. */
   vec2 corre = vec2(u_slip, -u_slip * 0.8) * u_ink;
 
-  float dM = clamp(t * 0.95 + halo * 0.45, 0.0, 1.15);
-  float dV = clamp((1.0 - t) * 0.95 + halo * 0.45, 0.0, 1.15);
+  /* La corriente arrastra la retícula. Se aplica a la coordenada que
+     entra a la trama, no al color: lo que se deforma es la grilla de
+     puntos, que es justamente lo que hace que se lea como tinta
+     corriendo y no como un fondo que cambia de brillo. */
+  vec2 fl = corriente(px, u_time);
+  vec2 arrastre = fl * 26.0;
 
-  float m = trama(px + corre, 0.2618, dM);   /* 15° */
-  float v = trama(px - corre, 1.3090, dV);   /* 75° */
+  /* Donde la corriente se junta, la tinta se espesa. */
+  float espesor = (fl.x + fl.y) * 0.075;
+
+  float dM = clamp(t * 0.95 + halo * 0.45 + espesor, 0.0, 1.15);
+  float dV = clamp((1.0 - t) * 0.95 + halo * 0.45 - espesor, 0.0, 1.15);
+
+  float m = trama(px + corre + arrastre, 0.2618, dM);   /* 15° */
+  float v = trama(px - corre - arrastre, 1.3090, dV);   /* 75° */
 
   /* Base sólida y las dos tramas impresas encima. La plancha tiene que
      seguir siendo una superficie brillante: el monograma negro se cala
@@ -150,6 +178,7 @@ export function Press({ host, tintas }: { host: React.RefObject<HTMLElement | nu
       cell: gl.getUniformLocation(prog, "u_cell"),
       slip: gl.getUniformLocation(prog, "u_slip"),
       ink: gl.getUniformLocation(prog, "u_ink"),
+      time: gl.getUniformLocation(prog, "u_time"),
     };
 
     /* Un cuadro ya, antes de cualquier bucle. Con alpha:false el lienzo
@@ -162,6 +191,7 @@ export function Press({ host, tintas }: { host: React.RefObject<HTMLElement | nu
       gl.uniform1f(u.near, 0);
       gl.uniform1f(u.slip, 0);
       gl.uniform1f(u.ink, ink.current);
+      gl.uniform1f(u.time, 0);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
 
@@ -208,6 +238,10 @@ export function Press({ host, tintas }: { host: React.RefObject<HTMLElement | nu
 
     let yAnterior = getScroll();
     let slip = 0;
+    /* El reloj arranca en el montaje y no en el epoch: así el primer
+       cuadro del bucle sigue justo al cuadro estático que ya se pintó,
+       en vez de saltar a un punto arbitrario de la corriente. */
+    const arranque = performance.now();
 
     const pintar = () => {
       /* Fuera de pantalla no se dibuja: un bucle que nadie ve es
@@ -224,6 +258,7 @@ export function Press({ host, tintas }: { host: React.RefObject<HTMLElement | nu
       gl.uniform1f(u.near, near);
       gl.uniform1f(u.slip, slip);
       gl.uniform1f(u.ink, ink.current);
+      gl.uniform1f(u.time, (performance.now() - arranque) / 1000);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
 
