@@ -114,7 +114,10 @@ body {
   z-index: -1;
   background-image: radial-gradient(circle at center, var(--color-magenta) 1.7px, transparent 1.8px);
   background-size: 11px 11px;
-  animation: deriva 26s linear infinite;
+  /* Cuatro mosaicos en doce segundos: unos cuatro píxeles por segundo.
+     Antes era uno cada veintiséis, medio píxel por segundo, que no se
+     ve. Quien cae en el respaldo también tiene que ver correr la tinta. */
+  animation: deriva 12s linear infinite;
   animation-play-state: paused;
   opacity: 0;
   transition: opacity .7s ease .45s;
@@ -123,7 +126,7 @@ body {
 .halftone.is-lit::after  { opacity: 1; }
 @keyframes deriva {
   from { transform: translate3d(0, 0, 0); }
-  to   { transform: translate3d(11px, 11px, 0); }
+  to   { transform: translate3d(44px, -22px, 0); }
 }
 
 /* ==========================================================

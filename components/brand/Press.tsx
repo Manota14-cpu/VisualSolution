@@ -55,13 +55,14 @@ mat2 giro(float a) {
   return mat2(c, -s, s, c);
 }
 
-/* El campo de flujo. Dos octavas de seno cruzado alcanzan para una
-   corriente que nunca se repite a simple vista y que cuesta ocho
-   operaciones por píxel: un ruido de verdad acá sería pagar de más
-   por algo que a esta escala no se distingue. */
-vec2 corriente(vec2 p, float t) {
-  float a = sin(p.y * 0.0041 + t * 0.21) + 0.55 * sin(p.y * 0.0094 - t * 0.14);
-  float b = cos(p.x * 0.0037 - t * 0.17) + 0.55 * cos(p.x * 0.0089 + t * 0.12);
+/* El campo: hacia dónde empuja la corriente en cada punto. Cruza x con
+   y a propósito —no cada eje con el suyo— porque si no el resultado son
+   bandas rectas en vez de remolinos. Dos octavas alcanzan y cuestan
+   ocho operaciones por píxel; un ruido de verdad sería pagar de más por
+   algo que a esta escala no se distingue. */
+vec2 campo(vec2 p, float t) {
+  float a = sin(p.y * 0.0062 + t * 0.11) + 0.60 * sin(p.x * 0.0041 - t * 0.08);
+  float b = cos(p.x * 0.0055 - t * 0.10) + 0.60 * cos(p.y * 0.0037 + t * 0.07);
   return vec2(a, b);
 }
 
@@ -92,13 +93,21 @@ void main() {
 
   /* La corriente arrastra la retícula. Se aplica a la coordenada que
      entra a la trama, no al color: lo que se deforma es la grilla de
-     puntos, que es justamente lo que hace que se lea como tinta
-     corriendo y no como un fondo que cambia de brillo. */
-  vec2 fl = corriente(px, u_time);
-  vec2 arrastre = fl * 26.0;
+     puntos, y eso es lo que hace que se lea como tinta corriendo y no
+     como un fondo que cambia de brillo.
+
+     Son dos términos y hacen falta los dos. La deriva avanza siempre y
+     nunca vuelve —sin ella el movimiento es un temblor que oscila en el
+     lugar—, y el campo la curva distinto en cada zona, que es lo que la
+     convierte en un campo y no en un desplazamiento parejo. A dieciséis
+     píxeles por segundo sobre una celda de once, la retícula cruza una
+     celda y media por segundo: se ve moverse sin pedir atención. */
+  vec2 fl = campo(px, u_time);
+  vec2 deriva = vec2(u_time * 15.0, u_time * -6.0);
+  vec2 arrastre = fl * 34.0 + deriva;
 
   /* Donde la corriente se junta, la tinta se espesa. */
-  float espesor = (fl.x + fl.y) * 0.075;
+  float espesor = (fl.x + fl.y) * 0.11;
 
   float dM = clamp(t * 0.95 + halo * 0.45 + espesor, 0.0, 1.15);
   float dV = clamp((1.0 - t) * 0.95 + halo * 0.45 - espesor, 0.0, 1.15);
