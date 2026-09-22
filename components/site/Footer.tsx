@@ -40,7 +40,7 @@ const columns = [
     title: "Redes",
     links: [
       { href: site.instagram.url, label: "Instagram" },
-      { href: site.linkedin, label: "LinkedIn" },
+      { href: site.tiktok, label: "TikTok" },
       { href: site.youtube, label: "YouTube" },
     ],
   },

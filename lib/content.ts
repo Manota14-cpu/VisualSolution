@@ -15,9 +15,8 @@ export const site = {
     handle: "@visualsolution.com.ar",
     url: "https://www.instagram.com/visualsolution.com.ar/",
   },
-  // TODO: LinkedIn y YouTube siguen apuntando a la portada de cada red.
-  linkedin: "https://www.linkedin.com/",
-  youtube: "https://www.youtube.com/",
+  tiktok: "https://www.tiktok.com/@visualsolution_",
+  youtube: "https://www.youtube.com/@visualsolution_arg",
   /* Para que el formulario envíe de verdad, poner acá la URL de
      Formspree, Getform o tu propia API. Vacío usa el cliente de correo. */
   formEndpoint: "",

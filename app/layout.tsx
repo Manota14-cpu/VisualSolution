@@ -69,7 +69,7 @@ const datosDelEstudio = {
   url: siteUrl,
   email: site.email,
   image: `${siteUrl}/opengraph-image`,
-  sameAs: [site.instagram.url, site.linkedin, site.youtube],
+  sameAs: [site.instagram.url, site.tiktok, site.youtube],
   copyrightHolder: { "@type": "Organization", name: legal.holder, url: siteUrl },
   copyrightYear: legal.year,
   areaServed: "AR",
