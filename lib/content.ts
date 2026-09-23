@@ -351,19 +351,18 @@ export const works: Work[] = [
     previewPosition: "50% 52%",
     previewEntera: { fondo: "#E5E6E8" },
     alt: "Pieza de App Visual: «Todo tu negocio en una sola app», con el ícono VA entre dos estrellas",
-    /* TODO — PENDIENTE DE INFORMACIÓN.
-       Acá NO hay nada inventado a propósito: todavía no se sabe qué
-       hace la aplicación. En cuanto llegue la información hay que
-       completar short, summary, tech, facts y chapters, y agregar
-       `url` o `download` si hay enlace. Mientras tanto la tarjeta se
-       muestra como "en preparación", que es la verdad. */
-    pending: true,
-    short: "Aplicación descargable desarrollada por el estudio. Ficha en preparación.",
-    summary: "Ficha en preparación.",
+    /* Todo lo de acá sale del post de Instagram y de la pieza, en las
+       palabras del estudio. No se afirma nada más: el stack no está
+       publicado, así que no va. */
+    short:
+      "Stock, caja y ventas en una sola app. Funciona sin internet, los datos quedan en tu computadora y no se paga cuota.",
+    summary: "Todo tu negocio en una sola app.",
     facts: [
-      { label: "Tipo", value: "Aplicación descargable" },
-      { label: "Desarrollo", value: "Visual Solution" },
-      { label: "Estado", value: "Ficha en preparación" },
+      { label: "Hace", value: "Stock, caja y ventas" },
+      { label: "Para", value: "Kiosco, despensa, panadería o distribuidora" },
+      { label: "Funciona", value: "Sin internet, con los datos en tu computadora" },
+      { label: "Costo", value: "Sin cuota" },
+      { label: "Estado", value: "Disponible" },
     ],
   },
 ];
