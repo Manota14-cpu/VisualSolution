@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, Anton } from "next/font/google";
+import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { MetalRig } from "@/components/brand/MetalRig";
@@ -17,16 +17,6 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
-/* Anton reemplaza a PP Neue Corp Compact, que es una tipografía de
-   pago. DESIGN.md la nombra como sustituto válido junto a Bebas Neue y
-   Druk Wide Bold: un solo peso, ultracondensado y pesado, que es lo que
-   sostiene el display a 189px. */
-const anton = Anton({
-  subsets: ["latin"],
-  weight: ["400"],
-  variable: "--font-anton",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   /* Sin metadataBase, cualquier ruta relativa de las tarjetas de
@@ -54,7 +44,17 @@ export const metadata: Metadata = {
      nombrarla acá, Next la engancha sola. */
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
-  icons: { icon: "/favicon.svg" },
+  /* El ícono sale de la pieza del estudio: el VS azul sobre papel
+     cuadriculado. Los tamaños chicos van recortados más cerca de la marca
+     para que a 32px no sea casi todo fondo; el de 180 es la pieza entera. */
+  icons: {
+    icon: [
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-48.png", sizes: "48x48", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: { url: "/apple-touch-icon.png", sizes: "180x180" },
+  },
 };
 
 /* Datos estructurados. Es lo que le permite a un buscador entender que
@@ -90,7 +90,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${dmSans.variable} ${anton.variable}`}>
+    <html lang="es" className={dmSans.variable}>
       <body>
         <script
           type="application/ld+json"

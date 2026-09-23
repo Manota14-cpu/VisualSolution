@@ -2,7 +2,9 @@
    El símbolo VS. Es el mismo path que public/logo.svg, en un
    viewBox de 143.5 x 76.
    Si alguna vez rediseñás el logo hay que actualizar tres lugares:
-   este archivo, public/logo.svg y public/favicon.svg.
+   este archivo y public/logo.svg; los íconos de la pestaña
+   (public/favicon-*.png, favicon.ico y apple-touch-icon.png) salen de
+   una pieza aparte y se regeneran desde ella.
    ============================================================ */
 
 export const MARK_PATH =

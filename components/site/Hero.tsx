@@ -206,7 +206,7 @@ export function Marquee() {
   );
 
   return (
-    <div className="marquee-band border-y border-papel/20">
+    <div className="marquee-band">
       <div className="overflow-hidden">
         <div className="animate-marquee flex w-max">
           {line(false)}

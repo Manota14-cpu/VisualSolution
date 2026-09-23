@@ -24,6 +24,8 @@ Tinta Azul runs on a pale blue-grey canvas (#EAF0F6) with white surfaces, and a 
 
 ## Tokens — Typography
 
+*Since September 2026 all display type on the site — section headings, service titles, project names, step numerals — is DM Sans 500 in sentence case with tight negative tracking (−0.04em to −0.06em, tighter as the size grows), matching the video hero. Anton (the free substitute for PP Neue Corp Compact described below) is no longer loaded on the page; it survives only in the generated share images. The character of the brand is carried by the halftone, the blue ink, the liquid-metal buttons and the VS mark, not by the display face. Blue bands (marquee, closing CTA, footer) sit in rounded frames inset 8–12px from the viewport edge, like the hero.*
+
 ### PP Neue Corp Compact — All headings and display text. A custom condensed ultrabold face that gives headlines an industrial, sign-painted weight. The 189px display size in the hero is the signature — compressed, almost structural rather than typographic. Feature settings "ss06" and "ss10" activate alternate letterforms and spacing for a more aggressive condensed rhythm. Positive tracking (+0.02em) is unusual for display sizes and keeps the heavy strokes from feeling claustrophobic at 80–189px. · `--font-pp-neue-corp-compact`
 - **Substitute:** Bebas Neue, Anton, Druk Wide Bold
 - **Weights:** 400 (Ultrabold cut)

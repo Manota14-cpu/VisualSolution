@@ -22,7 +22,7 @@ design/             sus tokens: variables.css, theme.css y tokens.json
 lib/
   content.ts        TODO el texto y los datos del sitio
   motion.ts         base compartida: preferencias, scroll, bucle de rAF
-public/             logo.svg y favicon.svg
+public/             logo.svg, íconos de la pestaña, video del hero
 legacy/             la versión anterior en HTML plano, por si hace falta
 ```
 
@@ -97,7 +97,9 @@ lo rediseñás:
 - **Marca plana:** `MARK_PATH` en `components/brand/Mark.tsx`. Es el mismo
   `path` que `public/logo.svg`, en un viewBox de 143.5 x 76. Lo usan la barra,
   el pie, el botón de volver arriba y el preloader.
-- **Favicon:** `public/favicon.svg`.
+- **Íconos de la pestaña:** `public/favicon-32.png`, `favicon-48.png`, `favicon.ico` y
+  `apple-touch-icon.png` (180px), generados desde la pieza del VS azul sobre
+  papel cuadriculado. Los chicos van recortados más cerca de la marca.
 
 ## Sistema de diseño
 
