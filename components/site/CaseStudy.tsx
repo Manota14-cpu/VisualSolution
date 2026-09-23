@@ -12,7 +12,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { askAbout } from "@/lib/consult";
 import { clamp01 } from "@/lib/motion";
-import type { Work } from "@/lib/content";
+import { etiquetaEnlace, type Work } from "@/lib/content";
 import { MetalFaz } from "@/components/brand/MetalRig";
 
 /* La imagen de portada es la que viaja desde la grilla. El nombre de
@@ -22,7 +22,12 @@ export function CaseCover({ work, morphName }: { work: Work; morphName?: string 
   return (
     <div
       className="shot relative aspect-[16/9] w-full overflow-hidden rounded-cards md:aspect-[21/9]"
-      style={morphName ? ({ viewTransitionName: morphName } as React.CSSProperties) : undefined}
+      style={
+        {
+          ...(morphName ? { viewTransitionName: morphName } : {}),
+          ...(work.previewEntera ? { background: work.previewEntera.fondo } : {}),
+        } as React.CSSProperties
+      }
     >
       {work.preview ? (
         <Image
@@ -31,7 +36,8 @@ export function CaseCover({ work, morphName }: { work: Work; morphName?: string 
           fill
           priority
           sizes="(max-width: 1200px) 100vw, 1200px"
-          className="object-cover object-top"
+          className={work.previewEntera ? "object-contain" : "object-cover object-top"}
+          style={!work.previewEntera && work.previewPosition ? { objectPosition: work.previewPosition } : undefined}
         />
       ) : (
         /* Sin captura, la portada se llena con la plancha del sistema y
@@ -203,7 +209,7 @@ export function CaseStudy({
             >
               <MetalFaz />
               <i className="diamond" aria-hidden="true" />
-              Explorar proyecto
+              {etiquetaEnlace(work.url)}
               <span className="sr-only"> (se abre en una pestaña nueva)</span>
             </a>
           )}

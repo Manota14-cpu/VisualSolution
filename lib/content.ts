@@ -182,6 +182,15 @@ export type Work = {
      propósito: sin archivo la tarjeta dibuja una plancha con el nombre
      en vez de una imagen rota. */
   preview?: string;
+  /* Dónde se centra el recorte, como object-position. Las capturas de
+     sitios se recortan desde arriba, que es donde está el hero; una pieza
+     gráfica necesita su propio punto. */
+  previewPosition?: string;
+  /* La captura es una pieza gráfica —un afiche cuadrado— y no una
+     pantalla. En la portada del caso, que es muy ancha, se muestra entera
+     sobre el color de su papel en vez de recortarla hasta perder el
+     texto. */
+  previewEntera?: { fondo: string };
   /* Sólo lo que está confirmado. Un stack que no se verificó no va. */
   tech?: string[];
   /* Dos líneas para la tarjeta del catálogo. */
@@ -199,6 +208,11 @@ export type Work = {
   /* Imágenes sueltas al pie del caso, en una tira que se desliza. */
   gallery?: string[];
 };
+
+/* La acción del enlace dice adónde lleva: un post de Instagram no es
+   "explorar un proyecto". */
+export const etiquetaEnlace = (url: string) =>
+  /(^|[/.])instagram\.com\//.test(url) ? "Ver en Instagram" : "Explorar proyecto";
 
 export const works: Work[] = [
   {
@@ -326,11 +340,17 @@ export const works: Work[] = [
     kind: "Software / Aplicación",
     year: "2026",
     category: "software",
-    /* Sin url: no hay enlace público todavía, así que la tarjeta lleva
-       a la ficha en vez de a un sitio externo. */
-    /* Captura o mockup: public/trabajos/app-visual.webp */
-    // preview: "/trabajos/app-visual.webp",
-    alt: "App Visual, aplicación de escritorio desarrollada por Visual Solution",
+    /* El post de Instagram que presenta la app. Va sin los parámetros de
+       rastreo del enlace copiado (utm_source y stkn, un token de quien lo
+       compartió): Instagram abre el mismo post sin ellos. */
+    url: "https://www.instagram.com/p/DdkOwO0Dol4/",
+    /* La pieza del post. Es cuadrada: en la tarjeta se recorta centrada
+       al 52%, que entra justo de "Todo tu" a "En una sola app"; en la
+       ficha se ve entera sobre el gris de su papel. */
+    preview: "/trabajos/app-visual.webp",
+    previewPosition: "50% 52%",
+    previewEntera: { fondo: "#E5E6E8" },
+    alt: "Pieza de App Visual: «Todo tu negocio en una sola app», con el ícono VA entre dos estrellas",
     /* TODO — PENDIENTE DE INFORMACIÓN.
        Acá NO hay nada inventado a propósito: todavía no se sabe qué
        hace la aplicación. En cuanto llegue la información hay que

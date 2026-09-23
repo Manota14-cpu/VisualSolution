@@ -7,7 +7,7 @@ import { Reveal, SplitHeading, useReveal } from "@/components/motion/Reveal";
 import { CaseLayer } from "@/components/site/CaseLayer";
 import { scrollToId } from "@/components/motion/MotionProvider";
 import { useMotionEnv, withTransition } from "@/lib/motion";
-import { workFilters, works, type Work } from "@/lib/content";
+import { etiquetaEnlace, workFilters, works, type Work } from "@/lib/content";
 import { MetalFaz } from "@/components/brand/MetalRig";
 
 /* ============================================================
@@ -54,6 +54,7 @@ function Ventana({ work, morphing }: { work: Work; morphing: boolean }) {
             fill
             sizes="(max-width: 900px) 100vw, 60vw"
             className="object-cover object-top"
+            style={work.previewPosition ? { objectPosition: work.previewPosition } : undefined}
           />
         ) : (
           /* Sin captura, la ventana no queda vacía ni rota: se llena
@@ -115,7 +116,7 @@ function Tarjeta({
                 <a className="btn btn-metal btn-sm" href={work.url} target="_blank" rel="noopener noreferrer">
                   <MetalFaz />
                   <i className="diamond" aria-hidden="true" />
-                  Explorar proyecto
+                  {etiquetaEnlace(work.url!)}
                   <span className="sr-only"> (se abre en una pestaña nueva)</span>
                 </a>
                 <button className="obra-ficha" type="button" onClick={() => onOpen(work)}>
