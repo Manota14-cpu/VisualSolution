@@ -2,12 +2,12 @@
 
 /* ============================================================
    LA PLANCHA
-   El giro del hero es una plancha de impresión: el degradado
-   violeta→magenta con la trama de puntos encima, y el monograma
-   VS calado en negro a escala arquitectónica.
+   El giro del hero es una plancha de impresión: papel claro con
+   la trama de puntos azules encima, y el monograma VS impreso en
+   tinta azul a escala arquitectónica.
 
-   Debajo del negro hay dos copias del mismo monograma, una
-   magenta y una violeta, corridas en direcciones opuestas. Eso
+   Debajo del azul hay dos copias del mismo monograma, una en azul
+   medio y una en bruma, corridas en direcciones opuestas. Eso
    es un fuera de registro: el error clásico de la impresión en
    varias tintas, cuando las planchas no se alinean y los colores
    asoman por los bordes. Acá es deliberado, y el puntero lo
@@ -111,7 +111,7 @@ export function Plate({ className, services = [] }: { className?: string; servic
       </span>
 
       <svg className="marca" viewBox={MARK_VIEWBOX} aria-hidden="true">
-        {/* las dos tintas corridas, y encima el negro que las tapa */}
+        {/* las dos tintas corridas, y encima el azul que las tapa */}
         <path className="tinta tinta-a" d={MARK_PATH} fillRule="nonzero" />
         <path className="tinta tinta-b" d={MARK_PATH} fillRule="nonzero" />
         <path className="tinta-negra" d={MARK_PATH} fillRule="nonzero" />

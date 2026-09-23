@@ -2,11 +2,11 @@
 
 Sitio del estudio. Next.js 15 (App Router) + React 19 + Tailwind v4.
 
-El sistema visual es **Caldera**, definido en `DESIGN.md` y en `design/`:
-negro total, magenta y violeta como únicas luces, tipografía comprimida
-ultrabold hasta 189px y cero sombras. En el hero, el bloque de trama de
-puntos con el monograma VS calado en negro a escala arquitectónica y fuera
-de registro: dos tintas corridas que el puntero abre y cierra.
+El sistema visual es **Tinta Azul**, definido en `DESIGN.md`: una sola tinta
+azul en tres fuerzas sobre papel claro, tipografía comprimida ultrabold hasta
+189px y cero sombras. En el hero, el papel con la trama de puntos azules y el
+monograma VS impreso en azul a escala arquitectónica y fuera de registro: dos
+tintas corridas que el puntero abre y cierra.
 
 ```
 app/
@@ -101,30 +101,39 @@ lo rediseñás:
 
 ## Sistema de diseño
 
-El sistema es **Caldera** y está definido, entero, en cuatro archivos que
-mandó el cliente y que son la fuente de verdad:
+El sistema es **Tinta Azul**. Reemplazó en septiembre de 2026 a **Caldera**
+(lienzo negro, magenta y violeta), que fue el sistema con el que el cliente
+arrancó. Cambió sólo el color: tipografía, radios, espaciado y la regla de cero
+sombras siguen iguales.
 
-- `DESIGN.md` — la referencia larga: roles de cada color, los do's y don'ts,
-  la descripción de cada componente y los motivos firma.
-- `design/variables.css` — los tokens como custom properties.
-- `design/theme.css` — los mismos tokens en el bloque `@theme` de Tailwind v4.
-- `design/tokens.json` — los mismos, en JSON.
+- `DESIGN.md` — la referencia larga y la fuente de verdad: roles de cada color,
+  los pares que se midieron, los do's y don'ts, cada componente y los motivos
+  firma.
+- `design/variables.css`, `design/theme.css` y `design/tokens.json` son los
+  archivos originales de Caldera que mandó el cliente. Quedan como historia:
+  nada del sitio los importa.
 
-`app/globals.css` copia esos valores tal cual. **Si hay que cambiar un color o
-un radio, se cambia primero en esos archivos.**
+`app/globals.css` define los tokens en su bloque `@theme`. **Si hay que cambiar
+un color, se cambia ahí y en `DESIGN.md`**, y en `lib/og.ts`, que dibuja la
+tarjeta para compartir en el servidor y no puede leer variables de CSS.
 
-Neón prensado contra obsidiana: el lienzo es negro total y cada elemento
-magenta o violeta se lee como luz que sube desde abajo de la superficie.
+Tinta azul sobre papel. El lienzo es claro y todo lo que pesa —texto, logo,
+acción— va en el azul corporativo.
 
-- **Superficies:** ónix `#000000` de punta a punta, carbón `#18151E` para
-  tarjetas y bloques de contenido, magenta `#EC4899` para lo destacado y
-  violeta `#8B5CF6` para una sola tarjeta y el bloque del hero.
-- **Texto:** tiza `#FFFFFF` para absolutamente todo lo que se apoya sobre el
-  lienzo. Lo secundario baja opacidad (70% y 55%), que no es un color nuevo.
-  Obsidiana `#070607` existe solo para escribir **encima** de un relleno
-  brillante: magenta, violeta o tinte. Nunca sobre el negro.
-- **Etiquetas:** tinte violeta `#C4B5FD` con texto obsidiana. Es el único
-  elemento teñido de todo el sistema.
+- **Superficies:** fondo `#EAF0F6` de punta a punta, papel `#FFFFFF` para
+  tarjetas, campos y la píldora de la nav. El azul `#0036A5` pleno aparece como
+  **bandas**: la marquesina, el cierre, el servicio abierto y el pie. Así el
+  color de la marca tiene peso y el sitio no queda pálido.
+- **Texto:** azul `#0036A5` para todo lo que se apoya sobre el lienzo o el
+  papel (8.8:1 y 10.1:1). Lo secundario baja a 80–85% de opacidad, nunca menos:
+  al 70% mide 4.3:1, apenas debajo de AA. Sobre las bandas azules, papel.
+- **Acentos:** azul medio `#155BCD` para las barras de las cabeceras, los hovers,
+  la línea del proceso y los anillos de foco (5.4:1 sobre el lienzo).
+- **Etiquetas:** bruma `#AECDED` con texto azul. Es el único elemento teñido.
+- **Imágenes y maquetas:** el degradado `#0036A5 → #155BCD → #AECDED`, con la
+  bruma en la punta para que el texto blanco se apoye sobre el tramo azul.
+- **Error:** `#C62828`, sólo en la validación del formulario. Es el único color
+  que no es tinta: un borde azul no avisa que algo está mal.
 - **Tipografía:** Anton para el display, que es el sustituto libre de
   PP Neue Corp Compact (la original es de pago; `DESIGN.md` la nombra junto a
   Bebas Neue y Druk Wide Bold). Va de 26px a 189px con tracking **positivo**
@@ -134,7 +143,7 @@ magenta o violeta se lee como luz que sube desde abajo de la superficie.
 - **Radios, el sistema de tres:** 100px los campos, 40px las tarjetas y los
   botones rectangulares, píldora completa el resto.
 - **Elevación:** ninguna. Ni una sombra en todo el sitio. La jerarquía se arma
-  con contraste de color: negro → carbón → magenta.
+  con contraste de valor: lienzo → papel → azul.
 - **Divisores:** punteados de 1.5px, nunca rayados ni llenos.
 - **Layout:** 1280px de ancho máximo, 80px entre secciones, 40px de relleno
   de tarjeta.
@@ -142,10 +151,10 @@ magenta o violeta se lee como luz que sube desde abajo de la superficie.
 ### Las tres reglas que no se negocian
 
 1. Ni una sombra.
-2. Solo magenta y violeta como acentos, más el tinte violeta para etiquetas.
-   Ningún color más — el rojo de error también es magenta.
-3. El violeta no se usa para controles. Es superficie del hero, efecto y una
-   sola tarjeta destacada. Los botones son magenta.
+2. Una sola tinta en tres fuerzas: azul, azul medio y bruma. El rojo existe
+   sólo para decir "esto está mal".
+3. Nunca texto blanco sobre bruma (1.65:1) ni azul sobre azul medio (1.65:1).
+   Todo lo demás pasa AA: se midió antes de elegir.
 
 Las reglas de componentes (`.btn`, `.chip`, `.nav-link`, `.field-input`) van
 **dentro** de `@layer components`. Es importante: lo que queda fuera de una capa
@@ -154,10 +163,9 @@ sobre cualquier componente que fije `display`. Ya pasó dos veces.
 
 ### Los motivos firma
 
-1. **La trama de puntos** (`.halftone`): puntos magenta sobre un degradado
-   violeta→magenta que termina en magenta pleno arriba a la derecha. Va
-   siempre a escala de hero y con 40px de radio. Es lo más reconocible del
-   sistema.
+1. **La trama de puntos** (`.halftone`): tinta azul sobre papel claro, bruma
+   abajo a la izquierda que se abre hacia el lienzo arriba a la derecha. Va
+   siempre a escala de hero. Es lo más reconocible del sistema.
 2. **El titular a 189px**, con interlineado 0.94.
 3. **El sistema de tres radios**, que da redondez sin monotonía.
 
@@ -179,8 +187,9 @@ resta.
   ancho en un chat, y a esa escala una retícula de 16px se vuelve papilla gris.
   El motivo firma no sobrevive al medio; el degradado, el monograma y el titular
   sí.
-- **El sello va en obsidiana y no en magenta**: arriba a la derecha la plancha ya
-  *es* magenta, y un sello magenta sobre magenta no se ve.
+- **La tarjeta sigue la lógica del hero**: papel claro con el monograma en azul,
+  y el reclamo en azul mordiendo la plancha. El sello va en azul pleno con
+  letra de papel, que es el único peso en la esquina donde la plancha se aclara.
 - Las dos caras del sistema se bajan de Google en build. Si el pedido falla, la
   tarjeta se arma igual con la tipografía que trae el generador: vale más una
   tarjeta con otra tipografía que ninguna.
@@ -218,11 +227,17 @@ El movimiento acompaña, no protagoniza: el sistema es plano y editorial.
 **Hero**
 
 - El giro es una **plancha de impresión** (`components/brand/Plate.tsx`): el
-  degradado con la trama encima y el monograma VS calado en negro a escala
+  papel con la trama encima y el monograma VS impreso en azul a escala
   arquitectónica. Es el único lugar del sitio donde la marca aparece a este
   tamaño.
-- Debajo del negro hay dos copias del mismo monograma, una magenta y una
-  violeta, corridas en direcciones opuestas. Eso es un **fuera de registro**:
+- **El titular muerde el papel pero no toca la marca.** Los dos son del mismo
+  azul: si se pisan, las letras se funden con el trazo de la S. Por eso el
+  monograma va arriba y con alto explícito derivado de la banda (un
+  `max-height` en porcentaje ahí es circular y no limita nada). Medido en el
+  peor momento de la deriva por scroll, de 300 a 540px de banda, quedan entre
+  50 y 200px de aire.
+- Debajo del azul hay dos copias del mismo monograma, una en azul medio y una
+  en bruma, corridas en direcciones opuestas. Eso es un **fuera de registro**:
   el error clásico de la impresión en varias tintas, cuando las planchas no
   se alinean y los colores asoman por los bordes.
 - El corrimiento lo maneja el puntero —cuanto más lejos del centro, más se
@@ -238,11 +253,10 @@ El movimiento acompaña, no protagoniza: el sistema es plano y editorial.
 - Las etiquetas de servicio viven **debajo del titular**, que es donde alguien
   las busca. Si nadie toca nada, el afiche se lee igual.
 
-**La tesis: la luz sube desde abajo del negro**
+**La tesis: las cosas se imprimen**
 
-`DESIGN.md` dice que cada elemento magenta o violeta se lee como luz que sube
-desde abajo de la superficie. Eso es todo el movimiento del sitio: **nada se
-desliza, las cosas se encienden**. Una sola idea material, con un momento
+Todo el movimiento del sitio sale de la misma idea material que el color: tinta
+sobre papel. **Nada se desliza, las cosas se imprimen**. Una sola idea material, con un momento
 protagonista y el resto en voz baja.
 
 - **La composición del hero es un afiche, no una tarjeta.** La plancha va a
@@ -250,10 +264,10 @@ protagonista y el resto en voz baja.
   abajo, contra el margen izquierdo y con las líneas escalonadas. Imagen y
   tipografía se traban en vez de apilarse: es lo único que separa una
   composición de una plantilla.
-- **El giro es una plancha de impresión** (`components/brand/Plate.tsx'):
-  el degradado con la trama encima y el monograma VS calado en negro a
-  escala arquitectónica. Debajo del negro hay dos copias del mismo
-  monograma, una magenta y una violeta, corridas en direcciones opuestas:
+- **El giro es una plancha de impresión** (`components/brand/Plate.tsx`):
+  el papel con la trama encima y el monograma VS impreso en azul a escala
+  arquitectónica. Debajo del azul hay dos copias del mismo monograma, una
+  en azul medio y una en bruma, corridas en direcciones opuestas:
   eso es un **fuera de registro**, el error clásico de la impresión en
   varias tintas cuando las planchas no se alinean. Acá es deliberado, lo
   maneja el puntero —cuanto más lejos del centro, más se abren— y cada
@@ -261,17 +275,17 @@ protagonista y el resto en voz baja.
   la marca aparece a este tamaño.
 - **Las etiquetas van justo debajo del titular**, que es donde alguien las
   busca: son lo que arma la consulta y lo que cambia el botón. Apagada es
-  una píldora de carbón; elegida se rellena de magenta, igual que el filtro
+  una píldora de papel; elegida se rellena de azul, igual que el filtro
   activo del catálogo y el paso alcanzado del proceso.
-- **El momento** es la llegada del hero. El bloque arranca negro y la luz sube
-  por debajo (`@keyframes subir`, un `clip-path` que se abre desde el borde de
-  abajo); cuando termina se encienden los puntos de la trama. Después cada
-  línea del reclamo entra desde abajo de su propia ventana, arrastrada por un
-  filo de magenta que sube con ella y se apaga arriba.
+- **El momento** es la llegada del hero. El papel se imprime desde el borde de
+  abajo (`@keyframes subir`, un `clip-path` que se abre hacia arriba); cuando
+  termina aparecen los puntos de la trama. Después cada línea del reclamo entra
+  desde abajo de su propia ventana, arrastrada por un filo de azul medio que
+  sube con ella y se apaga arriba.
 - **La trama es una serigrafía de verdad** (`components/brand/Press.tsx`).
   Un cuadrilátero y un shader, en WebGL crudo: sin una sola dependencia
   nueva y 0,3 kB de bundle. Cada tinta tiene su propio **ángulo de
-  pantalla** —15° el magenta, 75° el violeta— que es exactamente lo que
+  pantalla** —15° el azul medio, 75° el azul— que es exactamente lo que
   hace un taller de serigrafía para que las dos retículas no formen muaré
   al superponerse. Los puntos crecen y se achican con la densidad de
   tinta, se abren donde pasa el puntero, y **la velocidad del scroll corre
@@ -281,10 +295,11 @@ protagonista y el resto en voz baja.
   `alpha: false` el lienzo arranca negro opaco y tapa la trama en CSS que
   hay debajo, así que si la primera pintada esperara al primer tick, la
   plancha parpadearía en negro.
-- Degrada solo: sin WebGL no se monta nada, y en equipos de cuatro núcleos
-  o menos y en pantallas de menos de 768px tampoco. Queda la trama en CSS,
-  que deriva un mosaico completo cada veintiséis segundos y se frena sola
-  al salir de pantalla. En un celular el costo de GPU es cero.
+- Degrada solo: sin WebGL, o con movimiento reducido pedido por la persona,
+  no se monta y queda la trama en CSS, que también deriva y se frena sola al
+  salir de pantalla. No hay otro portón: un cuadrilátero con ocho senos por
+  píxel no es caro, y exigir más de cuatro núcleos y 768px de ancho dejaba
+  afuera a casi todos los teléfonos. En pantallas chicas dibuja a densidad 1.
 - **La luz sigue al puntero.** Sobre la plancha, un disco arrastra más puntos
   y más brillo. La máscara viaja con el disco, así que moverlo es una
   transformación y no repinta. Son dos custom properties, no estado.
@@ -293,12 +308,12 @@ protagonista y el resto en voz baja.
 
 - Nav: los seis enlaces comparten una sola píldora de luz que se desliza hasta
   el que tiene el cursor o el foco. Hace legible que son un grupo.
-- Cabeceras: una barra corta de magenta que se dibuja sola al entrar. El mismo
+- Cabeceras: una barra corta de azul medio que se dibuja sola al entrar. El mismo
   material que el filo del hero, en voz baja.
 - Marquesina: se frena si alguien quiere leerla, y cada capacidad se enciende.
-- Servicios: la tarjeta violeta respira su propia trama; las de carbón sangran
-  luz violeta desde el borde de abajo al pasar el cursor. Es luz, no sombra:
-  vive adentro de la tarjeta. El monograma suelta un anillo al entrar.
+- Servicios: cada pliego abierto se inunda de azul pleno con su trama de
+  bruma, y el texto se da vuelta a papel. El monograma suelta un anillo al
+  entrar.
 - Trabajos: **tres tarjetas, no una grilla de piezas iguales**. Con esta
   cantidad el primero ocupa el ancho completo y los otros dos van a la par,
   así la sección tiene una entrada clara. Cada trabajo se muestra adentro de
@@ -316,14 +331,15 @@ protagonista y el resto en voz baja.
   Turbopack en Pack— salió de mirar el sitio en vivo, no de suponer. La ficha
   de App Visual se muestra como "en preparación" hasta que haya información
   real: es preferible a inventarla.
-- Proceso: la línea se dibuja en magenta y termina siempre sobre un número; el
+- Proceso: la línea se dibuja en azul medio y termina siempre sobre un número; el
   que alcanza suelta el mismo anillo que el monograma.
 - Preguntas: la pregunta se corre, el chevrón se enciende y la respuesta sube
   apenas después de abrirse la fila.
 - Contacto: etiquetas flotantes, el campo enfocado se enciende desde abajo y el
   botón muta a un tilde dibujado.
-- Botones: una luz cruza el relleno magenta; en el secundario el contorno se
-  enciende antes de que llegue el relleno.
+- Botones: de metal líquido. Chapa azul, etiqueta en papel, y el metal en el
+  canto: dos anillos cónicos girando en sentidos opuestos. El reflejo sigue al
+  puntero y el golpe sale de donde se apretó.
 - Pie: los enlaces se subrayan desde el lado por el que entra el cursor.
 - Volver arriba: el símbolo gira 360° mientras la página sube.
 

@@ -85,7 +85,7 @@ const datosDelEstudio = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: "#EAF0F6",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -105,7 +105,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <MetalRig />
 
         <a
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-pills focus:bg-magenta focus:px-5 focus:py-3 focus:text-obsidian"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-pills focus:bg-azul focus:px-5 focus:py-3 focus:text-papel"
           href="#main"
         >
           Ir al contenido

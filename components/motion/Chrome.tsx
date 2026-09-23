@@ -65,7 +65,7 @@ export function ScrollProgress() {
     <div className="progress-wrap fixed inset-x-0 top-0 z-50 h-0.5" aria-hidden="true">
       <div
         className="progress h-full w-full"
-        style={{ background: "var(--color-magenta)" }}
+        style={{ background: "var(--color-azul-medio)" }}
       />
     </div>
   );

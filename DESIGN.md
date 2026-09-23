@@ -1,21 +1,26 @@
-# Caldera — Style Reference
-> neon pressed into obsidian. The canvas is total black, and every magenta or violet element reads as light glowing up from beneath the surface.
+# Visual Solution — Tinta Azul · Style Reference
+> blue ink on paper. The canvas is light, and everything with weight — text, logo, action — is printed in one corporate blue.
 
-**Theme:** dark
+**Theme:** light
 
-Caldera now runs on a pure black canvas lit by two chromatic accents. The interface is flat and unshadowed, letting ultrabold compressed type at near-architectural scale (up to 189px) carry all structural weight. A single vivid magenta (#EC4899) acts as the primary aggressive chromatic accent against total black, with a violet (#8B5CF6) reserved for the hero gradient, glow effects, and a secondary card, plus a lighter violet tint used for tags. The visual language is nocturnal rather than volcanic: condensed heavy letterforms, halftone dot patterns, 40px radii on cards and buttons, and 800px pill controls — light contained within a void-black surface.
+*Palette replaced in September 2026. The system was previously Caldera (black canvas, magenta and violet accents); typography, spacing, radii and the no-shadow rule carry over unchanged. Only color changed.*
+
+Tinta Azul runs on a pale blue-grey canvas (#EAF0F6) with white surfaces, and a single ink in three strengths: corporate blue (#0036A5) for text, logo and primary actions; a secondary blue (#155BCD) for accents, hovers and active lines; and a mist blue (#AECDED) for tags and soft fills. The interface stays flat and unshadowed, letting ultrabold compressed type at near-architectural scale (up to 189px) carry structural weight. The print metaphor that shaped the hero is now literal: halftone dots in blue ink on light paper, and the VS monogram printed solid in corporate blue. Full-strength blue appears as bands — the marquee, the closing call to action, the opened service and the footer — so the brand color has weight and the page never reads as pale.
 
 ## Tokens — Colors
 
 | Name | Value | Token | Role |
 |------|-------|-------|------|
-| Magenta | `#EC4899` | `--color-magenta` | Primary action buttons, featured stat cards, key visual highlights — the only warm chromatic accent; its vivid saturation against black creates urgency without needing supporting decorative weight |
-| Violet | `#8B5CF6` | `--color-violet` | Hero gradient base, single secondary card surface, glow/effect treatments — appears in the hero dot pattern, effect washes, and one standout card; never used for controls |
-| Violet Mist | `#C4B5FD` | `--color-violet-mist` | Tag and category badge backgrounds, small highlight washes — a light tint of Violet that labels blog post categories and program announcements |
-| Carbon | `#18151E` | `--color-carbon` | Card surfaces, content block backgrounds, secondary button fills — the violet-tinted charcoal that lifts elements off the black canvas |
-| Onyx | `#000000` | `--color-onyx` | Page canvas, dominant background — pure black that grounds every section; darker than card surfaces to create figure/ground separation without shadows |
-| Obsidian | `#070607` | `--color-obsidian` | Text on bright accent fills, button borders, dotted dividers — near-black used only against Magenta, Violet, or Violet Mist surfaces, never against the black canvas |
-| Chalk | `#ffffff` | `--color-chalk` | Primary text, headings, link text, high-contrast overlays — pure white, now the primary text color everywhere since every surface in the system is dark |
+| Fondo | `#EAF0F6` | `--color-fondo` | Page canvas, dominant background |
+| Papel | `#FFFFFF` | `--color-papel` | Cards, inputs, nav pill, and all text on blue surfaces |
+| Azul | `#0036A5` | `--color-azul` | Primary text, headings, logo, primary action fills, full-strength bands — 8.8:1 on the canvas, 10.1:1 on white |
+| Azul medio | `#155BCD` | `--color-azul-medio` | Accents: heading underline bars, hovers, the process rail, focus rings, the halftone's 15° screen — 5.4:1 on the canvas |
+| Bruma | `#AECDED` | `--color-bruma` | Tag and badge fills, soft washes, the light end of the image gradient — always with Azul text (6.2:1), never white (1.65:1) |
+| Error | `#C62828` | `--color-error` | Form validation only — the one color that is not ink. 5.6:1 on white |
+
+**Image and mockup gradient:** `#0036A5 → #155BCD → #AECDED`, with the mist stop kept to the far corner so white type rests on the blue part.
+
+**Measured pairs that fail and are never used:** white on Bruma (1.65:1), Azul on Azul medio (1.65:1).
 
 ## Tokens — Typography
 
@@ -104,62 +109,62 @@ Caldera now runs on a pure black canvas lit by two chromatic accents. The interf
 ### Primary CTA Button
 **Role:** Main conversion action
 
-Filled Magenta (#EC4899) with Obsidian (#070607) text. 800px border-radius (full pill). Padding 12px vertical, 24px horizontal. DM Sans 500 weight at 16px. No shadow. The pill shape is the most distinctive control shape in the system — never rectangular.
+Liquid-metal pill: Azul (#0036A5) plate with Papel (#FFFFFF) label; the metal is the rim — two counter-rotating conic rings in Azul, Azul medio, Bruma and white highlights. 800px border-radius. Padding 12px vertical, 24px horizontal. DM Sans 500 weight at 16px. No shadow. On a full-blue band the plate inverts to Papel with an Azul label.
 
 ### Secondary Pill Button
 **Role:** Alternative action or paired CTA
 
-Transparent background, 1.5px Chalk (#ffffff) border, Chalk text. 40px border-radius. Padding 16px all sides. DM Sans 500 at 16px. Border style is solid here, not dotted. Sits beside the primary CTA as the quieter counterpart.
+Same liquid-metal pill with a transparent plate, Azul (#0036A5) label and the rim at reduced opacity. Sits beside the primary CTA as the quieter counterpart.
 
 ### Outlined Ghost Link
 **Role:** Low-emphasis text link or nav item
 
-Transparent background, no visible border, Chalk text. 800px pill radius. Padding 0 vertical, 12px horizontal. DM Sans 500 at 16px. Used for nav items and inline links — relies on color and position rather than container weight.
+Transparent background, no visible border, Azul text. 800px pill radius. Padding 0 vertical, 12px horizontal. DM Sans 500 at 16px. Used for nav items and inline links — relies on color and position rather than container weight.
 
 ### Stat Feature Card
 **Role:** Highlight key metrics (TVL, transactions, etc.)
 
-Magenta (#EC4899) solid background, Chalk (#ffffff) text. 40px border-radius. Padding 40px on all sides. No shadow. The large metric number uses PP Neue Corp Compact at 80px+; the label above uses DM Sans 500 at 14–16px. These cards are the system's most visually dominant elements after the hero.
+Azul (#0036A5) solid background, Papel (#FFFFFF) text. 40px border-radius. Padding 40px on all sides. No shadow. The large metric number uses PP Neue Corp Compact at 80px+; the label above uses DM Sans 500 at 14–16px. These cards are the system's most visually dominant elements after the hero.
 
 ### Content Card
 **Role:** Blog posts, announcements, program entries
 
-Carbon (#18151E) background, no border, no shadow. 40px border-radius. Padding 40px all sides. Contains a category tag, headline (PP Neue Corp Compact 26–32px in Chalk), and date metadata. The image area at the top can be a halftone or solid Magenta block.
+Papel (#FFFFFF) background, no border, no shadow. 40px border-radius. Padding 40px all sides. Contains a category tag, headline (PP Neue Corp Compact 26–32px in Azul), and date metadata. The image area at the top uses the image gradient (#0036A5 → #155BCD → #AECDED) with a mist halftone overlay.
 
-### Violet Hero Card
-**Role:** Single standout content surface
+### Full-Blue Band
+**Role:** Emphasis surfaces — marquee, closing CTA, opened service, footer
 
-Violet (#8B5CF6) background with a white halftone dot pattern overlay. 40px border-radius. Used sparingly — appears once as a signature visual anchor. No shadow.
+Azul (#0036A5) to Azul medio (#155BCD) gradient at 42°, with a Bruma halftone overlay at low opacity. Text on it is Papel. No shadow.
 
 ### Category Tag Badge
 **Role:** Label blog posts and announcements
 
-Violet Mist (#C4B5FD) background, Obsidian (#070607) text. Pill shape (800px radius). DM Sans 500 at 12–14px. Padding approximately 3–4px vertical, 8–10px horizontal. Small, soft, and functionally distinct — the only tinted element in the system.
+Bruma (#AECDED) background, Azul (#0036A5) text. Pill shape (800px radius). DM Sans 500 at 12–14px. Padding approximately 3–4px vertical, 8–10px horizontal. Small, soft, and functionally distinct — the only tinted element in the system.
 
 ### Navigation Bar
 **Role:** Top-level site navigation
 
-Onyx (#000000) page background continues through. Nav items are Chalk text in DM Sans 500 at 16px, separated by 9px gaps. The entire nav row can sit inside a Carbon (#18151E) pill container with 800px radius — a signature element. Logo lockup (mountain icon + wordmark) sits left, social icons and CTA right.
+The entire nav row sits inside a Papel (#FFFFFF) pill with a faint Azul border at 15% — a signature element. Nav items are Azul text in DM Sans 500 at 16px, and a single Azul pill slides under the hovered or active link, flipping its text to Papel. Logo lockup (mountain icon + wordmark) sits left, social icons and CTA right.
 
 ### Hero Halftone Block
 **Role:** Hero section visual centerpiece
 
-Large rounded rectangle filled with a Violet (#8B5CF6) to Magenta (#EC4899) gradient overlaid with a magenta halftone dot pattern. 40px border-radius. Dimensions are hero-scale (roughly 50% of viewport width). The halftone effect is the system's most distinctive visual signature — pixel-art-like, high-density dot grid that fades to solid magenta at the top right.
+Full-bleed band of light paper — Bruma (#AECDED) at the bottom-left opening to the canvas (#EAF0F6) at the top-right — printed with two halftone screens in blue ink: Azul medio at 15° and Azul at 75°, so the grids never moiré. The VS monogram sits on top in solid Azul, with two misregistered copies (Azul medio and Bruma) peeking from its edges. The headline bites the paper from below but never touches the monogram: they are the same blue and would fuse.
 
 ### Input Field
 **Role:** Form input
 
-Transparent background, 1.5px Chalk (#ffffff) border. 100px border-radius (pill). Padding 24px vertical, 32px left, 64px right. Chalk text. DM Sans 500. This treatment now applies throughout, since the entire interface sits on a dark canvas.
+Papel (#FFFFFF) background, 1.5px Azul border at 35% opacity, Azul medio on focus, Error (#C62828) when invalid. 100px border-radius (pill). Padding 24px vertical, 32px left, 64px right. Azul text. DM Sans 500.
 
 ### Partner Logo Strip
 **Role:** Display ecosystem partners or integrations
 
-Carbon (#18151E) background card, 40px radius, 40px padding. Logos arranged in a single row with consistent height, separated by vertical 1.5px Chalk dotted dividers. No individual logo containers — flat inline treatment.
+Papel (#FFFFFF) background card, 40px radius, 40px padding. Logos arranged in a single row with consistent height, separated by vertical 1.5px Azul dotted dividers at low opacity. No individual logo containers — flat inline treatment.
 
 ### Dotted Divider
 **Role:** Section separator and decorative detail
 
-1.5px dotted line in Chalk (#ffffff). Used as vertical dividers in nav and partner strips, and occasionally as horizontal section breaks. The dotted (not dashed, not solid) style is a small but consistent signature detail.
+1.5px dotted line in Azul at about 22% opacity (white at 30% on blue bands). Used as vertical dividers in nav and partner strips, and occasionally as horizontal section breaks. The dotted (not dashed, not solid) style is a small but consistent signature detail.
 
 ## Do's and Don'ts
 
@@ -167,62 +172,64 @@ Carbon (#18151E) background card, 40px radius, 40px padding. Logos arranged in a
 - Use PP Neue Corp Compact at 48px or larger for any heading that needs to feel structural — below 40px the ultrabold weight overwhelms and loses its industrial character
 - Apply 40px border-radius to all cards, content blocks, and non-pill buttons as the default surface radius
 - Use 800px border-radius (full pill) for all buttons, tags, nav containers, and small interactive elements
-- Set primary CTAs to Magenta (#EC4899) with Obsidian (#070607) text, sized at 12px/24px padding — never rectangular, always pill-shaped
+- Set primary CTAs as liquid-metal pills with an Azul (#0036A5) plate and Papel label, sized at 12px/24px padding — never rectangular, always pill-shaped
 - Keep body text at DM Sans 500 (Medium) — never drop to Regular weight, which reads as anemic against the ultrabold display type
-- Use the halftone dot pattern (magenta dots on a violet-to-magenta gradient) as the hero/signature visual treatment — it is the system's most recognizable motif
-- Layer surfaces using color contrast (Onyx canvas → Carbon cards → Magenta features) rather than shadows or borders
+- Use the halftone dot pattern (blue ink on light paper) as the hero/signature visual treatment — it is the system's most recognizable motif
+- Layer surfaces using value contrast (Fondo canvas → Papel cards → Azul bands) rather than shadows
+- Put Azul text on Bruma, never white; keep Azul off Azul medio
 
 ### Don't
-- Do not add drop shadows to any element — the system is intentionally flat; shadows would undermine the void-black depth
+- Do not add drop shadows to any element — the system is intentionally flat
 - Do not use rectangular (low-radius) buttons — the pill/40px-radius treatment is non-negotiable
-- Do not introduce additional accent colors beyond Magenta and Violet (plus its Violet Mist tint) — the palette is deliberately constrained to two chromatic hues
+- Do not introduce colors beyond the one ink in three strengths — Error red is the only exception, and only for validation
 - Do not use Regular or Bold weights of DM Sans for body — Medium (500) is the only correct weight
 - Do not set headings below 26px or above 189px — the display type only works at architectural scale
-- Do not use Violet for buttons or controls — it is reserved for the hero gradient, effects, and a single accent card
+- Do not let the headline touch the hero monogram — both are Azul and the letters fuse with the strokes
 - Do not apply negative letter-spacing to PP Neue Corp Compact — the +0.02em positive tracking is intentional at display sizes to prevent stroke collision
-- Do not use Obsidian text directly on the black canvas — it only works on top of Magenta, Violet, or Violet Mist fills; body copy and headings on the canvas always use Chalk
+- Do not drop secondary text below 80% Azul on the canvas — at 70% it measures 4.3:1, just under AA
 
 ## Surfaces
 
 | Level | Name | Value | Purpose |
 |-------|------|-------|---------|
-| 0 | Onyx Canvas | `#000000` | Page background — pure black that grounds all content |
-| 1 | Carbon Surface | `#18151E` | Cards, content blocks, secondary buttons — violet-tinted dark charcoal |
-| 2 | Magenta Feature | `#EC4899` | Featured stat cards and emphasis surfaces — the only warm chromatic surface elevation |
-| 3 | Violet Hero | `#8B5CF6` | Hero gradient block — reserved for the homepage hero pattern overlay |
+| 0 | Fondo Canvas | `#EAF0F6` | Page background |
+| 1 | Papel Surface | `#FFFFFF` | Cards, inputs, nav pill |
+| 2 | Azul Band | `#0036A5` | Marquee, closing CTA, opened service, footer |
+| 3 | Image Gradient | `#0036A5 → #155BCD → #AECDED` | Project mockups and image areas |
 
 ## Elevation
 
-Deliberately shadowless. The design relies on color contrast (black canvas vs. dark charcoal cards vs. vivid magenta/violet) and generous 40px corner radii to create surface hierarchy. No element casts a shadow anywhere in the system — the flatness keeps the heavy type and bold color from feeling overwrought against the dark.
+Deliberately shadowless. The design relies on value contrast (pale canvas vs. white cards vs. full-strength blue bands) and generous 40px corner radii to create surface hierarchy. No element casts a shadow anywhere in the system.
 
 ## Imagery
 
-Imagery is minimal and deliberate. The hero uses an abstract halftone dot pattern (magenta dots on a violet-to-magenta gradient) rather than photography — it functions as brand artwork, not decoration. Product and announcement cards use either solid Magenta blocks or the Violet halftone as image-area fills, keeping a consistent graphic system. Partner/integration logos are rendered as monochrome white marks on dark backgrounds. No photography, no 3D renders, no lifestyle imagery anywhere. Icons are small, monochrome, and minimal — Discord, X, and Telegram sit in the nav as simple white glyphs. The visual language is graphic and editorial, not photographic: think poster design under blacklight, not stock imagery.
+Imagery is minimal and deliberate. The hero uses an abstract halftone dot pattern (blue ink on light paper) rather than photography — it functions as brand artwork, not decoration. Project cards without a screenshot use the image gradient (#0036A5 → #155BCD → #AECDED) with a mist halftone as the image-area fill, keeping a consistent graphic system. No photography, no 3D renders, no lifestyle imagery anywhere. Icons are small, monochrome, and minimal — Discord, X, and Telegram sit in the nav as simple white glyphs. The visual language is graphic and editorial, not photographic: think a one-ink print run, not stock imagery.
 
 ## Agent Prompt Guide
 
 ## Quick Color Reference
-- Page background: #000000 (Onyx)
-- Card/content surface: #18151E (Carbon)
-- Primary text/headings: #ffffff (Chalk)
-- Primary action: #EC4899 (filled action, Obsidian text)
-- Accent: #8B5CF6 (Violet) — hero gradient and effects
-- Tag/badge: #C4B5FD (Violet Mist)
-- Text/border on bright fills: #070607 (Obsidian)
+- Page background: #EAF0F6 (Fondo)
+- Card/content surface: #FFFFFF (Papel)
+- Primary text/headings/logo: #0036A5 (Azul)
+- Primary action: liquid-metal pill, #0036A5 plate, white label
+- Accent, hover, active line: #155BCD (Azul medio)
+- Tag/badge: #AECDED (Bruma) with #0036A5 text
+- Text on blue bands: #FFFFFF (Papel)
+- Image gradient: #0036A5 → #155BCD → #AECDED
+- Validation error: #C62828
 
 ## 3-5 Example Component Prompts
-1. Create a Primary Action Button: #EC4899 background, #070607 text, 9999px radius, compact pill padding. Use this filled treatment for the main CTA.
+1. Create a Primary Action Button: #0036A5 plate, #FFFFFF label, 800px radius, compact pill padding, with a liquid-metal rim of counter-rotating conic gradients in #0036A5, #155BCD, #AECDED and white.
 
-2. **Stat Row**: Four Magenta (#EC4899) cards in a row, each 40px radius, 40px padding. Label in DM Sans 500 at 14px, Chalk (#ffffff) text. Metric value in PP Neue Corp Compact at 80px weight 400, Chalk text, line-height 1.1.
+2. **Stat Row**: Four Azul (#0036A5) cards in a row, each 40px radius, 40px padding. Label in DM Sans 500 at 14px, white text. Metric value in PP Neue Corp Compact at 80px weight 400, white, line-height 1.1.
 
-3. **Content Card**: Carbon (#18151E) background, 40px radius, 40px padding. Violet Mist (#C4B5FD) pill tag at top with DM Sans 500 12px Obsidian text, 800px radius. Headline at 32px PP Neue Corp Compact, Chalk, letter-spacing 0.64px. Date at 12px system sans-serif, Chalk.
+3. **Content Card**: Papel (#FFFFFF) background, 40px radius, 40px padding. Bruma (#AECDED) pill tag at top with DM Sans 500 12px Azul text, 800px radius. Headline at 32px PP Neue Corp Compact, Azul, letter-spacing 0.64px. Date at 12px system sans-serif, Azul at 78%.
 
-
-5. **Dark Input Section**: Onyx (#000000) background. Chalk (#ffffff) pill input with 100px radius, 24px/32px padding, 1.5px Chalk border. DM Sans 500 16px Chalk text. Submit button: Magenta fill, 800px radius, 12px/24px padding.
+4. **Input Section**: Fondo (#EAF0F6) background. White pill input with 100px radius, 24px/32px padding, 1.5px Azul border at 35%. DM Sans 500 16px Azul text. Submit: the primary liquid-metal pill.
 
 ## Signature Motifs
 
-Three visual signatures define Caldera's identity and should be reused across new pages: (1) The halftone dot pattern — magenta dots on a violet-to-magenta gradient, always at hero scale with 40px radius, is the most recognizable motif. (2) The 189px display headline — ultrabold compressed type at near-architectural scale, with tight 0.94 line-height, signals the page is a Caldera page. (3) The triple-radius system — 100px for inputs, 40px for cards and rectangular buttons, 800px for pills — creates a consistent roundness without monotony.
+Three visual signatures define the identity and should be reused across new pages: (1) The halftone dot pattern — blue ink in two screens (15° and 75°) on light paper, at hero scale. (2) The 189px display headline — ultrabold compressed type at near-architectural scale, with tight 0.94 line-height. (3) The triple-radius system — 100px for inputs, 40px for cards and rectangular buttons, 800px for pills — creates a consistent roundness without monotony.
 
 ## Similar Brands
 
@@ -239,13 +246,12 @@ Three visual signatures define Caldera's identity and should be reused across ne
 ```css
 :root {
   /* Colors */
-  --color-magenta: #EC4899;
-  --color-violet: #8B5CF6;
-  --color-violet-mist: #C4B5FD;
-  --color-carbon: #18151E;
-  --color-onyx: #000000;
-  --color-obsidian: #070607;
-  --color-chalk: #ffffff;
+  --color-fondo: #EAF0F6;
+  --color-papel: #FFFFFF;
+  --color-azul: #0036A5;
+  --color-azul-medio: #155BCD;
+  --color-bruma: #AECDED;
+  --color-error: #C62828;
 
   /* Typography — Font Families */
   --font-pp-neue-corp-compact: 'PP Neue Corp Compact', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -321,10 +327,9 @@ Three visual signatures define Caldera's identity and should be reused across ne
   --radius-buttons: 40px;
 
   /* Surfaces */
-  --surface-onyx-canvas: #000000;
-  --surface-carbon-surface: #18151E;
-  --surface-magenta-feature: #EC4899;
-  --surface-violet-hero: #8B5CF6;
+  --surface-fondo-canvas: #EAF0F6;
+  --surface-papel-surface: #FFFFFF;
+  --surface-azul-band: #0036A5;
 }
 ```
 
@@ -333,13 +338,12 @@ Three visual signatures define Caldera's identity and should be reused across ne
 ```css
 @theme {
   /* Colors */
-  --color-magenta: #EC4899;
-  --color-violet: #8B5CF6;
-  --color-violet-mist: #C4B5FD;
-  --color-carbon: #18151E;
-  --color-onyx: #000000;
-  --color-obsidian: #070607;
-  --color-chalk: #ffffff;
+  --color-fondo: #EAF0F6;
+  --color-papel: #FFFFFF;
+  --color-azul: #0036A5;
+  --color-azul-medio: #155BCD;
+  --color-bruma: #AECDED;
+  --color-error: #C62828;
 
   /* Typography */
   --font-pp-neue-corp-compact: 'PP Neue Corp Compact', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;

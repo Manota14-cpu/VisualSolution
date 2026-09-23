@@ -14,7 +14,7 @@ export function Closer() {
           text="Tu marca merece verse tan bien como funciona."
           className="mx-auto max-w-[18ch] display display-lg"
         />
-        <Reveal as="p" delay={1} className="mx-auto mt-5 max-w-[52ch] text-[17px] leading-relaxed text-obsidian/75">
+        <Reveal as="p" delay={1} className="mx-auto mt-5 max-w-[52ch] text-[17px] leading-relaxed text-papel/85">
           Contanos la idea. La primera propuesta no se cobra.
         </Reveal>
         <Reveal as="a" delay={2} className="btn btn-metal mt-8" href="#contacto">
@@ -48,17 +48,17 @@ const columns = [
 
 export function Footer() {
   return (
-    <footer className="bg-carbon pb-10 pt-14 text-chalk">
+    <footer className="bg-azul pb-10 pt-14 text-papel">
       <div className="mx-auto w-full max-w-[1200px] px-4 md:px-10">
         <div className="flex flex-wrap justify-between gap-10">
           <div className="grid max-w-[34ch] content-start gap-4">
             <a className="inline-flex items-center gap-2" href="#top" aria-label="Visual Solution, inicio">
               <Mark className="block h-auto w-[26px]" />
-              <span className="text-sm font-medium text-chalk">
-                Visual <span className="text-chalk/60">Solution</span>
+              <span className="text-sm font-medium text-papel">
+                Visual <span className="text-papel/75">Solution</span>
               </span>
             </a>
-            <p className="text-sm leading-relaxed text-chalk/70">
+            <p className="text-sm leading-relaxed text-papel/85">
               Desarrollo web y producción de contenido para marcas que quieren vender mejor.
             </p>
           </div>
@@ -66,13 +66,13 @@ export function Footer() {
           <div className="flex flex-wrap gap-12">
             {columns.map((col) => (
               <div key={col.title} className="grid content-start gap-2">
-                <h4 className="label mb-2 block text-chalk/60">{col.title}</h4>
+                <h4 className="label mb-2 block text-papel/75">{col.title}</h4>
                 {col.links.map((l) => {
                   const external = l.href.startsWith("http");
                   return (
                     <a
                       key={l.href}
-                      className="foot-link text-sm text-chalk/70 transition-colors duration-200 hover:text-chalk"
+                      className="foot-link text-sm text-papel/85 transition-colors duration-200 hover:text-papel"
                       href={l.href}
                       {...(external ? { target: "_blank", rel: "noopener" } : {})}
                     >
@@ -88,18 +88,18 @@ export function Footer() {
         {/* El aviso legal. Va en un <small> porque eso es exactamente lo
             que el elemento significa: letra chica de derechos y
             atribución, no un párrafo más. */}
-        <small className="mt-10 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 border-t border-dotted border-chalk/30 pt-6 text-center label text-chalk/60">
+        <small className="mt-10 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 border-t border-dotted border-papel/30 pt-6 text-center label text-papel/75">
           <span>
             © {legal.year} {legal.holder}. {legal.rights}.
           </span>
-          <span className="text-chalk/30" aria-hidden="true">
+          <span className="text-papel/40" aria-hidden="true">
             |
           </span>
           <span>{legal.credit}</span>
-          <span className="text-chalk/30" aria-hidden="true">
+          <span className="text-papel/40" aria-hidden="true">
             |
           </span>
-          <a className="foot-link transition-colors duration-200 hover:text-chalk" href={siteUrl}>
+          <a className="foot-link transition-colors duration-200 hover:text-papel" href={siteUrl}>
             {siteHost}
           </a>
         </small>

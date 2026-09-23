@@ -106,14 +106,14 @@ export function Services() {
   const [abierto, setAbierto] = useState<string>(inicial);
 
   return (
-    <section className="bg-onyx py-20 md:py-28" id="servicios">
+    <section className="bg-fondo py-20 md:py-28" id="servicios">
       <div className="mx-auto w-full max-w-[1200px] px-4 md:px-10">
         <Reveal className="mb-10 max-w-[44ch] md:mb-14">
           <SplitHeading
             text="Todo lo que tu marca necesita para verse y funcionar bien."
             className="display display-md"
           />
-          <p className="mt-6 max-w-[62ch] text-base leading-relaxed text-chalk/70">
+          <p className="mt-6 max-w-[62ch] text-base leading-relaxed text-azul/85">
             Trabajamos las dos mitades del mismo problema: la pieza técnica que sostiene el negocio y el
             contenido que lo hace visible.
           </p>

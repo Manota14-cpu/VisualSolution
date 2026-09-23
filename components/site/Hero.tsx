@@ -70,7 +70,7 @@ export function Hero() {
   }, [elegidos]);
 
   return (
-    <section className="relative overflow-hidden bg-onyx pb-16 pt-24 md:pb-24 md:pt-28" id="top">
+    <section className="relative overflow-hidden bg-fondo pb-16 pt-24 md:pb-24 md:pt-28" id="top">
       {/* La plancha, a sangre. */}
       <div className="banda">
         <Plate className="halftone h-full w-full" services={taken} />
@@ -147,7 +147,7 @@ export function Marquee() {
   );
 
   return (
-    <div className="marquee-band border-y border-chalk/20">
+    <div className="marquee-band border-y border-papel/20">
       <div className="overflow-hidden">
         <div className="animate-marquee flex w-max">
           {line(false)}

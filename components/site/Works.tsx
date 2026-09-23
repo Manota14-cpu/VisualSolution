@@ -201,12 +201,12 @@ export function Works() {
   }, [close]);
 
   return (
-    <section className="bg-onyx py-20 md:py-28" id="trabajos">
+    <section className="bg-fondo py-20 md:py-28" id="trabajos">
       <div className="mx-auto w-full max-w-[1200px] px-4 md:px-10">
         <div className="mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <Reveal>
             <SplitHeading text="Trabajos" className="display display-md" />
-            <p className="mt-6 max-w-[54ch] text-base leading-relaxed text-chalk/70">
+            <p className="mt-6 max-w-[54ch] text-base leading-relaxed text-azul/85">
               Sitios web, tiendas online y software a medida. Los que están publicados se pueden
               recorrer desde acá: preferimos mostrarlos funcionando antes que contarlos.
             </p>
@@ -250,7 +250,7 @@ export function Works() {
         </div>
 
         {visible.length === 0 && (
-          <p className="mt-8 label text-chalk/55">No hay trabajos de ese tipo todavía.</p>
+          <p className="mt-8 label text-azul/80">No hay trabajos de ese tipo todavía.</p>
         )}
       </div>
 

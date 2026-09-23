@@ -113,14 +113,14 @@ export function Nav() {
       />
 
       <header
-        className={`nav-shell fixed inset-x-0 top-4 z-40 mx-auto flex w-[calc(100%-2rem)] max-w-[1200px] items-center justify-between gap-6 rounded-pills border border-chalk/20 bg-carbon py-2 pl-4 pr-2 ${
+        className={`nav-shell fixed inset-x-0 top-4 z-40 mx-auto flex w-[calc(100%-2rem)] max-w-[1200px] items-center justify-between gap-6 rounded-pills border border-azul/15 bg-papel py-2 pl-4 pr-2 ${
           stuck ? "is-stuck" : ""
         }`}
       >
         <a className="inline-flex items-center gap-2" href="#top" aria-label="Visual Solution, inicio">
-          <Mark className={`block h-auto w-[26px] text-magenta ${pop ? "nav-pop" : ""}`} />
-          <span className="whitespace-nowrap text-sm font-medium text-chalk">
-            Visual <span className="text-chalk/55">Solution</span>
+          <Mark className={`block h-auto w-[26px] text-azul ${pop ? "nav-pop" : ""}`} />
+          <span className="whitespace-nowrap text-sm font-medium text-azul">
+            Visual <span className="text-azul/80">Solution</span>
           </span>
         </a>
 
@@ -155,7 +155,7 @@ export function Nav() {
             {hero.primaryCta}
           </a>
           <button
-            className="grid size-9 place-items-center rounded-pills border border-chalk/20 lg:hidden"
+            className="grid size-9 place-items-center rounded-pills border border-azul/20 text-azul lg:hidden"
             type="button"
             aria-expanded={open}
             aria-controls="menu"
@@ -165,7 +165,7 @@ export function Nav() {
             <svg width="15" height="12" viewBox="0 0 15 12" fill="none" aria-hidden="true">
               <path
                 d="M1 1.5h13"
-                stroke="#000000"
+                stroke="currentColor"
                 strokeWidth="1.2"
                 strokeLinecap="round"
                 style={{
@@ -176,14 +176,14 @@ export function Nav() {
               />
               <path
                 d="M1 6h13"
-                stroke="#000000"
+                stroke="currentColor"
                 strokeWidth="1.2"
                 strokeLinecap="round"
                 style={{ opacity: open ? 0 : 1, transition: "opacity .2s" }}
               />
               <path
                 d="M1 10.5h13"
-                stroke="#000000"
+                stroke="currentColor"
                 strokeWidth="1.2"
                 strokeLinecap="round"
                 style={{
@@ -199,14 +199,14 @@ export function Nav() {
 
       <div
         id="menu"
-        className={`fixed inset-0 z-40 flex-col bg-onyx px-4 pb-10 pt-24  ${
+        className={`fixed inset-0 z-40 flex-col bg-fondo px-4 pb-10 pt-24  ${
           open ? "flex" : "hidden"
         }`}
       >
         {nav.map((item) => (
           <a
             key={item.href}
-            className="display border-b border-chalk/20 py-4 text-[clamp(34px,12vw,60px)] text-chalk"
+            className="display border-b border-azul/20 py-4 text-[clamp(34px,12vw,60px)] text-azul"
             href={item.href}
             onClick={() => setOpen(false)}
           >

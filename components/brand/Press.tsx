@@ -9,7 +9,7 @@
    Lo que cambia respecto de la versión en CSS no es que se vea
    "más brillante": es que la trama ahora se comporta como una
    trama. Cada tinta tiene su propio ángulo de pantalla —15° el
-   magenta, 75° el violeta— que es exactamente lo que hace un
+   azul medio, 75° el azul— que es exactamente lo que hace un
    taller de serigrafía para que las dos retículas no formen
    muaré al superponerse. Los puntos crecen y se achican con la
    densidad de tinta, se abren donde pasa el puntero, y el scroll
@@ -20,8 +20,7 @@
    puntos no están clavados a una grilla sino que siguen una
    corriente lenta, y donde la corriente se junta la tinta se
    espesa. Es la misma idea de un flow field resuelto a través de
-   una matriz de medio tono, pero en las dos tintas del sistema en
-   vez de en un rojo-naranja que la paleta no admite.
+   una matriz de medio tono, en las dos tintas azules del sistema.
 
    Sin dependencias: es un cuadrilátero y un shader, unas ochenta
    líneas de WebGL crudo. Si el navegador no da, no se monta nada
@@ -47,8 +46,10 @@ uniform float u_slip;   // cuánto se corrió una plancha contra la otra
 uniform float u_ink;    // tintas en juego: sube con cada servicio elegido
 uniform float u_time;   // segundos desde que arrancó la plancha
 
-const vec3 VIOLETA = vec3(0.545, 0.361, 0.965);
-const vec3 MAGENTA = vec3(0.925, 0.282, 0.600);
+const vec3 AZUL  = vec3(0.000, 0.212, 0.647);   // #0036A5
+const vec3 MEDIO = vec3(0.082, 0.357, 0.804);   // #155BCD
+const vec3 BRUMA = vec3(0.682, 0.804, 0.929);   // #AECDED
+const vec3 FONDO = vec3(0.918, 0.941, 0.965);   // #EAF0F6
 
 mat2 giro(float a) {
   float c = cos(a), s = sin(a);
@@ -78,9 +79,9 @@ void main() {
   vec2 px = gl_FragCoord.xy;
   vec2 uv = px / u_res;
 
-  /* La mezcla de las dos tintas corre en diagonal, igual que el
-     degradado del sistema: violeta abajo a la izquierda, magenta
-     pleno arriba a la derecha. */
+  /* El papel y la carga de cada tinta corren en diagonal, igual que
+     el degradado del sistema: bruma abajo a la izquierda, lienzo
+     arriba a la derecha. */
   float t = clamp(uv.x * 0.62 + uv.y * 0.55 + 0.08, 0.0, 1.0);
 
   /* El puntero abre la trama: más tinta y puntos más gordos donde
@@ -109,28 +110,26 @@ void main() {
   /* Donde la corriente se junta, la tinta se espesa. */
   float espesor = (fl.x + fl.y) * 0.11;
 
-  float dM = clamp(t * 0.95 + halo * 0.45 + espesor, 0.0, 1.15);
-  float dV = clamp((1.0 - t) * 0.95 + halo * 0.45 - espesor, 0.0, 1.15);
+  /* Los puntos no pasan de un tercio de la celda. Sobre papel claro la
+     tinta es lo oscuro, y el monograma —que también es tinta— tiene que
+     seguir leyéndose encima: con retículas tan cargadas como las de la
+     plancha oscura, el VS se perdía entre sus propios puntos. */
+  float dM = clamp(t * 0.58 + halo * 0.35 + espesor * 0.7, 0.0, 0.9);
+  float dV = clamp((1.0 - t) * 0.50 + halo * 0.35 - espesor * 0.7, 0.0, 0.9);
 
   float m = trama(px + corre + arrastre, 0.2618, dM);   /* 15° */
   float v = trama(px - corre - arrastre, 1.3090, dV);   /* 75° */
 
-  /* La plancha sin entintar y las dos tramas impresas encima.
+  /* El papel y las dos tramas impresas encima.
 
-     La base va por debajo del color pleno a propósito: son los puntos
-     los que llegan al magenta y al violeta enteros. Si la base ya
-     estuviera al máximo —como estaba— el punto magenta caería sobre un
-     fondo magenta y la trama sería invisible justo en la mitad donde el
-     degradado es magenta, que es exactamente lo que pasaba.
-
-     Con los puntos cubriendo cerca de la mitad de la superficie, el
-     promedio queda alto: la plancha sigue siendo la superficie
-     brillante de donde se cala el monograma negro. */
-  vec3 base = mix(VIOLETA, MAGENTA, t);
-  vec3 col = base * 0.66;
-  col = mix(col, MAGENTA, m * 0.95);
-  col = mix(col, VIOLETA * 1.06, v * 0.45);
-  col += halo * 0.12;
+     El papel va claro —bruma abajo a la izquierda, lienzo arriba a la
+     derecha— y la tinta es lo oscuro. Es la condición para que una
+     trama se lea: zona con tinta y zona sin tinta. La plancha oscura
+     anterior tuvo el problema al revés, magenta sobre magenta, y la
+     trama desaparecía en media superficie. */
+  vec3 col = mix(BRUMA, FONDO, t);
+  col = mix(col, MEDIO, m * 0.85);
+  col = mix(col, AZUL, v * 0.70);
 
   gl_FragColor = vec4(col, 1.0);
 }

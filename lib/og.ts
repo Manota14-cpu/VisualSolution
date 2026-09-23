@@ -21,12 +21,13 @@ import { MARK_PATH, MARK_VIEWBOX } from "@/components/brand/Mark";
 
 export const OG = { width: 1200, height: 630 };
 
-const ONIX = "#000000";
-const OBSIDIANA = "#070607";
-const TIZA = "#FFFFFF";
-const MAGENTA = "#EC4899";
-const VIOLETA = "#8B5CF6";
-const TINTE = "#C4B5FD";
+/* La misma paleta que globals.css. Acá no llegan las variables de CSS:
+   la tarjeta la dibuja el servidor, así que los valores van escritos. */
+const FONDO = "#EAF0F6";
+const PAPEL = "#FFFFFF";
+const AZUL = "#0036A5";
+const MEDIO = "#155BCD";
+const BRUMA = "#AECDED";
 
 /* Las dos caras del sistema. Se bajan una sola vez en build; si por lo
    que sea no están, la tarjeta se arma igual con la que trae el
@@ -61,7 +62,7 @@ export async function fuentes(): Promise<Cara[]> {
 
 const hay = (fs: Cara[], n: string) => (fs.some((f) => f.name === n) ? n : "sans-serif");
 
-/** El monograma, fuera de registro: las dos tintas y el negro encima. */
+/** El monograma, fuera de registro: las dos tintas y el azul encima. */
 function Marca({ alto, corre = 10 }: { alto: number; corre?: number }) {
   const ancho = (alto * 143.5) / 76;
   const capa = (color: string, dx: number, dy: number) => ({
@@ -78,7 +79,7 @@ function Marca({ alto, corre = 10 }: { alto: number; corre?: number }) {
     type: "div",
     props: {
       style: { display: "flex", position: "relative", width: ancho + corre * 2, height: alto + corre },
-      children: [capa(MAGENTA, corre * 2, 0), capa(TINTE, 0, corre), capa(OBSIDIANA, corre, corre / 2)],
+      children: [capa(MEDIO, corre * 2, 0), capa(BRUMA, 0, corre), capa(AZUL, corre, corre / 2)],
     },
   };
 }
@@ -98,7 +99,7 @@ export function tarjeta({ titulo, pie, caras }: { titulo: string[]; pie: string;
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: ONIX,
+        backgroundColor: PAPEL,
         fontFamily: hay(caras, "DM Sans"),
       },
       children: [
@@ -108,19 +109,24 @@ export function tarjeta({ titulo, pie, caras }: { titulo: string[]; pie: string;
           props: {
             style: {
               display: "flex",
-              alignItems: "center",
+              /* La marca va arriba y no centrada: el reclamo sube bastante
+                 más que los 34px del margen, porque tres líneas de Anton no
+                 entran abajo, y marca y reclamo son del mismo azul. Si se
+                 pisan, las letras se funden con el trazo de la S. */
+              alignItems: "flex-start",
               justifyContent: "center",
+              paddingTop: 30,
               height: 350,
               position: "relative",
-              backgroundColor: VIOLETA,
-              backgroundImage: `linear-gradient(42deg, ${VIOLETA} 4%, ${MAGENTA} 96%)`,
+              backgroundColor: BRUMA,
+              backgroundImage: `linear-gradient(42deg, ${BRUMA} 4%, ${FONDO} 96%)`,
             },
             children: [
-              Marca({ alto: 200 }),
+              Marca({ alto: 150 }),
               {
-                /* El sello va en obsidiana, no en magenta: arriba a la
-                   derecha la plancha ya ES magenta y un sello magenta
-                   sobre magenta no se ve. */
+                /* El sello va en azul pleno con letra de papel: arriba
+                   a la derecha la plancha se aclara hasta el lienzo, y
+                   es el único peso que hay en esa esquina. */
                 type: "div",
                 props: {
                   style: {
@@ -128,8 +134,8 @@ export function tarjeta({ titulo, pie, caras }: { titulo: string[]; pie: string;
                     top: 30,
                     right: 44,
                     display: "flex",
-                    backgroundColor: OBSIDIANA,
-                    color: TINTE,
+                    backgroundColor: AZUL,
+                    color: PAPEL,
                     borderRadius: 999,
                     padding: "13px 28px",
                     fontSize: 25,
@@ -165,7 +171,7 @@ export function tarjeta({ titulo, pie, caras }: { titulo: string[]; pie: string;
                     lineHeight: 0.92,
                     letterSpacing: "0.02em",
                     textTransform: "uppercase",
-                    color: TIZA,
+                    color: AZUL,
                   },
                   children: titulo.map((l) => ({ type: "div", props: { children: l } })),
                 },
@@ -177,7 +183,7 @@ export function tarjeta({ titulo, pie, caras }: { titulo: string[]; pie: string;
                     display: "flex",
                     marginTop: 24,
                     fontSize: 27,
-                    color: "rgba(255,255,255,0.62)",
+                    color: "rgba(0,54,165,0.8)",
                   },
                   children: pie,
                 },
