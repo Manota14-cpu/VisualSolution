@@ -46,6 +46,14 @@
   /* funcional: el único color que no es tinta */
   --color-error:      #C62828;  /* 5.6:1 sobre papel */
 
+  /* El token semántico de shadcn. Lo usan los componentes de
+     components/ui tal como vienen escritos (bg-primary,
+     text-primary/70). Va en el crema con el que está dibujado
+     prisma-hero —el mismo #E1E0CC que usa para el título y la nav—
+     y no en el azul: sobre el video oscuro, un párrafo azul no se lee.
+     Ningún componente del sitio lo usa. */
+  --color-primary:    #E1E0CC;
+
   --font-ui: var(--font-dm-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-display: var(--font-anton), "Bebas Neue", ui-sans-serif, system-ui, sans-serif;
 
@@ -1272,6 +1280,17 @@ body {
    adentro: lo que queda afuera le gana a las utilidades de Tailwind
    y entonces md:hidden deja de funcionar sobre cualquier componente
    que fije display. Ya pasó dos veces. */
+
+/* El grano que componentes/ui da por hecho. En un proyecto armado con
+   shadcn viene de la plantilla; acá no existía, y sin la clase la capa
+   de ruido de prisma-hero no dibujaba nada. Es un feTurbulence en un
+   SVG inline: sin archivo que pedir y sin costo de red. */
+@layer components {
+  .noise-overlay {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+}
 
 /* Una línea: cada navegación real del sitio —entrar a un caso desde
    una URL, volver con el botón atrás, el mapa del sitio— deja de ser un
