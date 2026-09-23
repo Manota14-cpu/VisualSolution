@@ -226,6 +226,24 @@ El movimiento acompaña, no protagoniza: el sistema es plano y editorial.
 
 **Hero**
 
+- **Desde septiembre de 2026 el hero es un video** (`components/site/Hero.tsx`):
+  alguien trabajando en una terraza sobre las nubes
+  (`public/video/manotacielo.mp4`, con póster del primer cuadro), el nombre
+  "Visual Solution" a escala de cartel abajo a la izquierda con las palabras
+  que suben (`components/ui/words-pull-up.tsx`, de framer-motion) y, a la
+  derecha, un panel de vidrio azul con el reclamo, las etiquetas y los
+  botones de metal. La estructura viene de un hero de 21st.dev; contenido,
+  colores y navegación son los de Visual.
+- El monograma va en el cielo como marca de agua (`.hero-marca`, blanco
+  translúcido en `overlay`), alineado con el título para armar el logotipo
+  completo. Se mide para no tocar nunca el nombre: en teléfonos de menos de
+  720px de alto se oculta, porque no queda lugar entre la nav y el título.
+- El panel existe por contraste: sobre una nube blanca, el texto chico en
+  blanco necesita al menos 72% de azul detrás para pasar AA (4.9:1).
+- Con movimiento reducido el video no corre y queda el póster.
+- La plancha de impresión que se describe abajo (`Plate.tsx`, `Press.tsx`)
+  fue el hero anterior. Los componentes siguen en el repo pero no se usan.
+
 - El giro es una **plancha de impresión** (`components/brand/Plate.tsx`): el
   papel con la trama encima y el monograma VS impreso en azul a escala
   arquitectónica. Es el único lugar del sitio donde la marca aparece a este

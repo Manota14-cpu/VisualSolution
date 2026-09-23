@@ -46,14 +46,6 @@
   /* funcional: el único color que no es tinta */
   --color-error:      #C62828;  /* 5.6:1 sobre papel */
 
-  /* El token semántico de shadcn. Lo usan los componentes de
-     components/ui tal como vienen escritos (bg-primary,
-     text-primary/70). Va en el crema con el que está dibujado
-     prisma-hero —el mismo #E1E0CC que usa para el título y la nav—
-     y no en el azul: sobre el video oscuro, un párrafo azul no se lee.
-     Ningún componente del sitio lo usa. */
-  --color-primary:    #E1E0CC;
-
   --font-ui: var(--font-dm-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-display: var(--font-anton), "Bebas Neue", ui-sans-serif, system-ui, sans-serif;
 
@@ -1281,15 +1273,106 @@ body {
    y entonces md:hidden deja de funcionar sobre cualquier componente
    que fije display. Ya pasó dos veces. */
 
-/* El grano que componentes/ui da por hecho. En un proyecto armado con
-   shadcn viene de la plantilla; acá no existía, y sin la clase la capa
-   de ruido de prisma-hero no dibujaba nada. Es un feTurbulence en un
-   SVG inline: sin archivo que pedir y sin costo de red. */
+/* El grano sobre el video del hero. Es un feTurbulence en un SVG
+   inline: sin archivo que pedir y sin costo de red. */
 @layer components {
   .noise-overlay {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-size: 200px 200px;
   }
+}
+
+/* ==========================================================
+   EL HERO DE VIDEO
+   ========================================================== */
+
+/* El monograma en el cielo. Blanco translúcido y en modo overlay: en
+   vez de pegarse encima como un sello, aclara lo que tiene debajo y se
+   mezcla con la luz de las nubes. Arranca por debajo de la nav.
+
+   Va a la izquierda, sobre el mismo borde que el título: el VS arriba y
+   el nombre abajo arman el logotipo completo, de fondo. A la derecha
+   quedaba detrás del panel y el vidrio le tapaba la mitad. Los 52px son
+   el margen del título: 12 del marco más 40 de relleno. */
+.hero-marca {
+  position: absolute;
+  z-index: 0;
+  top: clamp(96px, 13%, 150px);
+  left: 52px;
+  /* Se dimensiona por el alto y no por el ancho: así termina antes de
+     que empiece el texto de la derecha en cualquier proporción de
+     pantalla. Por el ancho, en una pantalla ancha y baja bajaba hasta
+     el párrafo y le quitaba contraste. */
+  width: auto;
+  height: min(34vh, 28vw);
+  overflow: visible;
+  fill: rgb(255 255 255 / .42);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+/* En tablet el título ocupa todo el ancho y sube más: la marca se
+   achica para no tocarlo. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hero-marca { height: min(24vh, 26vw); }
+}
+@media (max-width: 767px) {
+  /* en un teléfono va centrado, entre la nav y el nombre */
+  .hero-marca { left: 50%; translate: -50% 0; height: 34vw; top: 88px; }
+}
+/* En un teléfono bajo no queda lugar entre la nav y el nombre: la marca
+   pisaría el título, y el nombre escrito es lo que no se puede perder. */
+@media (max-width: 767px) and (max-height: 720px) {
+  .hero-marca { display: none; }
+}
+
+/* En el teléfono las etiquetas van en una fila que se desliza de costado.
+   En tres filas empujaban el nombre fuera de la pantalla. El fundido del
+   borde derecho avisa que hay más. */
+@media (max-width: 639px) {
+  .sobre-video .etiquetas {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    margin-inline: -4px;
+    padding: 2px 4px 6px;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, #000 84%, transparent);
+            mask-image: linear-gradient(90deg, #000 84%, transparent);
+  }
+  .sobre-video .etiquetas::-webkit-scrollbar { display: none; }
+  .sobre-video .chip { flex: none; scroll-snap-align: start; }
+}
+
+/* El panel de la derecha. Azul al 72% con desenfoque: sobre la peor
+   nube posible —blanco pleno— el texto blanco queda en 4.9:1. Con
+   menos azul, el párrafo no pasa AA justo donde el video es más claro. */
+.hero-panel {
+  padding: clamp(18px, 2vw, 26px);
+  border-radius: var(--radius-cards);
+  border: 1px solid rgb(255 255 255 / .16);
+  background: rgb(0 54 165 / .72);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+          backdrop-filter: blur(14px) saturate(1.15);
+}
+
+/* Sobre el video la tinta es papel. La principal se invierte a chapa
+   de papel —azul sobre el panel azul se perdía y quedaba igual que la
+   secundaria—, y la secundaria pasa a etiqueta de papel. */
+.sobre-video .btn-metal:not(.es-suave) { background: var(--color-papel); color: var(--color-azul); }
+.sobre-video .btn-metal:not(.es-suave):hover { background: var(--color-fondo); }
+.sobre-video .btn-metal:not(.es-suave) .diamond { background: var(--color-azul-medio); }
+.sobre-video .btn-metal:not(.es-suave)::after {
+  background: radial-gradient(58% 150% at var(--mx) var(--my), rgb(21 91 205 / .14) 0%, transparent 72%);
+}
+.sobre-video .btn-metal:not(.es-suave) .onda {
+  background: radial-gradient(circle, rgb(21 91 205 / .28), rgb(174 205 237 / .3) 62%, transparent 72%);
+}
+.sobre-video .hint { color: rgb(255 255 255 / .85); }
+.sobre-video .btn-metal.es-suave { color: var(--color-papel); }
+.sobre-video .btn-metal.es-suave:hover { background: rgb(255 255 255 / .12); }
+.sobre-video .btn-metal.es-suave .diamond { background: var(--color-bruma); }
+.sobre-video .btn-metal.es-suave::after {
+  background: radial-gradient(58% 150% at var(--mx) var(--my), rgb(255 255 255 / .22) 0%, transparent 72%);
 }
 
 /* Una línea: cada navegación real del sitio —entrar a un caso desde
