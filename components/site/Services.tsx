@@ -12,14 +12,13 @@ import { services, type Service } from "@/lib/content";
    estructura que sale sola, y era lo último que quedaba en pie.
 
    Cerrado, un pliego es una línea de titular en display sobre el
-   negro. Abierto, se inunda con la plancha —el mismo degradado y
-   la misma trama del hero— y el texto se da vuelta a obsidiana,
-   que es el único uso válido de ese negro: encima de un relleno
-   brillante.
+   lienzo. Abierto, se inunda de azul pleno con su trama y el texto
+   se da vuelta a papel.
 
-   Uno solo abierto por vez. La sección entra con el destacado ya
-   abierto: una lista de titulares cerrados no dice qué hace el
-   estudio, y eso es justamente lo que la sección tiene que decir.
+   Uno solo abierto por vez, y el abierto se cierra con el mismo
+   toque que lo abrió. La sección entra con el destacado ya abierto
+   —una lista de titulares cerrados no dice qué hace el estudio—,
+   pero después manda quien la usa: si quiere cerrarlo, se cierra.
    ============================================================ */
 
 function Pliego({
@@ -103,7 +102,8 @@ function Pliego({
 export function Services() {
   /* Arranca abierto el destacado; si ninguno lo es, el primero. */
   const inicial = services.find((s) => s.featured)?.id ?? services[0].id;
-  const [abierto, setAbierto] = useState<string>(inicial);
+  /* null es "ninguno abierto". */
+  const [abierto, setAbierto] = useState<string | null>(inicial);
 
   return (
     <section className="bg-fondo py-20 md:py-28" id="servicios">
@@ -126,8 +126,7 @@ export function Services() {
               service={s}
               indice={i}
               abierto={abierto === s.id}
-              /* Cerrar el abierto dejaría la sección muda: siempre queda uno. */
-              onToggle={() => setAbierto(s.id)}
+              onToggle={() => setAbierto((a) => (a === s.id ? null : s.id))}
             />
           ))}
         </div>
