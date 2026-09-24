@@ -28,6 +28,9 @@ export function Contact() {
   const [sending, setSending] = useState(false);
   const [ok, setOk] = useState(false);
   const [sent, setSent] = useState<string | null>(null);
+  /* El último enlace de WhatsApp, para reabrirlo desde el panel si el
+     navegador no dejó abrir la pestaña. */
+  const [waUrl, setWaUrl] = useState<string | null>(null);
   const [failed, setFailed] = useState("");
   const { reduce } = useMotionEnv();
   const mensajeRef = useRef<HTMLTextAreaElement>(null);
@@ -103,8 +106,31 @@ export function Contact() {
     setErrors(found);
     if (Object.keys(found).length) return;
 
-    /* Sin backend configurado arma un correo con los datos. Con
-       site.formEndpoint cargado, pasa a ser un POST con JSON. */
+    /* Por WhatsApp: se abre un chat con el estudio y la consulta ya
+       escrita; la persona sólo toca Enviar. Se abre acá, antes de
+       cualquier await, porque el navegador sólo deja abrir una pestaña
+       nueva como respuesta directa a un clic. Si igual la bloquea,
+       WhatsApp se abre en esta misma pestaña. */
+    if (site.whatsapp) {
+      const texto = [
+        `Hola, soy ${values.nombre.trim()}.`,
+        `Me interesa: ${values.servicio}.`,
+        "",
+        values.mensaje.trim(),
+        "",
+        `Mi correo: ${values.email.trim()}`,
+      ].join("\n");
+      const url = `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(texto)}`;
+      setWaUrl(url);
+      const w = window.open(url, "_blank");
+      if (w) w.opener = null;
+      else window.location.href = url;
+      finish("Te abrimos WhatsApp con tu consulta escrita. Sólo falta tocar Enviar ahí.");
+      return;
+    }
+
+    /* Sin WhatsApp ni backend configurado arma un correo con los datos.
+       Con site.formEndpoint cargado, pasa a ser un POST con JSON. */
     if (!site.formEndpoint) {
       const cuerpo = `Nombre: ${values.nombre}\nCorreo: ${values.email}\nServicio: ${values.servicio}\n\n${values.mensaje}`;
       window.location.href = `mailto:${site.email}?subject=${encodeURIComponent(
@@ -173,12 +199,21 @@ export function Contact() {
             <div className="rounded-cards bg-papel p-8" role="status">
               <h3 className="display display-sm">Mensaje listo para enviar</h3>
               <p className="mt-2 max-w-[44ch] text-base leading-relaxed text-azul/85">{sent}</p>
+              {waUrl && (
+                <p className="mt-3 text-sm text-azul/85">
+                  ¿No se abrió?{" "}
+                  <a className="link" href={waUrl} target="_blank" rel="noopener noreferrer">
+                    Abrir WhatsApp de nuevo
+                  </a>
+                </p>
+              )}
               <button
                 className="btn btn-metal es-suave mt-6"
                 type="button"
                 onClick={() => {
                   setValues(empty);
                   setSent(null);
+                  setWaUrl(null);
                 }}
               >
                 <MetalFaz />
@@ -286,10 +321,12 @@ export function Contact() {
               )}
 
               <div className="mt-2 flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-center">
-                <p className="label text-azul/80">Usamos estos datos solo para responderte.</p>
+                <p className="label text-azul/80">
+                  {site.whatsapp ? "Se abre WhatsApp con tu consulta. Acá no guardamos nada." : "Usamos estos datos solo para responderte."}
+                </p>
                 <button className={`btn btn-metal ${ok ? "ok" : ""}`} type="submit" disabled={sending}>
                   <MetalFaz />
-                  <span className="send-label">{sending ? "Enviando" : "Enviar mensaje"}</span>
+                  <span className="send-label">{sending ? "Enviando" : site.whatsapp ? "Enviar por WhatsApp" : "Enviar mensaje"}</span>
                   <span className="send-ok" aria-hidden="true">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                       <path

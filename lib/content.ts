@@ -17,8 +17,14 @@ export const site = {
   },
   tiktok: "https://www.tiktok.com/@visualsolution_",
   youtube: "https://www.youtube.com/@visualsolution_arg",
-  /* Para que el formulario envíe de verdad, poner acá la URL de
-     Formspree, Getform o tu propia API. Vacío usa el cliente de correo. */
+  /* El formulario se manda por WhatsApp: abre un chat con este número y la
+     consulta ya escrita. Formato internacional sin "+": 54 (Argentina),
+     9 (celular: WhatsApp registra así los celulares argentinos; sin el 9
+     el enlace suele decir que el número no está en WhatsApp) y 3492 301333.
+     Vacío, el formulario vuelve a usar formEndpoint o el correo. */
+  whatsapp: "5493492301333",
+  /* Sólo se usa si whatsapp está vacío: la URL de Formspree, Getform o una
+     API propia. Si también está vacío, se arma un correo. */
   formEndpoint: "",
 } as const;
 
