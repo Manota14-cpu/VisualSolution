@@ -243,8 +243,13 @@ El movimiento acompaña, no protagoniza: el sistema es plano y editorial.
 - El panel existe por contraste: sobre una nube blanca, el texto chico en
   blanco necesita al menos 72% de azul detrás para pasar AA (4.9:1).
 - Con movimiento reducido el video no corre y queda el póster.
-- La plancha de impresión que se describe abajo (`Plate.tsx`, `Press.tsx`)
-  fue el hero anterior. Los componentes siguen en el repo pero no se usan.
+- El video va en dos versiones: la completa (539 KB) y, para teléfonos en
+  vertical, la franja central recortada a 9:16 (186 KB), que es lo único que
+  se ve ahí. El original pesaba 3.8 MB; se recodificó sin diferencia visible
+  (SSIM 0.986).
+- La plancha de impresión que se describe abajo fue el hero anterior. Sus
+  componentes (`Plate.tsx`, `Press.tsx`) y su CSS se eliminaron; quedan en el
+  historial de git.
 
 - El giro es una **plancha de impresión** (`components/brand/Plate.tsx`): el
   papel con la trama encima y el monograma VS impreso en azul a escala

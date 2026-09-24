@@ -120,9 +120,16 @@ export function Hero() {
             aria-hidden="true"
             tabIndex={-1}
             className="absolute inset-0 h-full w-full object-cover"
-            src="/video/manotacielo.mp4"
             poster="/video/manotacielo-poster.jpg"
-          />
+          >
+            {/* En un teléfono vertical el video cubre la altura y sólo se ve
+                la franja del centro. Esa franja, recortada a 9:16, pesa 186 KB
+                contra 539 KB del completo, con la misma nitidez. El completo
+                va primero y con media: un navegador que no entiende media en
+                source toma el primero y ve el video entero. */}
+            <source src="/video/manotacielo.mp4" type="video/mp4" media="(min-width: 768px), (orientation: landscape)" />
+            <source src="/video/manotacielo-vertical.mp4" type="video/mp4" />
+          </video>
 
           {/* El grano */}
           <div className="noise-overlay pointer-events-none absolute inset-0 opacity-[0.7] mix-blend-overlay" />

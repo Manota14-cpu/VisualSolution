@@ -36,7 +36,12 @@ export function Faq() {
                     aria-controls={`faq-${i}`}
                     onClick={() => setOpen(isOpen ? null : i)}
                   >
-                    <span className="q">{item.q}</span>
+                    <span className="flex items-baseline gap-4 md:gap-6">
+                      <span className="faq-num" aria-hidden="true">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span className="q">{item.q}</span>
+                    </span>
                     <span
                       className="chev grid size-9 shrink-0 place-items-center rounded-pills border border-azul/20 text-azul/85"
                       aria-hidden="true"
@@ -47,7 +52,7 @@ export function Faq() {
                 </h3>
                 <div className="answer" id={`faq-${i}`} inert={!isOpen}>
                   <div>
-                    <p className="max-w-[58ch] px-3 pb-7 text-[17px] leading-relaxed text-azul/85">{item.a}</p>
+                    <p className="faq-a max-w-[58ch] pb-7 pr-3 text-[17px] leading-relaxed text-azul/85">{item.a}</p>
                   </div>
                 </div>
               </div>

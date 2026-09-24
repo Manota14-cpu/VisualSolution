@@ -30,6 +30,12 @@ export const WordsPullUp = ({ text, className = "", showAsterisk = false, style 
             style={{ marginRight: isLast ? 0 : "0.25em" }}
           >
             {word}
+            {/* El espacio real va adentro de la palabra, al final: se
+                colapsa al borde de la línea y no se ve, pero el texto
+                queda "Visual Solution" y no "VisualSolution" para un
+                buscador o un lector de pantalla. El aire visual lo sigue
+                poniendo el margen. */}
+            {!isLast && " "}
             {showAsterisk && isLast && (
               <span className="absolute top-[0.65em] -right-[0.3em] text-[0.31em]">*</span>
             )}

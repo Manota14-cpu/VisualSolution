@@ -226,7 +226,7 @@ export const works: Work[] = [
        (1600×1000 sirve) y descomentá la línea de abajo. Mientras tanto
        la tarjeta dibuja la plancha del sistema con el nombre, que es
        material de marca y no una imagen rota. */
-    // preview: "/trabajos/neweb.webp",
+    preview: "/trabajos/neweb.webp",
     alt: "Portada del sitio NEWEB, una experiencia web sobre el sistema solar",
     /* Lo único que se afirma acá está verificado contra el sitio en
        vivo: las secciones, las piezas y el stack salen de la página,
@@ -265,7 +265,7 @@ export const works: Work[] = [
     category: "ecommerce",
     url: "https://packdistribuidoraar.vercel.app",
     /* Captura: public/trabajos/pack-distribuidora.webp */
-    // preview: "/trabajos/pack-distribuidora.webp",
+    preview: "/trabajos/pack-distribuidora.webp",
     alt: "Portada del sitio de Pack Distribuidora, catálogo de productos descartables",
     tech: ["Next.js", "Turbopack", "Catálogo", "Carrito"],
     short:
@@ -306,7 +306,7 @@ export const works: Work[] = [
     category: "web",
     url: "https://noir-studio-seven.vercel.app",
     /* Captura: public/trabajos/recuperar-el-planeta.webp */
-    // preview: "/trabajos/recuperar-el-planeta.webp",
+    preview: "/trabajos/recuperar-el-planeta.webp",
     alt: "Recuperar el planeta, infografía web sobre informática y medio ambiente",
     tech: ["Three.js", "Vanta.js", "Lenis", "Sitio estático"],
     short:

@@ -92,66 +92,6 @@ body {
 }
 
 /* ==========================================================
-   EL MOTIVO: LA TRAMA DE PUNTOS
-   Puntos de tinta azul sobre papel: bruma abajo que se abre
-   hacia el lienzo arriba. Es la firma visual del sistema y va
-   siempre a escala de hero.
-   ========================================================== */
-.halftone {
-  position: relative;
-  isolation: isolate;
-  background-color: var(--color-fondo);
-}
-
-/* El papel. Sube desde el borde de abajo al entrar: la superficie
-   se imprime, no aparece con un fundido. */
-.halftone::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  /* El papel queda claro para que la tinta tenga de dónde recortarse:
-     una trama se lee porque hay zona con tinta y zona sin tinta. El
-     degradado es apenas un tono, bruma → lienzo. */
-  background-image: linear-gradient(42deg, var(--color-bruma) 6%, var(--color-fondo) 94%);
-  animation: subir 1.15s cubic-bezier(.16,1,.3,1) .1s both;
-}
-@keyframes subir {
-  from { clip-path: inset(100% 0 0 0); }
-  to   { clip-path: inset(0 0 0 0); }
-}
-
-/* Los puntos. Derivan un solo mosaico cada veintiséis segundos: no se
-   ve moverse, se ve vivo. Se frenan al salir de pantalla. */
-.halftone::after {
-  content: "";
-  position: absolute;
-  inset: -14px;
-  z-index: -1;
-  /* Dos retículas, una por tinta, corridas media celda entre sí como
-     en la plancha de verdad. Los puntos van al color pleno, que es lo
-     que los separa del degradado apagado de abajo. */
-  background-image:
-    radial-gradient(circle at center, var(--color-azul-medio) 1.9px, transparent 2px),
-    radial-gradient(circle at center, var(--color-azul) 1.2px, transparent 1.3px);
-  background-size: 11px 11px, 11px 11px;
-  background-position: 0 0, 5.5px 5.5px;
-  /* Cuatro mosaicos en doce segundos: unos cuatro píxeles por segundo.
-     Antes era uno cada veintiséis, medio píxel por segundo, que no se
-     ve. Quien cae en el respaldo también tiene que ver correr la tinta. */
-  animation: deriva 12s linear infinite;
-  animation-play-state: paused;
-  opacity: 0;
-  transition: opacity .7s ease .45s;
-}
-.halftone.is-live::after { animation-play-state: running; }
-.halftone.is-lit::after  { opacity: 1; }
-@keyframes deriva {
-  from { transform: translate3d(0, 0, 0); }
-  to   { transform: translate3d(44px, -22px, 0); }
-}
-
-/* ==========================================================
    TIPOGRAFÍA
    Los titulares hablan igual que el hero: DM Sans 500, en caja
    baja y con el interletrado cerrado. Antes eran Anton en
@@ -170,104 +110,6 @@ body {
   letter-spacing: -0.045em;
   text-wrap: balance;
   color: var(--color-azul);
-}
-.display-xl { font-size: clamp(56px, 13.5vw, 189px); line-height: 0.85; letter-spacing: -0.07em; }
-
-/* ==========================================================
-   EL AFICHE
-   Un hero centrado con la imagen adentro de una tarjeta es la
-   composición que arma cualquiera. Acá la banda va a sangre, de
-   borde a borde, y el reclamo la muerde desde abajo: imagen y
-   tipografía se traban en vez de apilarse.
-   ========================================================== */
-.banda {
-  position: relative;
-  width: 100%;
-  height: clamp(300px, 54vh, 540px);
-}
-/* a sangre no hay esquinas que redondear */
-.banda .plancha { height: 100%; border-radius: 0; }
-
-/* El monograma sube y se achica para que el titular muerda el papel sin
-   tocar la marca. Con la tinta azul, marca y titular son del mismo
-   color: si se pisan, las letras se funden con el trazo de la S.
-
-   El alto va explícito, derivado de la banda. Un max-height en
-   porcentaje no sirve acá: la fila de la grilla toma el alto de la
-   propia marca, el porcentaje se vuelve circular y la altura termina
-   saliendo del ancho. El segundo término del min() es el tope por
-   ancho en pantallas angostas (84vw por la proporción 76/143.5 del
-   trazado), así la marca no queda con aire muerto arriba y abajo.
-
-   La cuenta: la marca ocupa el 58% de la banda, la deriva por scroll la
-   baja un 7% de su alto y la escala le suma un 3%; el titular muerde
-   hasta 72px. Medido de 300 a 540 de banda quedan entre 30 y 90px de
-   aire. */
-.banda { --alto-banda: clamp(300px, 54vh, 540px); height: var(--alto-banda); }
-.banda .plancha { align-items: start; padding-top: clamp(20px, 5vh, 48px); }
-.banda .plancha .marca {
-  width: auto;
-  max-width: none;
-  max-height: none;
-  height: min(calc(var(--alto-banda) * .58), calc(84vw * .5296));
-}
-
-
-/* El reclamo muerde la banda desde abajo y se va contra el margen
-   izquierdo. La segunda línea entra: el bloque deja de ser un
-   rectángulo centrado y pasa a ser una composición. */
-.claim {
-  position: relative;
-  z-index: 2;
-  margin-top: clamp(-72px, -5.2vw, -26px);
-  text-align: left;
-}
-.claim-line:nth-child(2) { padding-left: clamp(24px, 9vw, 150px); }
-.claim-line:nth-child(3) { padding-left: clamp(12px, 4vw, 68px); }
-
-/* El cierre: el subtítulo a la izquierda y las acciones a la derecha,
-   sobre la misma línea. Nada centrado. */
-.cierre {
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-  margin-top: clamp(28px, 4vw, 52px);
-}
-@media (min-width: 900px) {
-  .cierre {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 48px;
-  }
-  .cierre .tagline { max-width: 44ch; }
-}
-
-/* El momento del sitio. Cada línea del reclamo entra desde abajo de su
-   propia ventana, y la arrastra un filo de magenta que sube con ella y
-   se apaga arriba. No es un fundido: es la luz descubriendo el texto. */
-.claim-line { display: block; position: relative; overflow: hidden; }
-.claim-line > i {
-  display: block;
-  font-style: normal;
-  animation: linea-sube .95s cubic-bezier(.16,1,.3,1) var(--d, 0ms) both;
-}
-.claim-line::after {
-  content: "";
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  height: 3px;
-  background: var(--color-azul-medio);
-  animation: linea-filo .95s cubic-bezier(.16,1,.3,1) var(--d, 0ms) both;
-}
-@keyframes linea-sube {
-  from { transform: translateY(104%); }
-  to   { transform: none; }
-}
-@keyframes linea-filo {
-  0%   { transform: translateY(0);     opacity: 1; }
-  72%  { transform: translateY(-100%); opacity: 1; }
-  100% { transform: translateY(-100%); opacity: 0; }
 }
 
 /* La cabecera de sección se marca con una barra corta que se dibuja
@@ -611,110 +453,6 @@ body {
   }
 
 /* ==========================================================
-   LA PLANCHA
-   El giro del hero. El papel con la trama encima y el
-   monograma impreso en tinta a escala arquitectónica, con dos
-   tintas corridas por debajo: un fuera de registro deliberado,
-   que es el error clásico de la impresión en varias tintas.
-   El puntero lo maneja y cada servicio elegido lo abre más.
-   ========================================================== */
-.plancha {
-  --rx: 5px;
-  --ry: -4px;
-  --tintas: 1;
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-}
-
-/* La prensa tapa la trama en CSS cuando arranca. Va debajo del
-   monograma y encima de las capas de fondo. */
-.prensa {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-/* sin contexto no hay nada que mostrar: el lienzo se saca del medio */
-.plancha:not(.is-gpu) .prensa { display: none; }
-/* con la prensa andando, el disco de luz lo hace el shader */
-.plancha.is-gpu .luz { display: none; }
-
-.plancha .marca {
-  position: relative;
-  z-index: 1;
-  width: min(84%, 900px);
-  max-height: 76%;
-  height: auto;
-  overflow: visible;
-}
-.plancha .tinta,
-.plancha .tinta-negra {
-  transition: transform .45s cubic-bezier(.16,1,.3,1);
-}
-/* las dos tintas asoman por los bordes del azul, en direcciones
-   opuestas: es lo que hace que se lea como un registro corrido y no
-   como una sombra de color */
-.plancha .tinta-a {
-  fill: var(--color-azul-medio);
-  transform: translate(calc(var(--rx) * var(--tintas)), calc(var(--ry) * var(--tintas)));
-}
-.plancha .tinta-b {
-  fill: var(--color-bruma);
-  transform: translate(calc(var(--rx) * var(--tintas) * -1), calc(var(--ry) * var(--tintas) * -1));
-}
-.plancha .tinta-negra { fill: var(--color-azul); }
-
-/* La marca deriva mientras la banda cruza la pantalla. Lo maneja el
-   scroll directamente, sin JS y sin listeners: donde el navegador no
-   soporta la línea de tiempo, no pasa nada y la marca queda quieta. */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .plancha .marca {
-      animation: deriva-marca linear both;
-      animation-timeline: view();
-      animation-range: entry 0% exit 100%;
-    }
-  }
-}
-@keyframes deriva-marca {
-  from { transform: translateY(7%)  scale(1.06); }
-  to   { transform: translateY(-7%) scale(1.06); }
-}
-
-/* El puntero arrastra un disco de luz por debajo de la marca, y donde
-   pasa la trama se abre y deja ver más puntos. La máscara viaja con el
-   disco, así que moverlo es una transformación y no repinta nada. */
-.plancha .luz {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-.plancha .luz > i {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 440px;
-  height: 440px;
-  margin: -220px 0 0 -220px;
-  background:
-    radial-gradient(circle at center, rgb(0 54 165 / .5) 2px, transparent 2.1px) 0 0 / 11px 11px,
-    radial-gradient(circle at center, rgb(21 91 205 / .1), transparent 68%);
-  -webkit-mask-image: radial-gradient(circle at center, #000 6%, transparent 66%);
-  mask-image: radial-gradient(circle at center, #000 6%, transparent 66%);
-  transform: translate3d(var(--lx, -400px), var(--ly, -400px), 0);
-  opacity: 0;
-  transition: opacity .4s ease, transform .14s linear;
-}
-.plancha.is-near .luz > i { opacity: 1; }
-
-/* ==========================================================
    LAS ETIQUETAS
    Van justo debajo del titular, que es donde alguien las busca:
    son lo que arma la consulta. Apagada es una píldora de papel;
@@ -904,6 +642,10 @@ body {
   font-size: clamp(40px, 5.2vw, 86px);
   line-height: .84;
   letter-spacing: -0.06em;
+  /* Ancho fijo de columna: en DM Sans cada dígito mide distinto y los
+     títulos de los pasos quedaban a distinta distancia del número. */
+  min-width: 1.28em;
+  font-variant-numeric: tabular-nums;
   color: rgb(0 54 165 / .18);
   transition: color .4s ease;
 }
@@ -940,6 +682,22 @@ body {
   border-color: var(--color-azul);
   color: var(--color-papel);
 }
+/* El número de la pregunta: chico, en tinta suave y de ancho fijo, para
+   que las preguntas arranquen todas en la misma columna. Idea tomada de
+   un acordeón numerado de 21st.dev. */
+.faq-num {
+  flex: none;
+  width: 22px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .04em;
+  color: rgb(0 54 165 / .75);
+}
+/* La respuesta arranca en la columna de la pregunta y no en la del
+   número: 12px de margen de la fila + 22px del número + el espacio entre
+   los dos (16px, 24px desde tablet). */
+.faq-a { padding-left: 50px; }
+@media (min-width: 768px) { .faq-a { padding-left: 58px; } }
 .answer { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .38s cubic-bezier(.16,1,.3,1); }
 .answer > div { overflow: hidden; }
 .faq-row.is-open .answer { grid-template-rows: 1fr; }
@@ -1264,6 +1022,10 @@ body {
    para que no le compita a la acción principal. */
 .obra-ficha {
   position: relative;
+  /* 44px de alto para el dedo; el texto sigue midiendo lo mismo. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   font-size: 14px;
   color: rgb(0 54 165 / .78);
   cursor: pointer;
@@ -1273,7 +1035,7 @@ body {
 .obra-ficha::after {
   content: "";
   position: absolute;
-  left: 0; right: 0; bottom: -3px;
+  left: 0; right: 0; bottom: 9px;
   height: 1.5px;
   background: var(--color-azul-medio);
   transform: scaleX(0);
@@ -1518,7 +1280,6 @@ input, textarea, select { caret-color: var(--color-azul-medio); }
   html { scroll-behavior: auto; }
 
   /* los bucles, apagados */
-  .halftone::after,
   .animate-marquee,
   .step-token.on,
   .token.pulsed { animation: none; }
@@ -1527,14 +1288,10 @@ input, textarea, select { caret-color: var(--color-azul-medio); }
   .rv { transform: none; }
   .w > i { transform: none; }
   .wipe { clip-path: none; }
-  .halftone::before { animation: none; }
-  .claim-line > i { animation: none; }
-  .claim-line::after { animation: none; opacity: 0; }
   .display-md::after { transform: scaleX(1); }
 
   /* los hovers pierden el desplazamiento y conservan el color */
   .chip:hover,
-  .plancha .tinta,
   .pliego:hover .pliego-titulo,
   .pliego-dentro,
   .faq-row:hover .q,
