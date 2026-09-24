@@ -75,6 +75,23 @@ export async function fondo(publico: string, { desenfoque = 0 } = {}): Promise<s
   }
 }
 
+/* El generador sólo sabe devolver PNG, y un PNG con una foto a sangre
+   pesa 750 KB. WhatsApp deja de mostrar la vista previa pasados unos
+   300 KB, y es justamente donde más se comparte el sitio. Se reencodea a
+   JPEG; si sharp no está, sale el PNG igual. */
+export async function comoJpeg(png: Response): Promise<Response> {
+  const crudo = Buffer.from(await png.arrayBuffer());
+  try {
+    const { default: sharp } = await import("sharp");
+    const jpg = await sharp(crudo).jpeg({ quality: 84, mozjpeg: true }).toBuffer();
+    return new Response(new Uint8Array(jpg), {
+      headers: { "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=31536000, immutable" },
+    });
+  } catch {
+    return new Response(new Uint8Array(crudo), { headers: { "Content-Type": "image/png" } });
+  }
+}
+
 /** La tarjeta. `titulo` va en líneas; `pie` es la línea chica. */
 export function tarjeta({
   titulo,

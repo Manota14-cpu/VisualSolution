@@ -1,10 +1,10 @@
 import { ImageResponse } from "next/og";
-import { OG, fondo, fuentes, tarjeta } from "@/lib/og";
+import { OG, comoJpeg, fondo, fuentes, tarjeta } from "@/lib/og";
 import { works, site } from "@/lib/content";
 
 export const alt = `Un trabajo de ${site.name}`;
 export const size = OG;
-export const contentType = "image/png";
+export const contentType = "image/jpeg";
 
 /* Una tarjeta por proyecto, con la captura del propio sitio de fondo:
    compartir un caso muestra ese caso. Se generan las mismas rutas que la
@@ -30,7 +30,8 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     work?.preview ? fondo(work.preview.replace(/^\//, ""), { desenfoque: 7 }) : Promise.resolve(null),
   ]);
 
-  return new ImageResponse(
+  return comoJpeg(
+    new ImageResponse(
     tarjeta({
       titulo: work ? enLineas(work.title) : [site.name],
       pie: work ? `${work.kind} · ${work.year}` : site.shortDescription,
@@ -39,5 +40,6 @@ export default async function Image({ params }: { params: Promise<{ slug: string
       veloFuerte: true,
     }) as never,
     { ...OG, fonts: caras.length ? caras : undefined }
+    )
   );
 }
