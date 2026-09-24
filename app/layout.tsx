@@ -4,6 +4,7 @@ import "./globals.css";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { MetalRig } from "@/components/brand/MetalRig";
 import { BackToTop, Grain, Preloader, ScrollProgress } from "@/components/motion/Chrome";
+import { WhatsAppFlotante } from "@/components/site/WhatsAppFlotante";
 import { legal, services, site, siteUrl } from "@/lib/content";
 
 /* next/font descarga y sirve las tipografías desde el propio dominio:
@@ -68,6 +69,7 @@ const datosDelEstudio = {
   description: site.description,
   url: siteUrl,
   email: site.email,
+  telephone: `+${site.whatsapp}`,
   image: `${siteUrl}/opengraph-image`,
   sameAs: [site.instagram.url, site.tiktok, site.youtube],
   copyrightHolder: { "@type": "Organization", name: legal.holder, url: siteUrl },
@@ -113,6 +115,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {children}
 
+        <WhatsAppFlotante />
         <BackToTop />
       </body>
     </html>

@@ -23,6 +23,8 @@ export const site = {
      el enlace suele decir que el número no está en WhatsApp) y 3492 301333.
      Vacío, el formulario vuelve a usar formEndpoint o el correo. */
   whatsapp: "5493492301333",
+  /* El mismo número, como se lee. */
+  whatsappVisible: "+54 9 3492 30-1333",
   /* Sólo se usa si whatsapp está vacío: la URL de Formspree, Getform o una
      API propia. Si también está vacío, se arma un correo. */
   formEndpoint: "",
@@ -214,6 +216,11 @@ export type Work = {
   /* Imágenes sueltas al pie del caso, en una tira que se desliza. */
   gallery?: string[];
 };
+
+/* Un chat de WhatsApp con el estudio, con el mensaje ya escrito si se
+   pasa uno. Lo usan el formulario, el botón flotante, Contacto y el pie. */
+export const whatsappUrl = (texto?: string) =>
+  `https://wa.me/${site.whatsapp}${texto ? `?text=${encodeURIComponent(texto)}` : ""}`;
 
 /* La acción del enlace dice adónde lleva: un post de Instagram no es
    "explorar un proyecto". */

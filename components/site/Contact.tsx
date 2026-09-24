@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Reveal, SplitHeading } from "@/components/motion/Reveal";
 import { useMotionEnv } from "@/lib/motion";
 import { onAskAbout, onAskForServices } from "@/lib/consult";
-import { serviceOptions, site } from "@/lib/content";
+import { serviceOptions, site, whatsappUrl } from "@/lib/content";
 import { MetalFaz } from "@/components/brand/MetalRig";
 
 type Fields = { nombre: string; email: string; servicio: string; mensaje: string };
@@ -120,7 +120,7 @@ export function Contact() {
         "",
         `Mi correo: ${values.email.trim()}`,
       ].join("\n");
-      const url = `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(texto)}`;
+      const url = whatsappUrl(texto);
       setWaUrl(url);
       const w = window.open(url, "_blank");
       if (w) w.opener = null;
@@ -171,6 +171,14 @@ export function Contact() {
           </p>
 
           <dl className="mt-10 grid gap-6">
+            <div>
+              <dt className="label mb-2 block text-azul/80">WhatsApp</dt>
+              <dd className="m-0">
+                <a className="link" href={whatsappUrl()} target="_blank" rel="noopener noreferrer">
+                  {site.whatsappVisible}
+                </a>
+              </dd>
+            </div>
             <div>
               <dt className="label mb-2 block text-azul/80">Correo</dt>
               <dd className="m-0">

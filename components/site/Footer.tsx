@@ -1,6 +1,6 @@
 import { Mark } from "@/components/brand/Mark";
 import { Reveal, SplitHeading } from "@/components/motion/Reveal";
-import { hero, legal, nav, site, siteHost, siteUrl } from "@/lib/content";
+import { hero, legal, nav, site, siteHost, siteUrl, whatsappUrl } from "@/lib/content";
 import { MetalFaz } from "@/components/brand/MetalRig";
 
 export function Closer() {
@@ -33,6 +33,7 @@ const columns = [
     title: "Contacto",
     links: [
       { href: "#contacto", label: hero.primaryCta },
+      { href: whatsappUrl(), label: `WhatsApp ${site.whatsappVisible}` },
       { href: `mailto:${site.email}`, label: site.email },
     ],
   },
