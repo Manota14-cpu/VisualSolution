@@ -242,11 +242,31 @@ El movimiento acompaña, no protagoniza: el sistema es plano y editorial.
   720px de alto se oculta, porque no queda lugar entre la nav y el título.
 - El panel existe por contraste: sobre una nube blanca, el texto chico en
   blanco necesita al menos 72% de azul detrás para pasar AA (4.9:1).
-- Con movimiento reducido el video no corre y queda el póster.
-- El video va en dos versiones: la completa (539 KB) y, para teléfonos en
-  vertical, la franja central recortada a 9:16 (186 KB), que es lo único que
-  se ve ahí. El original pesaba 3.8 MB; se recodificó sin diferencia visible
-  (SSIM 0.986).
+- Con movimiento reducido el video no corre y queda el póster. Fuera de
+  pantalla se pausa: nadie lo ve y decodificarlo en loop sólo gasta batería.
+- **El video es un loop de 7 s sin corte.** El original (5 s a 720p, en el
+  historial de git) terminaba con una nube en primer plano que no estaba en el
+  primer cuadro: el loop pegaba un salto. Ahora:
+  1. Cámara lenta al 50%, con cuadros intermedios interpolados por
+     movimiento (`minterpolate`, sin deformaciones en la persona ni en el
+     borde del edificio).
+  2. Los últimos 3 s se funden con los primeros (curva smoothstep). El salto
+     del último cuadro al primero mide 0.20 contra 0.29 de promedio entre dos
+     cuadros seguidos: a la vista no hay costura. La cámara está quieta
+     (menos de 0.05 px de deriva en todo el clip), así que el fundido no
+     duplica bordes.
+  3. Reescalado a 2560×1440 con Real-ESRGAN (`realesr-general-x4v3`,
+     reducción de ruido 0.5), que recupera barandas, juntas y bordes de nube
+     en vez de estirar píxeles.
+- Va en cuatro fuentes, y el navegador toma la primera que puede reproducir:
+  AV1 de 10 bits (sin bandas en el degradado del cielo) y H.264 para lo
+  demás, cada uno en versión completa y en la franja central 9:16 para
+  teléfonos en vertical, que es lo único que se ve ahí. La completa pesa
+  1.2 MB en AV1 (2560×1440) y 2.4 MB en H.264 (1920×1080); la vertical
+  (810×1440), 484 KB y 1.2 MB. Las cuatro miden 0.99 o más de SSIM contra el
+  master: a la vista son iguales.
+- El póster es el primer cuadro del loop, decodificado con la misma matriz
+  de color que usa el navegador: cuando el video arranca no cambia nada.
 - La plancha de impresión que se describe abajo fue el hero anterior. Sus
   componentes (`Plate.tsx`, `Press.tsx`) y su CSS se eliminaron; quedan en el
   historial de git.

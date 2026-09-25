@@ -161,9 +161,9 @@ export function Hero() {
                 El completo va primero y con media: un navegador que no entiende
                 media en source toma el primero que puede reproducir y ve el
                 video entero. */}
-            <source src="/video/manotacielo-av1.mp4" type={'video/mp4; codecs="av01.0.12M.08"'} media={HORIZONTAL} />
+            <source src="/video/manotacielo-av1.mp4" type={'video/mp4; codecs="av01.0.12M.10"'} media={HORIZONTAL} />
             <source src="/video/manotacielo.mp4" type={'video/mp4; codecs="avc1.640028"'} media={HORIZONTAL} />
-            <source src="/video/manotacielo-vertical-av1.mp4" type={'video/mp4; codecs="av01.0.08M.08"'} />
+            <source src="/video/manotacielo-vertical-av1.mp4" type={'video/mp4; codecs="av01.0.08M.10"'} />
             <source src="/video/manotacielo-vertical.mp4" type={'video/mp4; codecs="avc1.640028"'} />
           </video>
 
