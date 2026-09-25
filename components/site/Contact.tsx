@@ -166,7 +166,7 @@ export function Contact() {
             text="Hablemos de tu proyecto."
             className="display display-md"
           />
-          <p className="mt-4 max-w-[62ch] text-base leading-relaxed text-azul/85">
+          <p className="mt-8 max-w-[62ch] text-base leading-relaxed text-azul/85">
             Contanos qué necesitás y te respondemos con una propuesta concreta: alcance, plazo y precio.
           </p>
 
@@ -204,7 +204,7 @@ export function Contact() {
 
         <Reveal delay={1}>
           {sent ? (
-            <div className="rounded-cards bg-papel p-8" role="status">
+            <div className="rounded-cards bg-papel p-6 sm:p-8" role="status">
               <h3 className="display display-sm">Mensaje listo para enviar</h3>
               <p className="mt-2 max-w-[44ch] text-base leading-relaxed text-azul/85">{sent}</p>
               {waUrl && (
@@ -229,7 +229,7 @@ export function Contact() {
               </button>
             </div>
           ) : (
-            <form className="grid gap-4 rounded-cards bg-papel p-6" onSubmit={onSubmit} noValidate>
+            <form className="grid gap-4 rounded-cards bg-papel p-5 sm:p-6 lg:p-8" onSubmit={onSubmit} noValidate>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className={`grid gap-2 ${errors.nombre ? "has-error" : ""}`}>
                   <div className="fl">
@@ -329,10 +329,13 @@ export function Contact() {
               )}
 
               <div className="mt-2 flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-center">
-                <p className="label text-azul/80">
+                <p className="label max-w-[36ch] leading-snug text-azul/80">
                   {site.whatsapp ? "Se abre WhatsApp con tu consulta. Acá no guardamos nada." : "Usamos estos datos solo para responderte."}
                 </p>
-                <button className={`btn btn-metal ${ok ? "ok" : ""}`} type="submit" disabled={sending}>
+                {/* shrink-0: con la leyenda larga al lado, la fila lo achicaba
+                    y el metal, que recorta lo que sobra, le comía la primera
+                    letra ("nviar por WhatsApp"). */}
+                <button className={`btn btn-metal shrink-0 ${ok ? "ok" : ""}`} type="submit" disabled={sending}>
                   <MetalFaz />
                   <span className="send-label">{sending ? "Enviando" : site.whatsapp ? "Enviar por WhatsApp" : "Enviar mensaje"}</span>
                   <span className="send-ok" aria-hidden="true">

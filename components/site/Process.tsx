@@ -75,7 +75,7 @@ export function Process() {
       <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-10 px-4 md:px-10 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
         <Reveal className="self-start lg:sticky lg:top-28">
           <SplitHeading text="Cómo trabajamos" className="display display-md" />
-          <p className="mt-4 max-w-[34ch] text-base leading-relaxed text-azul/85">
+          <p className="mt-8 max-w-[34ch] text-base leading-relaxed text-azul/85">
             Cuatro instancias, fechas cerradas y una sola persona a cargo de la comunicación durante todo el
             proyecto.
           </p>

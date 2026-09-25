@@ -207,7 +207,7 @@ export function Works() {
         <div className="mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <Reveal>
             <SplitHeading text="Trabajos" className="display display-md" />
-            <p className="mt-6 max-w-[54ch] text-base leading-relaxed text-azul/85">
+            <p className="mt-8 max-w-[54ch] text-base leading-relaxed text-azul/85">
               Sitios web, tiendas online y software a medida. Los que están publicados se pueden
               recorrer desde acá: preferimos mostrarlos funcionando antes que contarlos.
             </p>

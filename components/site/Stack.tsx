@@ -34,7 +34,7 @@ export function Stack() {
         </h2>
         <ul className="stack-logos mt-7">
           {herramientas.map((h) => (
-            <li key={h.slug}>
+            <li key={h.slug} data-logo={h.slug}>
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d={h.path} />
               </svg>

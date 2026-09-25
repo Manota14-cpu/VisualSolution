@@ -113,7 +113,7 @@ export function Services() {
             text="Todo lo que tu marca necesita para verse y funcionar bien."
             className="display display-md"
           />
-          <p className="mt-6 max-w-[62ch] text-base leading-relaxed text-azul/85">
+          <p className="mt-8 max-w-[62ch] text-base leading-relaxed text-azul/85">
             Trabajamos las dos mitades del mismo problema: la pieza técnica que sostiene el negocio y el
             contenido que lo hace visible.
           </p>

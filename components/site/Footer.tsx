@@ -89,15 +89,17 @@ export function Footer() {
         {/* El aviso legal. Va en un <small> porque eso es exactamente lo
             que el elemento significa: letra chica de derechos y
             atribución, no un párrafo más. */}
-        <small className="mt-10 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 border-t border-dotted border-papel/30 pt-6 text-center label text-papel/75">
+        {/* En el teléfono cada dato va en su renglón: los separadores
+            quedaban colgando al principio de la línea siguiente. */}
+        <small className="mt-10 flex flex-col items-center justify-center gap-2 border-t border-dotted border-papel/30 pt-6 text-center label leading-relaxed text-papel/75 sm:flex-row sm:flex-wrap sm:gap-x-3 sm:gap-y-1">
           <span>
             © {legal.year} {legal.holder}. {legal.rights}.
           </span>
-          <span className="text-papel/40" aria-hidden="true">
+          <span className="hidden text-papel/40 sm:inline" aria-hidden="true">
             |
           </span>
           <span>{legal.credit}</span>
-          <span className="text-papel/40" aria-hidden="true">
+          <span className="hidden text-papel/40 sm:inline" aria-hidden="true">
             |
           </span>
           <a className="foot-link transition-colors duration-200 hover:text-papel" href={siteUrl}>

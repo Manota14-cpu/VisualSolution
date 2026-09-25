@@ -203,17 +203,23 @@ export function Nav() {
           open ? "flex" : "hidden"
         }`}
       >
-        {nav.map((item) => (
+        {nav.map((item, i) => (
           <a
             key={item.href}
-            className="display border-b border-azul/20 py-4 text-[clamp(34px,12vw,60px)] text-azul"
+            className="display border-b border-dotted border-azul/30 py-4 text-[clamp(34px,12vw,60px)] text-azul"
             href={item.href}
             onClick={() => setOpen(false)}
+            style={{ ["--i" as string]: i } as React.CSSProperties}
           >
             {item.label}
           </a>
         ))}
-        <a className="btn btn-metal mt-6 self-start" href="#contacto" onClick={() => setOpen(false)}>
+        <a
+          className="btn btn-metal mt-8 self-start"
+          href="#contacto"
+          onClick={() => setOpen(false)}
+          style={{ ["--i" as string]: nav.length } as React.CSSProperties}
+        >
           <MetalFaz />
           <i className="diamond" aria-hidden="true" />
           {hero.primaryCta}

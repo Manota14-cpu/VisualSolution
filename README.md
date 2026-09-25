@@ -382,8 +382,15 @@ El sangrado de luz de una superficie se anima con `--luz`, declarada con
   continuo, que se detiene con la pestaña oculta.
 - El hero es SVG y CSS: no hay WebGL, no hay canvas y no hay nada que pueda
   fallar en un equipo viejo. Three.js se fue del proyecto con el logo 3D.
+- **Los hovers que mueven algo van dentro de `@media (hover: hover)`.** En un
+  teléfono el `:hover` queda pegado después del toque: la ficha elegida del
+  hero quedaba agrandada y la tarjeta tocada, levantada, hasta tocar otra
+  cosa.
+- **`:focus-visible` no lleva `border-radius`.** Vive fuera de `@layer`, así
+  que le ganaba al radio de cada píldora y un botón enfocado con el teclado
+  se volvía un rectángulo. Sobre las superficies azules el anillo va en papel.
 
-### Dos trampas que ya están resueltas
+### Tres trampas que ya están resueltas
 
 El nombre de una transición de vista tiene que ser **único en el documento**.
 En el catálogo hay dos piezas con la misma foto —el recorte que sigue al

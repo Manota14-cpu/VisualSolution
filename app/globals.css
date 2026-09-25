@@ -77,7 +77,13 @@
 }
 @keyframes fill-in { to { fill-opacity: 1; } }
 
-html { background: var(--color-fondo); color-scheme: light; }
+html {
+  background: var(--color-fondo);
+  color-scheme: light;
+  /* Sin Lenis (movimiento reducido, o antes de que cargue) un ancla o un
+     campo enfocado caerían debajo de la nav fija. */
+  scroll-padding-top: 96px;
+}
 
 body {
   background: var(--color-fondo);
@@ -89,7 +95,19 @@ body {
   font-size: 16px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Kerning y ligaduras de la fuente, siempre: a escala de afiche un par
+     sin kernear (Vi, To, ya) se ve como un hueco. */
+  text-rendering: optimizeLegibility;
+  font-kerning: normal;
+  font-feature-settings: "kern", "liga", "calt";
+  /* En el teléfono cada toque pintaba un recuadro gris encima de las
+     píldoras; los estados ya los dibuja el sistema. */
+  -webkit-tap-highlight-color: transparent;
 }
+
+/* Los párrafos no terminan en una palabra huérfana. */
+p, li, dd, figcaption { text-wrap: pretty; }
 
 /* ==========================================================
    TIPOGRAFÍA
@@ -499,8 +517,14 @@ body {
   cursor: grab;
   transition: transform .25s cubic-bezier(.16,1,.3,1), background-color .2s, opacity .25s;
 }
-.chip:hover { transform: scale(1.04); background: color-mix(in srgb, var(--color-bruma) 40%, var(--color-papel)); }
-.chip:active { cursor: grabbing; }
+/* Los hovers que mueven algo van sólo donde hay cursor: en un teléfono
+   el :hover queda pegado después del toque, y la ficha elegida se
+   quedaba agrandada hasta tocar otra cosa. */
+@media (hover: hover) {
+  .chip:hover { transform: scale(1.04); background: color-mix(in srgb, var(--color-bruma) 40%, var(--color-papel)); }
+  .chip.is-taken:hover { background: var(--color-azul-medio); }
+}
+.chip:active { cursor: grabbing; transform: scale(.97); }
 .chip-code {
   display: grid; place-items: center;
   width: 30px; height: 30px;
@@ -512,7 +536,6 @@ body {
 .chip-label { font-size: 16px; font-weight: 500; color: var(--color-azul); }
 
 .chip.is-taken { background: var(--color-azul); color: var(--color-papel); }
-.chip.is-taken:hover { background: var(--color-azul-medio); }
 .chip.is-taken .chip-label { color: var(--color-papel); }
 .chip.is-taken .chip-code { background: var(--color-papel); color: var(--color-azul); }
 
@@ -544,6 +567,12 @@ body {
 @media (min-width: 768px) {
   .marquee-band { margin-inline: 12px; }
 }
+/* La cinta se funde antes de tocar la punta de la píldora: sin esto,
+   las palabras se cortaban en seco contra el borde curvo. */
+.marquee-band > div {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+}
 .marquee-band .row { display: flex; width: max-content; }
 .marquee-band span {
   font-size: 14px; font-weight: 500; white-space: nowrap;
@@ -553,7 +582,7 @@ body {
 /* la cinta se frena si alguien quiere leerla */
 .marquee-band:hover .animate-marquee { animation-play-state: paused; }
 .mq-word { transition: color .2s ease; }
-.mq-word:hover { color: var(--color-bruma); }
+@media (hover: hover) { .mq-word:hover { color: var(--color-bruma); } }
 
 /* ==========================================================
    EL PIE
@@ -576,6 +605,15 @@ body {
   mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
 }
+
+/* El menú del teléfono entra en capas: el lienzo aparece y los enlaces
+   suben de a uno, en el orden en que se leen. */
+#menu.flex { animation: menu-in .3s cubic-bezier(.16,1,.3,1) both; }
+#menu.flex > * {
+  animation: rise .6s cubic-bezier(.16,1,.3,1) both;
+  animation-delay: calc(var(--i, 0) * 45ms + 60ms);
+}
+@keyframes menu-in { from { opacity: 0; } to { opacity: 1; } }
 
 /* ==========================================================
    NAVEGACIÓN
@@ -635,18 +673,38 @@ body {
    Logos en la tinta del sitio, a media voz: se encienden al pasar
    el cursor. Con el nombre al lado, que es lo que se lee.
    ========================================================== */
+/* La tira de socios del sistema: una tarjeta de papel con los logos en
+   fila, separados por el divisor punteado. Sueltos sobre el lienzo se
+   leían como una lista que quedó flotando entre dos secciones. */
 .stack-logos {
-  display: flex; flex-wrap: wrap; justify-content: center;
-  gap: 18px clamp(22px, 4vw, 48px);
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+  gap: 16px clamp(22px, 4vw, 44px);
+  padding: clamp(22px, 3vw, 30px) clamp(20px, 4vw, 40px);
+  border-radius: var(--radius-cards);
+  background: var(--color-papel);
 }
 .stack-logos li {
-  display: inline-flex; align-items: center; gap: 10px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
   font-size: 15px; font-weight: 500;
+  white-space: nowrap;
   color: rgb(0 54 165 / .8);
   transition: color .25s ease;
 }
 .stack-logos li:hover { color: var(--color-azul); }
 .stack-logos svg { width: 22px; height: 22px; fill: currentColor; flex: none; }
+/* El de WooCommerce es un globo ancho con la palabra adentro: al alto de
+   los demás quedaba en una rayita. Se agranda para que pese lo mismo. */
+.stack-logos li[data-logo="woocommerce"] svg { width: 38px; height: 38px; margin-block: -8px; }
+/* Con lugar para los siete en fila, cada uno ocupa su celda y los separa
+   el punteado. Más angosto, se acomodan en renglones sin divisores: un
+   punteado al principio de un renglón no divide nada. */
+@media (min-width: 1200px) {
+  .stack-logos { flex-wrap: nowrap; gap: 0; padding-inline: 12px; }
+  /* El sobrante se reparte parejo entre los siete: cada divisor queda a
+     la misma distancia del nombre que tiene a cada lado. */
+  .stack-logos li { flex: 1 1 auto; padding: 8px 10px; }
+  .stack-logos li + li { border-left: 1.5px dotted rgb(0 54 165 / .22); }
+}
 
 /* ==========================================================
    PROCESO Y PREGUNTAS
@@ -702,10 +760,12 @@ body {
 
 .faq-row { border-bottom: 1.5px dotted rgb(0 54 165 / .22); transition: background-color .25s; }
 .faq-row.is-open { background: var(--color-papel); }
-.faq-row:hover { background: rgb(255 255 255 / .6); }
 .faq-row .q { display: inline-block; transition: transform .3s cubic-bezier(.16,1,.3,1); }
-.faq-row:hover .q { transform: translateX(6px); }
-.faq-row:hover .chev { border-color: var(--color-azul-medio); color: var(--color-azul-medio); }
+@media (hover: hover) {
+  .faq-row:not(.is-open):hover { background: rgb(255 255 255 / .6); }
+  .faq-row:hover .q { transform: translateX(6px); }
+  .faq-row:not(.is-open):hover .chev { border-color: var(--color-azul-medio); color: var(--color-azul-medio); }
+}
 /* la respuesta no aparece de golpe con la fila: sube apenas después */
 .answer p {
   transform: translateY(-10px);
@@ -829,7 +889,7 @@ body {
   color: var(--color-azul);
   transition: color .3s ease .16s, transform .45s cubic-bezier(.16,1,.3,1);
 }
-.pliego:hover .pliego-titulo { transform: translateX(14px); }
+@media (hover: hover) { .pliego:hover .pliego-titulo { transform: translateX(14px); } }
 .pliego.is-open .pliego-titulo { color: var(--color-papel); transform: none; }
 .pliego:not(.is-open) .pliego-titulo { transition-delay: 0s; }
 .pliego:not(.is-open) .pliego-dentro { transition-delay: 0s; }
@@ -845,13 +905,32 @@ body {
   color: rgb(0 54 165 / .8);
   transition: transform .4s cubic-bezier(.16,1,.3,1), background-color .35s, border-color .35s, color .35s;
 }
-.pliego:hover .pliego-mas { border-color: var(--color-azul-medio); color: var(--color-azul-medio); }
+@media (hover: hover) { .pliego:not(.is-open):hover .pliego-mas { border-color: var(--color-azul-medio); color: var(--color-azul-medio); } }
 .pliego.is-open .pliego-mas {
   transform: rotate(135deg);
   background: var(--color-papel);
   border-color: var(--color-papel);
   color: var(--color-azul);
 }
+
+/* El más se dibuja con dos trazos y no con el glifo "+": el de la
+   tipografía se apoya en la línea de base y nunca queda en el centro
+   óptico del círculo, y al girar 135° para volverse cruz se notaba el
+   bamboleo. El carácter sigue en el marcado; sólo deja de pintarse. */
+.pliego-mas,
+.chev { position: relative; font-size: 0; line-height: 0; }
+.pliego-mas::before, .pliego-mas::after,
+.chev::before, .chev::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 12px; height: 1.5px;
+  margin: -.75px 0 0 -6px;
+  border-radius: 2px;
+  background: currentColor;
+}
+.pliego-mas::after,
+.chev::after { transform: rotate(90deg); }
 
 .pliego-cuerpo {
   display: grid;
@@ -936,8 +1015,8 @@ body {
   background-image: radial-gradient(124% 86% at 50% 118%, rgb(21 91 205 / var(--luz)), transparent 62%);
   transition: transform .3s cubic-bezier(.16,1,.3,1), --luz .45s ease;
 }
-.obra:hover,
 .obra:focus-within { transform: translateY(-5px); --luz: .14; }
+@media (hover: hover) { .obra:hover { transform: translateY(-5px); --luz: .14; } }
 
 @media (min-width: 820px) {
   /* La ancha se lee de costado: ventana a la izquierda, texto a la
@@ -981,8 +1060,8 @@ body {
   background: var(--color-fondo);
 }
 .ventana-vista img { transition: transform .7s cubic-bezier(.16,1,.3,1); }
-.obra:hover .ventana-vista img,
 .obra:focus-within .ventana-vista img { transform: scale(1.035); }
+@media (hover: hover) { .obra:hover .ventana-vista img { transform: scale(1.035); } }
 
 /* Sin captura la ventana no queda vacía ni rota: se llena con el
    degradado de las maquetas —azul, azul medio, bruma— y el nombre del
@@ -1019,7 +1098,7 @@ body {
   padding: clamp(20px, 2.4vw, 32px);
 }
 .obra-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.obra-anio { margin-left: auto; font-size: 12px; letter-spacing: .06em; color: rgb(0 54 165 / .78); }
+.obra-anio { margin-left: auto; font-size: 12px; letter-spacing: .06em; font-variant-numeric: tabular-nums; color: rgb(0 54 165 / .78); }
 .obra-espera { background: var(--color-bruma); }
 
 .obra-titulo {
@@ -1031,7 +1110,7 @@ body {
   color: var(--color-azul);
   transition: color .3s ease;
 }
-.obra:hover .obra-titulo { color: var(--color-azul-medio); }
+@media (hover: hover) { .obra:hover .obra-titulo { color: var(--color-azul-medio); } }
 
 .obra-texto {
   max-width: 52ch;
@@ -1050,7 +1129,7 @@ body {
   color: rgb(0 54 165 / .78);
   transition: border-color .3s ease, color .3s ease;
 }
-.obra:hover .obra-tech li { border-color: rgb(0 54 165 / .34); color: rgb(0 54 165 / .92); }
+@media (hover: hover) { .obra:hover .obra-tech li { border-color: rgb(0 54 165 / .34); color: rgb(0 54 165 / .92); } }
 
 .obra-acciones {
   display: flex;
@@ -1096,6 +1175,12 @@ body {
    adentro: lo que queda afuera le gana a las utilidades de Tailwind
    y entonces md:hidden deja de funcionar sobre cualquier componente
    que fije display. Ya pasó dos veces. */
+
+/* El video del hero es decorado: Safari en modo de ahorro de batería no
+   lo reproduce solo y encima le pinta un botón de play gigante. Queda el
+   póster, que es el mismo cuadro con el que arranca el loop. */
+.hero-video::-webkit-media-controls-start-playback-button { display: none !important; -webkit-appearance: none; }
+.hero-video::-webkit-media-controls { display: none !important; }
 
 /* El grano sobre el video del hero. Es un feTurbulence en un SVG
    inline: sin archivo que pedir y sin costo de red. */
@@ -1331,7 +1416,15 @@ html.lenis, html.lenis body { height: auto; }
 }
 input, textarea, select { caret-color: var(--color-azul-medio); }
 ::selection { background: var(--color-azul); color: var(--color-papel); }
-:focus-visible { outline: 2px solid var(--color-azul-medio); outline-offset: 3px; border-radius: 4px; }
+/* Sin border-radius acá: esta regla vive fuera de @layer y le ganaba al
+   radio de cada píldora, así que un botón enfocado con el teclado se
+   volvía un rectángulo. El contorno ya sigue la curva del elemento. */
+:focus-visible { outline: 2px solid var(--color-azul-medio); outline-offset: 3px; }
+/* Sobre el azul pleno el anillo de azul medio no se ve: va en papel. */
+.inundado :focus-visible,
+.sobre-video :focus-visible,
+.pliego.is-open :focus-visible,
+footer :focus-visible { outline-color: var(--color-papel); }
 
 /* ==========================================================
    MOVIMIENTO REDUCIDO

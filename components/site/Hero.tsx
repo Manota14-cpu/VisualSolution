@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { preload } from "react-dom";
 import { MotionConfig, motion } from "framer-motion";
 import { WordsPullUp } from "@/components/ui/words-pull-up";
 import { MetalFaz } from "@/components/brand/MetalRig";
@@ -27,6 +28,14 @@ import { hero, capabilities, heroServices, type HeroService } from "@/lib/conten
    ============================================================ */
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+
+/* El video. Es un loop de 7 s sin corte: el final se funde con el
+   principio en los últimos 3 s, así que el salto de vuelta mide menos
+   que el movimiento entre dos cuadros seguidos. El póster es el primer
+   cuadro del loop: cuando el video arranca no cambia nada en pantalla. */
+const POSTER = "/video/manotacielo-poster.jpg";
+/* Lo que no es un teléfono en vertical recibe el cuadro completo. */
+const HORIZONTAL = "(min-width: 768px), (orientation: landscape)";
 
 /* La entrada de cada bloque de la derecha, escalonada después del
    título. */
@@ -63,18 +72,35 @@ export function Hero() {
   const video = useRef<HTMLVideoElement>(null);
   const { reduce, ready } = useMotionEnv();
 
+  /* El póster es lo primero que se ve: se pide con prioridad alta, antes
+     de que el navegador descubra el video. */
+  preload(POSTER, { as: "image", fetchPriority: "high" });
+
   /* Con movimiento reducido el video no corre: queda el primer cuadro,
      que es el póster. El atributo autoPlay sigue en el marcado para que
-     arranque antes de hidratar en el caso común; acá sólo se frena. */
+     arranque antes de hidratar en el caso común; acá sólo se frena.
+     Fuera de pantalla se pausa: nadie lo ve y decodificar 1440p en loop
+     sólo gasta batería mientras se lee el resto de la página. */
   useEffect(() => {
     const v = video.current;
     if (!v || !ready) return;
     if (reduce) {
       v.pause();
       v.currentTime = 0;
-    } else {
-      v.play().catch(() => {});
+      return;
     }
+    const play = () => {
+      v.play().catch(() => {});
+    };
+    if (!("IntersectionObserver" in window)) {
+      play();
+      return;
+    }
+    const io = new IntersectionObserver(([e]) => (e.isIntersecting ? play() : v.pause()), {
+      threshold: 0,
+    });
+    io.observe(v);
+    return () => io.disconnect();
   }, [reduce, ready]);
 
   const toggle = useCallback((id: string) => {
@@ -116,19 +142,29 @@ export function Hero() {
             loop
             muted
             playsInline
+            disablePictureInPicture
+            disableRemotePlayback
             preload="auto"
             aria-hidden="true"
             tabIndex={-1}
-            className="absolute inset-0 h-full w-full object-cover"
-            poster="/video/manotacielo-poster.jpg"
+            className="hero-video absolute inset-0 h-full w-full object-cover"
+            poster={POSTER}
           >
-            {/* En un teléfono vertical el video cubre la altura y sólo se ve
-                la franja del centro. Esa franja, recortada a 9:16, pesa 186 KB
-                contra 539 KB del completo, con la misma nitidez. El completo
-                va primero y con media: un navegador que no entiende media en
-                source toma el primero y ve el video entero. */}
-            <source src="/video/manotacielo.mp4" type="video/mp4" media="(min-width: 768px), (orientation: landscape)" />
-            <source src="/video/manotacielo-vertical.mp4" type="video/mp4" />
+            {/* Cuatro fuentes, en el orden en que conviene tomarlas:
+                - AV1 primero: la misma nitidez en mucho menos peso. El codecs
+                  del type hace que un navegador sin AV1 la saltee sin
+                  descargar nada.
+                - H.264 después, para todo lo demás.
+                - En un teléfono vertical el video cubre la altura y sólo se ve
+                  la franja del centro: esa franja, recortada a 9:16, es lo
+                  único que se descarga ahí.
+                El completo va primero y con media: un navegador que no entiende
+                media en source toma el primero que puede reproducir y ve el
+                video entero. */}
+            <source src="/video/manotacielo-av1.mp4" type={'video/mp4; codecs="av01.0.12M.08"'} media={HORIZONTAL} />
+            <source src="/video/manotacielo.mp4" type={'video/mp4; codecs="avc1.640028"'} media={HORIZONTAL} />
+            <source src="/video/manotacielo-vertical-av1.mp4" type={'video/mp4; codecs="av01.0.08M.08"'} />
+            <source src="/video/manotacielo-vertical.mp4" type={'video/mp4; codecs="avc1.640028"'} />
           </video>
 
           {/* El grano */}
@@ -176,15 +212,18 @@ export function Hero() {
                   </div>
                 </motion.div>
 
+                {/* En el teléfono los dos botones no entran en una fila: cada uno
+                    toma el ancho completo, en vez de quedar dos píldoras de
+                    distinto largo apiladas contra la izquierda. */}
                 <motion.div {...sube(0.7)} className="flex flex-wrap items-center gap-3">
-                  <button className="btn btn-metal" type="button" onClick={empezar}>
+                  <button className="btn btn-metal max-sm:flex-auto" type="button" onClick={empezar}>
                     <MetalFaz />
                     <i className="diamond" aria-hidden="true" />
                     <span key={ctaLabel} className="cta-label">
                       {ctaLabel}
                     </span>
                   </button>
-                  <a className="btn btn-metal es-suave" href="#trabajos">
+                  <a className="btn btn-metal es-suave max-sm:flex-auto" href="#trabajos">
                     <MetalFaz />
                     {hero.secondaryCta}
                   </a>
