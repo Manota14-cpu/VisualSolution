@@ -58,7 +58,40 @@ export const legal = {
   holder: "Visual Solution",
   rights: "Todos los derechos reservados",
   credit: "Diseño y desarrollo propio",
+
+  /* TODO: COMPLETAR CON LOS DATOS REALES DEL TITULAR.
+     La Ley 24.240 de Defensa del Consumidor (art. 4) y la Ley 25.326 de
+     Protección de Datos Personales (art. 6) piden identificar a quien
+     presta el servicio y es responsable de los datos: nombre y apellido
+     o razón social, CUIT y domicilio. No se inventan: mientras estén
+     vacíos, las páginas legales no los muestran, pero el sitio no queda
+     en regla hasta completarlos. */
+  titular: "" as string, // nombre y apellido, o razón social, de quien factura
+  cuit: "" as string, // formato 20-12345678-9
+  domicilio: "" as string, // domicilio legal o comercial, con localidad y provincia
+
+  /* La fecha de la última revisión de las páginas legales. Se cambia a
+     mano cada vez que se modifica su contenido: es la que ve la persona
+     para saber si algo cambió desde la última vez que las leyó. */
+  actualizado: "25 de septiembre de 2026",
+
+  /* Disposición 890/2025 de la Subsecretaría de Defensa del Consumidor y
+     Lealtad Comercial: todo proveedor con sitio web tiene que enlazar el
+     formulario de la Ventanilla Federal Única de Reclamos con esta
+     leyenda. Va en el pie de todas las páginas. */
+  consumidor: {
+    leyenda: "Defensa de las y los Consumidores. Para reclamos ingrese aquí",
+    url: "https://www.argentina.gob.ar/produccion/defensadelconsumidor/formulario",
+  },
 } as const;
+
+/* Las páginas legales. El texto largo vive en cada página
+   (app/privacidad y app/terminos); acá sólo las rutas, para que el pie,
+   el formulario y el sitemap apunten al mismo lugar. */
+export const paginasLegales = [
+  { href: "/terminos", label: "Términos y condiciones" },
+  { href: "/privacidad", label: "Política de privacidad" },
+] as const;
 
 export const nav = [
   { href: "#servicios", label: "Servicios" },

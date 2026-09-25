@@ -76,6 +76,11 @@ const datosDelEstudio = {
   sameAs: [site.instagram.url, site.tiktok, site.youtube],
   copyrightHolder: { "@type": "Organization", name: legal.holder, url: siteUrl },
   copyrightYear: legal.year,
+  /* Los datos del titular sólo salen cuando están cargados en
+     lib/content: un buscador no puede recibir un CUIT vacío. */
+  ...(legal.titular ? { legalName: legal.titular } : {}),
+  ...(legal.cuit ? { taxID: legal.cuit } : {}),
+  ...(legal.domicilio ? { address: legal.domicilio } : {}),
   areaServed: "AR",
   knowsLanguage: "es",
   hasOfferCatalog: {

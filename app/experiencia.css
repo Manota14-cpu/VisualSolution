@@ -741,6 +741,238 @@ html.lite .hero-titulo { filter: none; }
 .pill:active { transform: scale(.96); }
 
 /* ==========================================================
+   EL AVISO DE DATOS Y EL CONSENTIMIENTO
+   El aviso va en letra chica pero legible (13px al 82%, pasa AA),
+   pegado a la casilla que lo acepta.
+   ========================================================== */
+.aviso-datos {
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgb(0 54 165 / .82);
+}
+.aviso-datos a {
+  color: var(--color-azul);
+  text-decoration: underline dotted 1.5px;
+  text-underline-offset: 3px;
+}
+.aviso-datos a:hover { color: var(--color-azul-medio); }
+
+.casilla {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--color-azul);
+  cursor: pointer;
+}
+/* El control real queda encima de la caja dibujada, invisible: sigue
+   siendo el que recibe el foco, el clic y el lector de pantalla. */
+.casilla input {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  z-index: 1;
+  opacity: 0;
+  cursor: pointer;
+}
+.casilla-caja {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid rgb(0 54 165 / .4);
+  border-radius: 8px;
+  background: var(--color-papel);
+  color: var(--color-papel);
+  transition: background-color .2s ease, border-color .2s ease, box-shadow .3s var(--ease-out);
+}
+.casilla-caja svg { width: 15px; height: 15px; transform: scale(.4); opacity: 0; transition: transform .35s var(--ease-out), opacity .2s ease; }
+.casilla input:checked + .casilla-caja { background: var(--color-azul); border-color: var(--color-azul); }
+.casilla input:checked + .casilla-caja svg { transform: none; opacity: 1; }
+.casilla input:focus-visible + .casilla-caja { box-shadow: 0 0 0 4px rgb(21 91 205 / .2); border-color: var(--color-azul-medio); }
+@media (hover: hover) { .casilla:hover .casilla-caja { border-color: var(--color-azul-medio); } }
+.has-error .casilla-caja { border-color: var(--color-error); }
+
+/* ==========================================================
+   LAS PÁGINAS LEGALES
+   Largas y para leer: columna de 68 caracteres, cuerpo a 17px con
+   interlineado amplio, índice fijo al costado en escritorio. Lo
+   que importa se marca con resaltador de bruma y no con negrita:
+   DM Sans se sirve sólo en 500 y una negrita sería falsa.
+   ========================================================== */
+@layer components {
+  .legal-cabecera { padding-top: clamp(44px, 6vw, 88px); }
+  .legal-cabecera .display { max-width: 14ch; }
+  .legal-bajada {
+    margin-top: 26px;
+    max-width: 56ch;
+    font-size: clamp(17px, 1.4vw, 20px);
+    line-height: 1.55;
+    color: rgb(0 54 165 / .86);
+  }
+  .legal-fecha {
+    margin-top: 16px;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 12px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: rgb(0 54 165 / .78);
+  }
+
+  .legal-resumen {
+    margin-top: clamp(36px, 4vw, 56px);
+    padding: clamp(24px, 3vw, 40px);
+    border-radius: var(--radius-cards);
+    background: var(--color-papel);
+  }
+  .legal-resumen h2 { font-size: clamp(20px, 1.8vw, 24px); line-height: 1.2; letter-spacing: -.025em; color: var(--color-azul); }
+  .legal-resumen ul { display: grid; gap: 12px; margin-top: 18px; }
+  .legal-resumen li {
+    position: relative;
+    padding-left: 26px;
+    max-width: 72ch;
+    font-size: 16px;
+    line-height: 1.55;
+    color: rgb(0 54 165 / .88);
+  }
+  .legal-resumen li::before {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: .62em;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--color-azul-medio);
+    transform: rotate(45deg);
+  }
+
+  .legal-cuerpo { display: grid; gap: 40px; margin-top: clamp(44px, 5vw, 72px); }
+  @media (min-width: 1024px) {
+    .legal-cuerpo { grid-template-columns: 240px minmax(0, 1fr); gap: 64px; }
+    .legal-indice { position: sticky; top: 100px; align-self: start; }
+  }
+  .legal-indice .label { color: rgb(0 54 165 / .8); }
+  .legal-indice ol { display: grid; gap: 2px; margin-top: 12px; }
+  .legal-indice a {
+    display: flex;
+    gap: 12px;
+    margin-inline: -10px;
+    padding: 7px 10px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.35;
+    color: rgb(0 54 165 / .84);
+    transition: background-color .25s ease, color .25s ease;
+  }
+  .legal-indice a span {
+    flex: none;
+    padding-top: 2px;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 11px;
+    letter-spacing: .06em;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-azul-medio);
+  }
+  .legal-indice a:hover { background: rgb(255 255 255 / .72); color: var(--color-azul); }
+  /* En el teléfono el índice va en dos columnas: doce renglones sueltos
+     empujaban el texto una pantalla y media hacia abajo. */
+  @media (min-width: 560px) and (max-width: 1023px) {
+    .legal-indice ol { grid-template-columns: 1fr 1fr; column-gap: 24px; }
+  }
+
+  .legal-texto section {
+    padding-block: clamp(28px, 3vw, 40px);
+    border-top: 1.5px dotted rgb(0 54 165 / .22);
+    scroll-margin-top: 96px;
+  }
+  .legal-texto section:first-child { padding-top: 0; border-top: 0; }
+  .legal-texto h2 {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    font-size: clamp(24px, 2.4vw, 32px);
+    line-height: 1.12;
+    letter-spacing: -.035em;
+    color: var(--color-azul);
+  }
+  .legal-n {
+    flex: none;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 12px;
+    letter-spacing: .08em;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-azul-medio);
+  }
+  .legal-texto p,
+  .legal-texto li { max-width: 68ch; font-size: 17px; line-height: 1.65; color: rgb(0 54 165 / .88); }
+  .legal-texto h2 + *,
+  .legal-texto p + *,
+  .legal-texto ul + * { margin-top: 14px; }
+  .legal-texto ul { display: grid; gap: 8px; }
+  .legal-texto li { position: relative; padding-left: 20px; }
+  .legal-texto li::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: .72em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-azul-medio);
+  }
+  /* Marcador de bruma a media altura: con la franja abajo se leía como
+     un subrayado, y el subrayado (punteado) es de los enlaces. */
+  .legal-texto strong {
+    font-weight: 500;
+    color: var(--color-azul);
+    padding-inline: .12em;
+    margin-inline: -.12em;
+    border-radius: 4px;
+    background: linear-gradient(transparent 30%, rgb(174 205 237 / .45) 30%, rgb(174 205 237 / .45) 90%, transparent 90%);
+    -webkit-box-decoration-break: clone;
+            box-decoration-break: clone;
+  }
+  .legal-texto a,
+  .legal-pie a {
+    color: var(--color-azul);
+    text-decoration: underline dotted 1.5px;
+    text-underline-offset: 3px;
+    transition: color .2s ease;
+  }
+  .legal-texto a:hover,
+  .legal-pie a:hover { color: var(--color-azul-medio); }
+
+  /* Las leyendas oficiales van textuales y aparte: se reconocen como
+     texto normativo y no como la voz del estudio. */
+  .legal-leyenda {
+    display: grid;
+    gap: 12px;
+    padding: 20px 24px;
+    border-left: 3px solid var(--color-azul-medio);
+    border-radius: 0 var(--radius-small) var(--radius-small) 0;
+    background: rgb(255 255 255 / .66);
+  }
+  .legal-texto .legal-leyenda p { font-size: 15px; line-height: 1.6; margin-top: 0; }
+
+  .legal-pie {
+    display: grid;
+    gap: 12px;
+    margin-top: 56px;
+    padding-top: 28px;
+    border-top: 1.5px dotted rgb(0 54 165 / .22);
+    font-size: 15px;
+    color: rgb(0 54 165 / .86);
+  }
+}
+
+/* ==========================================================
    MOVIMIENTO REDUCIDO
    ========================================================== */
 /* Menos movimiento, no ninguno: se quedan los cambios de color y de

@@ -66,29 +66,71 @@ así que conviene subir las fotos ya comprimidas.
 
 Está todo junto en `lib/content.ts`, marcado con `TODO`.
 
-1. **Los cinco proyectos del catálogo.** Casa Ferrán, Talleres Bravo,
-   Lumen Café, Nordelta Padel y Estudio Mirasol son de relleno, con fotos de
-   picsum.photos. Cambiá nombres, rubros, años y las dos URLs de cada uno
-   (`thumb` para la grilla, `full` para el visor).
+1. **Los datos del titular** (`legal.titular`, `legal.cuit`, `legal.domicilio`).
+   La Ley 24.240 y la Ley 25.326 piden identificar a quien presta el servicio
+   y es responsable de los datos. Mientras estén vacíos las páginas legales no
+   los muestran, pero el sitio no queda en regla hasta completarlos.
 
-2. **Las fotos de servicios.** Dos tarjetas usan picsum. Poné archivos tuyos
-   en `public/` y referencialos como `/mi-foto.jpg`.
+2. **Las fotos de servicios.** Dos pliegos usan picsum. Poné archivos tuyos en
+   `public/` y referencialos como `/mi-foto.jpg`. Cuando sean todas propias,
+   se puede borrar el bloque `remotePatterns` de `next.config.mjs`.
 
-3. **Los datos de contacto.** `hola@visualsolution.com` y `@visualsolution`
-   son placeholders, en el objeto `site`.
-
-4. **Las respuestas de Preguntas.** Los plazos y la forma de pago los escribí
-   como borrador razonable. Ajustalos a como trabajás de verdad.
-
-Cuando las fotos sean todas propias, se puede borrar el bloque
-`remotePatterns` de `next.config.mjs`.
+3. **Las respuestas de Preguntas.** Los plazos y la forma de pago son un
+   borrador razonable. Ajustalos a como trabajás de verdad (los términos ya
+   aclaran que son orientativos y que vale la propuesta escrita).
 
 ## El formulario
 
-Sin backend arma un correo con los datos y abre el cliente de mail.
-Para que envíe de verdad, poné la URL de Formspree, Getform o tu API en
-`site.formEndpoint` dentro de `lib/content.ts`. Con eso pasa a mandar un POST
-con JSON, y quedan activos la barra de carga y el mensaje de error.
+Manda la consulta por WhatsApp: arma el mensaje con lo escrito y abre un chat
+con `site.whatsapp`. El sitio no guarda nada. Si `site.whatsapp` queda vacío,
+usa `site.formEndpoint` (un POST con JSON a Formspree, Getform o una API
+propia) y, si tampoco hay, abre el cliente de correo.
+
+Antes del botón van el **aviso de datos** y la **casilla de consentimiento**,
+obligatoria (ver "Legal"). El aviso cambia solo según cuál de los tres caminos
+esté activo; la política de privacidad no: **si cambiás el canal, actualizá
+`app/privacidad/page.tsx` en el mismo cambio.**
+
+## Legal
+
+Todo lo que el sitio dice sobre datos y condiciones describe lo que el sitio
+hace de verdad. Si se suma analítica, cookies, un backend para el formulario
+o cualquier servicio nuevo, la política se actualiza en el mismo cambio, y se
+cambia `legal.actualizado`.
+
+- **`/privacidad`** (Ley 25.326 de Protección de Datos Personales): quién es
+  responsable, qué datos se reciben y cómo viaja el formulario, para qué se
+  usan, quién más interviene (WhatsApp, Gmail, Vercel), cuánto se conservan,
+  que no hay cookies ni analítica, los derechos con sus plazos (acceso en 10
+  días corridos, rectificación y supresión en 5 hábiles) y las dos leyendas
+  textuales de la ley y de la AAIP.
+- **`/terminos`**: para qué es el sitio (no es una tienda), uso permitido, que
+  lo publicado sobre plazos y pagos es orientativo, cómo se contrata, "la
+  primera propuesta no se cobra", derecho de revocación del consumidor
+  (art. 34 de la Ley 24.240 y arts. 1110 y 1116 del Código Civil y
+  Comercial), propiedad intelectual, trabajos y marcas de terceros, enlaces,
+  responsabilidad (sin recortar la Ley 24.240) y jurisdicción (art. 1109).
+- **El aviso junto al formulario** (Resolución AAIP 14/2018, que reemplazó a
+  la Disposición 10/2008): lo que pide el art. 6 de la Ley 25.326 tiene que
+  estar a la vista antes de recolectar, no sólo en la política.
+- **La casilla de consentimiento**: la Ley 25.326 (art. 5) pide consentimiento
+  expreso. Sin marcarla, el formulario no arma el mensaje.
+- **El enlace de Defensa del Consumidor** (Disposición 890/2025, Ventanilla
+  Federal Única de Reclamos), con la leyenda textual, en el pie de la portada
+  y en las páginas legales. La leyenda y la URL viven en `legal.consumidor`.
+- **Botón de arrepentimiento** (Resolución 424/2020): no está, a propósito. El
+  sitio no vende ni contrata en línea y lo que se contrata son trabajos a
+  medida, que el art. 1116 del Código Civil y Comercial excluye de la
+  revocación. Los términos igual explican el derecho y cómo ejercerlo. Si el
+  sitio algún día cobra o contrata en línea, el botón pasa a ser obligatorio.
+- **Compromisos que el estudio tiene que cumplir** porque la política los
+  promete: borrar las consultas que no avanzan dentro de los 12 meses,
+  responder los pedidos de acceso en 10 días corridos y los de corrección o
+  borrado en 5 hábiles, y no usar los datos para publicidad.
+
+Estos textos son una base sólida, no un asesoramiento: conviene que los
+revise un abogado antes de darlos por definitivos, en especial si el estudio
+factura como sociedad o trabaja con clientes fuera de la Argentina.
 
 ## El logo
 

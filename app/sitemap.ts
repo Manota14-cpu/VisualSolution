@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { works, siteUrl } from "@/lib/content";
+import { paginasLegales, works, siteUrl } from "@/lib/content";
 
 /* Las cinco páginas de caso son rutas reales y estáticas: sin sitemap,
    un buscador sólo encuentra la portada y depende de rastrear los
@@ -11,6 +11,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${siteUrl}/trabajos/${w.id}`,
       changeFrequency: "yearly" as const,
       priority: 0.8,
+    })),
+    ...paginasLegales.map((p) => ({
+      url: `${siteUrl}${p.href}`,
+      changeFrequency: "yearly" as const,
+      priority: 0.3,
     })),
   ];
 }

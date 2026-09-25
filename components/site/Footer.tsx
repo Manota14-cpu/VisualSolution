@@ -1,9 +1,10 @@
 import { siWhatsapp } from "simple-icons";
 import { Mark } from "@/components/brand/Mark";
 import { Reveal, SplitHeading } from "@/components/motion/Reveal";
-import { hero, legal, nav, site, siteHost, siteUrl, whatsappUrl } from "@/lib/content";
+import { hero, legal, nav, paginasLegales, site, siteHost, siteUrl, whatsappUrl } from "@/lib/content";
 import { MetalFaz } from "@/components/brand/MetalRig";
 import { Flecha } from "@/components/ui/Flecha";
+import { EnlaceConsumidor } from "@/components/site/Legal";
 
 export function Closer() {
   return (
@@ -68,6 +69,7 @@ const columns = [
       { href: site.youtube, label: "YouTube" },
     ],
   },
+  { title: "Legal", links: [...paginasLegales] },
 ];
 
 export function Footer() {
@@ -109,12 +111,19 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Disposición 890/2025: el enlace a la Ventanilla Federal Única de
+            Reclamos, con la leyenda textual que pide la norma. Va a la vista,
+            no escondido entre los enlaces. */}
+        <p className="mt-10 border-t border-dotted border-papel/30 pt-6 text-center text-sm">
+          <EnlaceConsumidor className="foot-link text-papel/85 transition-colors duration-200 hover:text-papel" />
+        </p>
+
         {/* El aviso legal. Va en un <small> porque eso es exactamente lo
             que el elemento significa: letra chica de derechos y
             atribución, no un párrafo más. */}
         {/* En el teléfono cada dato va en su renglón: los separadores
             quedaban colgando al principio de la línea siguiente. */}
-        <small className="mt-10 flex flex-col items-center justify-center gap-2 border-t border-dotted border-papel/30 pt-6 text-center label leading-relaxed text-papel/75 sm:flex-row sm:flex-wrap sm:gap-x-3 sm:gap-y-1">
+        <small className="mt-5 flex flex-col items-center justify-center gap-2 text-center label leading-relaxed text-papel/75 sm:flex-row sm:flex-wrap sm:gap-x-3 sm:gap-y-1">
           <span>
             © {legal.year} {legal.holder}. {legal.rights}.
           </span>

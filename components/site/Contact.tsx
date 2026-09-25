@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { Check, Copy, Mail, MessagesSquare } from "lucide-react";
 import { siInstagram, siWhatsapp } from "simple-icons";
 import { Reveal, SplitHeading } from "@/components/motion/Reveal";
@@ -11,10 +12,11 @@ import { onAskAbout, onAskForServices } from "@/lib/consult";
 import { serviceOptions, site, whatsappUrl } from "@/lib/content";
 import { MetalFaz } from "@/components/brand/MetalRig";
 
-type Fields = { nombre: string; email: string; servicio: string; mensaje: string };
+type Fields = { nombre: string; email: string; servicio: string; mensaje: string; acepta: boolean };
+type CampoTexto = Exclude<keyof Fields, "acepta">;
 type Errors = Partial<Record<keyof Fields, string>>;
 
-const empty: Fields = { nombre: "", email: "", servicio: "", mensaje: "" };
+const empty: Fields = { nombre: "", email: "", servicio: "", mensaje: "", acepta: false };
 
 function validate(v: Fields): Errors {
   const e: Errors = {};
@@ -23,6 +25,9 @@ function validate(v: Fields): Errors {
     e.email = "Revisá el correo, parece incompleto.";
   if (!v.servicio) e.servicio = "Elegí una opción.";
   if (v.mensaje.trim().length < 12) e.mensaje = "Contanos un poco más, con una línea alcanza.";
+  /* Ley 25.326, art. 5: el consentimiento tiene que ser expreso. La
+     casilla es eso: sin marcarla no se arma el mensaje. */
+  if (!v.acepta) e.acepta = "Para enviar, marcá que leíste y aceptás la política de privacidad.";
   return e;
 }
 
@@ -98,7 +103,7 @@ export function Contact() {
     []
   );
 
-  const set = (k: keyof Fields) => (e: { target: { value: string } }) => {
+  const set = (k: CampoTexto) => (e: { target: { value: string } }) => {
     setValues((v) => ({ ...v, [k]: e.target.value }));
     if (errors[k]) setErrors((x) => ({ ...x, [k]: undefined }));
   };
@@ -376,6 +381,55 @@ export function Contact() {
                   Con dos o tres líneas alcanza para armar una primera propuesta.
                 </p>
                 {errors.mensaje && <p className="text-xs text-error">{errors.mensaje}</p>}
+              </div>
+
+              {/* Resolución AAIP 14/2018 y art. 6 de la Ley 25.326: antes de
+                  recolectar se dice quién es responsable, para qué se usan los
+                  datos, quién los recibe, qué es obligatorio y cómo ejercer los
+                  derechos. Va acá, a la vista, y no sólo en la política. */}
+              <p id="aviso-datos" className="aviso-datos">
+                <span className="text-azul">Tus datos.</span> {site.name} los usa sólo para responder esta
+                consulta y armar la propuesta.{" "}
+                {site.whatsapp
+                  ? "El sitio no los guarda: se abre WhatsApp (un servicio de Meta) con tu mensaje escrito y nos llega recién cuando lo enviás."
+                  : site.formEndpoint
+                    ? "Se envían a nuestro sistema de contacto sólo para responderte."
+                    : "El sitio no los guarda: se abre tu programa de correo con el mensaje escrito y nos llega recién cuando lo enviás."}{" "}
+                Todos los campos son necesarios para poder responderte. Podés pedir acceso, corrección o
+                eliminación escribiendo a {site.email}. Más detalles en la{" "}
+                <Link href="/privacidad" target="_blank">
+                  política de privacidad
+                  <span className="sr-only"> (se abre en una pestaña nueva)</span>
+                </Link>
+                .
+              </p>
+
+              <div className={`grid gap-2 ${errors.acepta ? "has-error" : ""}`}>
+                <label className="casilla">
+                  <input
+                    type="checkbox"
+                    name="acepta"
+                    checked={values.acepta}
+                    onChange={(e) => {
+                      const acepta = e.target.checked;
+                      setValues((v) => ({ ...v, acepta }));
+                      if (errors.acepta) setErrors((x) => ({ ...x, acepta: undefined }));
+                    }}
+                    aria-invalid={!!errors.acepta}
+                    aria-describedby="aviso-datos"
+                    required
+                  />
+                  <span className="casilla-caja" aria-hidden="true">
+                    <svg viewBox="0 0 16 16" fill="none">
+                      <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                  <span>
+                    Leí la política de privacidad y acepto que {site.name} use estos datos para responder mi
+                    consulta.
+                  </span>
+                </label>
+                {errors.acepta && <p className="text-xs text-error">{errors.acepta}</p>}
               </div>
 
               {sending && (
