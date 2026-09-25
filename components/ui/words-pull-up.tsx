@@ -7,11 +7,24 @@ import { useRef } from "react";
 interface WordsPullUpProps {
   text: string;
   className?: string;
+  /* Clase de cada palabra: el degradé de luz del título va por palabra,
+     porque cada una se mueve sola. */
+  wordClassName?: string;
+  /* Mientras sea false, las palabras esperan abajo (la intro todavía está
+     en pantalla). */
+  activo?: boolean;
   showAsterisk?: boolean;
   style?: React.CSSProperties;
 }
 
-export const WordsPullUp = ({ text, className = "", showAsterisk = false, style }: WordsPullUpProps) => {
+export const WordsPullUp = ({
+  text,
+  className = "",
+  wordClassName = "",
+  activo = true,
+  showAsterisk = false,
+  style,
+}: WordsPullUpProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true });
   const words = text.split(" ");
@@ -23,10 +36,10 @@ export const WordsPullUp = ({ text, className = "", showAsterisk = false, style 
         return (
           <motion.span
             key={i}
-            initial={{ y: 20, opacity: 0 }}
-            animate={isInView ? { y: 0, opacity: 1 } : {}}
-            transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-            className="inline-block relative"
+            initial={{ y: "0.5em", opacity: 0 }}
+            animate={isInView && activo ? { y: 0, opacity: 1 } : {}}
+            transition={{ duration: 1.1, delay: 0.15 + i * 0.12, ease: [0.16, 1, 0.3, 1] }}
+            className={`inline-block relative ${wordClassName}`}
             style={{ marginRight: isLast ? 0 : "0.25em" }}
           >
             {word}

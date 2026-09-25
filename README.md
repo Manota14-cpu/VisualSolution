@@ -3,8 +3,8 @@
 Sitio del estudio. Next.js 15 (App Router) + React 19 + Tailwind v4.
 
 El sistema visual es **Tinta Azul**, definido en `DESIGN.md`: una sola tinta
-azul en tres fuerzas sobre papel claro, tipografía comprimida ultrabold hasta
-189px y cero sombras. En el hero, el papel con la trama de puntos azules y el
+azul en tres fuerzas sobre papel claro, tipografía a escala de cartel y una
+profundidad hecha con luz de la misma tinta. En el hero, el papel con la trama de puntos azules y el
 monograma VS impreso en azul a escala arquitectónica y fuera de registro: dos
 tintas corridas que el puntero abre y cierra.
 
@@ -13,6 +13,7 @@ app/
   layout.tsx        metadata, tipografías, elementos fijos
   page.tsx          compone las secciones
   globals.css       tokens de Tailwind, componentes y capa de movimiento
+  experiencia.css   profundidad, luz y movimiento: la capa de experiencia
 components/
   brand/            el símbolo VS, plano y como plancha de impresión
 DESIGN.md           el sistema de diseño, tal como lo mandó el cliente
@@ -105,8 +106,9 @@ lo rediseñás:
 
 El sistema es **Tinta Azul**. Reemplazó en septiembre de 2026 a **Caldera**
 (lienzo negro, magenta y violeta), que fue el sistema con el que el cliente
-arrancó. Cambió sólo el color: tipografía, radios, espaciado y la regla de cero
-sombras siguen iguales.
+arrancó. Cambió sólo el color: tipografía, radios y espaciado siguen iguales.
+Después, en el mismo mes, la regla de cero sombras pasó a ser **elevación en
+la tinta** (ver abajo) y se sumó la capa de experiencia (`app/experiencia.css`).
 
 - `DESIGN.md` — la referencia larga y la fuente de verdad: roles de cada color,
   los pares que se midieron, los do's y don'ts, cada componente y los motivos
@@ -144,15 +146,17 @@ acción— va en el azul corporativo.
   y en 700 le compite. Las sirve `next/font` desde el propio dominio.
 - **Radios, el sistema de tres:** 100px los campos, 40px las tarjetas y los
   botones rectangulares, píldora completa el resto.
-- **Elevación:** ninguna. Ni una sombra en todo el sitio. La jerarquía se arma
-  con contraste de valor: lienzo → papel → azul.
+- **Elevación:** primero contraste de valor (lienzo → papel → azul), después
+  luz de la misma tinta: el papel que se levanta lleva un filo blanco arriba y
+  una sombra azul larga y tenue abajo (`--sombra-1` en reposo, `--sombra-2`
+  levantado). Nunca gris ni negro.
 - **Divisores:** punteados de 1.5px, nunca rayados ni llenos.
 - **Layout:** 1280px de ancho máximo, 80px entre secciones, 40px de relleno
   de tarjeta.
 
 ### Las tres reglas que no se negocian
 
-1. Ni una sombra.
+1. La profundidad es luz de la misma tinta: ni una sombra gris o negra.
 2. Una sola tinta en tres fuerzas: azul, azul medio y bruma. El rojo existe
    sólo para decir "esto está mal".
 3. Nunca texto blanco sobre bruma (1.65:1) ni azul sobre azul medio (1.65:1).
@@ -212,9 +216,42 @@ resta.
   deploy es lo correcto. El `LICENSE` de la raíz reserva todos los derechos
   sobre el código, los textos y la identidad.
 
+## La capa de experiencia
+
+`app/experiencia.css` se carga después de `globals.css` y agrega profundidad,
+luz y movimiento sin tocar la paleta ni la letra. Cada movimiento tiene un
+trabajo: guiar la mirada, confirmar una acción o dar profundidad.
+
+- **Rótulos de sección** (`components/site/Eyebrow.tsx`): `01 —— SERVICIOS`,
+  con los mismos nombres de la nav. Convierten las secciones en un índice, y el
+  trazo que se dibuja al entrar reemplazó a la barrita bajo cada titular.
+- **Titulares a escala:** `display-md` hasta 76px, `display-lg` hasta 112px y
+  `display-xl` hasta 176px (sólo "Trabajos", con la cuenta de proyectos en
+  superíndice). `SplitHeading` acepta `accent`: el remate de la frase se
+  imprime en azul medio (bruma sobre las bandas azules).
+- **El lienzo vivo** (`.ambiente`, en `app/layout.tsx`): tres luces de bruma
+  que derivan en 48–64 s y la trama de puntos, fija y desvanecida. El
+  contenido pasa por encima y la trama queda quieta. Quieto en equipos
+  modestos (`html.lite`) y con movimiento reducido.
+- **La luz del cursor:** todo lo que lleva `data-luz` (tarjetas, el panel del
+  hero, el servicio abierto, el cierre) se ilumina desde donde está el
+  puntero, y el canto de las tarjetas se enciende cerca del cursor.
+  `components/brand/MetalRig.tsx` escribe `--lx/--ly` con un solo listener
+  delegado, una vez por cuadro.
+- **El imán:** los botones de metal se corren hasta 6px hacia el cursor y la
+  acción principal se enciende con un halo de su tinta.
+- **Ligado al scroll, sin JS:** la salida del hero, la deriva de las capturas
+  dentro de sus ventanas y el monograma del cierre son animaciones CSS con
+  `animation-timeline`. Corren en el compositor; donde el navegador no las
+  tiene, la página queda quieta y no se rompe nada.
+- **Las capturas se imprimen:** cuando una tarjeta entra, su imagen baja de
+  arriba hacia abajo como una pasada de la prensa.
+- **Todo lo que sigue al puntero** existe sólo con puntero fino. Con
+  `prefers-reduced-motion` se quedan los cambios de color y de luz.
+
 ## Animación
 
-El movimiento acompaña, no protagoniza: el sistema es plano y editorial.
+El movimiento acompaña, no protagoniza: el sistema es editorial.
 
 **Capa global** (`components/motion/MotionProvider.tsx`)
 
@@ -241,7 +278,19 @@ El movimiento acompaña, no protagoniza: el sistema es plano y editorial.
   completo. Se mide para no tocar nunca el nombre: en teléfonos de menos de
   720px de alto se oculta, porque no queda lugar entre la nav y el título.
 - El panel existe por contraste: sobre una nube blanca, el texto chico en
-  blanco necesita al menos 72% de azul detrás para pasar AA (4.9:1).
+  blanco necesita al menos 72% de azul detrás para pasar AA (4.9:1). Lleva un
+  canto de luz arriba a la izquierda y un reflejo que sigue al cursor.
+- **La entrada espera a la intro.** El preloader avisa cuando se va
+  (`terminarIntro()` en `lib/motion.ts`, que deja `html.intro-lista`) y recién
+  ahí el marco se abre, el video retrocede y el título sube palabra por
+  palabra. Antes la entrada pasaba escondida detrás del preloader.
+- **Profundidad:** con el cursor, el video se corre al revés y la marca, el
+  título y el panel lo acompañan a distintas distancias (`--hx/--hy`).
+- **Salida:** al bajar, el marco se achica hacia su base, el video se acerca y
+  el título se va antes que el panel. Cada efecto vive en su propia capa
+  (`.hero-marco`, `.hero-fondo`, `.hero-capa-panel`) porque framer-motion
+  escribe `transform` en línea y se pisarían. La capa del panel no se
+  desvanece: con opacidad, el `backdrop-filter` del vidrio se corta de golpe.
 - Con movimiento reducido el video no corre y queda el póster. Fuera de
   pantalla se pausa: nadie lo ve y decodificarlo en loop sólo gasta batería.
 - **El video es un loop de 7 s sin corte.** El original (5 s a 720p, en el
@@ -351,14 +400,19 @@ protagonista y el resto en voz baja.
 
 **Por sección**
 
-- Nav: los seis enlaces comparten una sola píldora de luz que se desliza hasta
-  el que tiene el cursor o el foco. Hace legible que son un grupo.
-- Cabeceras: una barra corta de azul medio que se dibuja sola al entrar. El mismo
-  material que el filo del hero, en voz baja.
+- Nav: una píldora de vidrio (desenfoque y papel al 74%) que al bajar se
+  compacta, se asienta y levanta su sombra. Los enlaces comparten una sola
+  píldora de luz que se desliza hasta el que tiene el cursor o el foco. En el
+  teléfono, el menú es un índice numerado con WhatsApp, correo e Instagram
+  abajo, y la nav queda por encima para que el botón de cerrar esté a mano.
+- Cabeceras: el rótulo numerado con su trazo que se dibuja al entrar, la frase
+  con su remate en azul medio y, en escritorio, el párrafo a la derecha.
 - Marquesina: se frena si alguien quiere leerla, y cada capacidad se enciende.
-- Servicios: cada pliego abierto se inunda de azul pleno con su trama de
-  bruma, y el texto se da vuelta a papel. El monograma suelta un anillo al
-  entrar.
+  Corre más rápido cuanto más rápido se baja (`playbackRate` de la misma
+  animación CSS, que conserva la posición) y vuelve sola a su paso.
+- Servicios: cada pliego lleva su número; al pasar el cursor sube una hoja de
+  papel desde la base. Abierto se inunda de azul pleno con su trama de bruma,
+  el texto se da vuelta a papel y la luz del cursor recorre la plancha.
 - Trabajos: **tres tarjetas, no una grilla de piezas iguales**. Con esta
   cantidad el primero ocupa el ancho completo y los otros dos van a la par,
   así la sección tiene una entrada clara. Cada trabajo se muestra adentro de
@@ -376,16 +430,27 @@ protagonista y el resto en voz baja.
   Turbopack en Pack— salió de mirar el sitio en vivo, no de suponer. La ficha
   de App Visual se muestra como "en preparación" hasta que haya información
   real: es preferible a inventarla.
-- Proceso: la línea se dibuja en azul medio y termina siempre sobre un número; el
-  que alcanza suelta el mismo anillo que el monograma.
+- Trabajos: el filtro tiene una sola píldora azul que viaja hasta la opción
+  elegida. Cada tarjeta se levanta con luz propia, y la captura deriva dentro
+  de su ventana mientras cruza la pantalla.
+- Proceso: la línea se dibuja en azul medio y termina siempre sobre un número.
+  El paso que acaba de alcanzar se levanta en una hoja de papel y los que
+  faltan quedan a media voz.
 - Preguntas: la pregunta se corre, el chevrón se enciende y la respuesta sube
-  apenas después de abrirse la fila.
-- Contacto: etiquetas flotantes, el campo enfocado se enciende desde abajo y el
-  botón muta a un tilde dibujado.
+  apenas después de abrirse la fila, que se vuelve hoja. Quien no encuentra
+  la suya tiene "Preguntanos por WhatsApp" debajo del titular.
+- Contacto: cada canal es una fila entera con ícono y flecha (el enlace se
+  estira sobre la fila), y el correo se copia con un botón. En el formulario,
+  etiquetas flotantes, el campo enfocado se enciende desde abajo con un aro de
+  luz y el botón muta a un tilde dibujado.
+- Cierre: el monograma vuelve enorme y en filete detrás de la frase, y la luz
+  del cursor aclara la trama. Suma la salida por WhatsApp.
 - Botones: de metal líquido. Chapa azul, etiqueta en papel, y el metal en el
   canto: dos anillos cónicos girando en sentidos opuestos. El reflejo sigue al
   puntero y el golpe sale de donde se apretó.
-- Pie: los enlaces se subrayan desde el lado por el que entra el cursor.
+- Pie: los enlaces se subrayan desde el lado por el que entra el cursor. Cierra
+  con la firma: "Visual Solution" a todo el ancho, impreso con la trama y
+  recortado por el borde.
 - Volver arriba: el símbolo gira 360° mientras la página sube.
 
 El sangrado de luz de una superficie se anima con `--luz`, declarada con

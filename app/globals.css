@@ -25,8 +25,10 @@
    una sola tinta, en tres fuerzas, sobre papel.
 
    Las tres reglas duras del sistema:
-   1. Ni una sombra. La jerarquía se arma con contraste de valor
-      (lienzo → papel → azul), nunca con elevación.
+   1. La profundidad es luz de la misma tinta. Nada de sombras grises
+      o negras: la elevación usa el azul a muy baja opacidad, como el
+      papel que levanta una sombra azulada sobre el lienzo claro. Los
+      tokens están en app/experiencia.css.
    2. Una sola tinta en tres fuerzas: azul, azul medio y bruma.
       El rojo existe sólo para decir "esto está mal".
    3. La bruma nunca lleva texto blanco encima (1.65:1) y el
@@ -86,7 +88,9 @@ html {
 }
 
 body {
-  background: var(--color-fondo);
+  /* Transparente a propósito: el lienzo lo pinta <html>, y entre los dos
+     vive la capa .ambiente (luz y trama fijas). Un fondo acá la taparía. */
+  background: transparent;
   color: var(--color-azul);
   font-family: var(--font-ui);
   /* DM Sans va siempre en 500. En 400 se ve anémica al lado del
@@ -130,26 +134,19 @@ p, li, dd, figcaption { text-wrap: pretty; }
   color: var(--color-azul);
 }
 
-/* La cabecera de sección se marca con una barra corta que se dibuja
-   sola. Es el mismo material que el filo del hero, en voz baja: el
-   reclamo es el único que se lleva la escena completa. */
-.display-md { position: relative; }
-.display-md::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -.28em;
-  width: 72px;
-  height: 2px;
-  background: var(--color-azul-medio);
-  transform: scaleX(0);
-  transform-origin: 0 50%;
-  transition: transform .7s cubic-bezier(.16,1,.3,1) .2s;
-}
-.display-md.in::after { transform: scaleX(1); }
-.display-lg { font-size: clamp(40px, 6.4vw, 92px);  line-height: 0.95; letter-spacing: -0.06em; }
-.display-md { font-size: clamp(34px, 4.2vw, 58px);  line-height: 1; }
+/* Los titulares de sección suben de escala: a 58px se leían como un
+   subtítulo más. Ahora cada sección abre con una frase que ocupa el
+   lugar, y el rótulo de arriba (.eyebrow) dice cuál es. La barrita que
+   se dibujaba debajo se fue al rótulo: dos marcas para lo mismo sobran. */
+.display-xl { font-size: clamp(64px, 12vw, 176px); line-height: .86; letter-spacing: -0.065em; }
+.display-lg { font-size: clamp(42px, 7.2vw, 112px); line-height: .92; letter-spacing: -0.06em; }
+.display-md { font-size: clamp(36px, 5.2vw, 76px);  line-height: .98; letter-spacing: -0.052em; }
 .display-sm { font-size: clamp(24px, 2.2vw, 30px);  line-height: 1.08; letter-spacing: -0.03em; }
+
+/* El remate de la frase va en la segunda fuerza de la tinta. Sobre el
+   azul pleno pasa a bruma, que es la que se lee ahí (6.2:1). */
+.acento { color: var(--color-azul-medio); }
+.inundado .acento { color: var(--color-bruma); }
 
 .tagline {
   font-size: clamp(18px, 2vw, 26px);
@@ -191,7 +188,6 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .inundado .display,
 .inundado h1, .inundado h2, .inundado h3,
 .inundado [class*="text-azul"] { color: var(--color-papel); }
-.inundado .display-md::after { background: var(--color-bruma); }
 
 /* la acción se invierte: chapa de papel con la etiqueta en tinta */
 .inundado .btn-metal { background: var(--color-papel); color: var(--color-azul); }
@@ -245,7 +241,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
     cursor: pointer;
     transition: background-color .2s, color .2s, border-color .2s, transform .18s;
   }
-  .btn:active { transform: translateY(1px); }
+  .btn:active { transform: translateY(1px) scale(.985); }
   .btn-sm { padding: 9px 18px; font-size: 14px; }
 
   /* ---------------- metal líquido ----------------
@@ -273,9 +269,19 @@ p, li, dd, figcaption { text-wrap: pretty; }
     border: 0;
     background: var(--color-azul);
     color: var(--color-papel);
-    transition: background-color .25s, transform .18s;
+    /* El imán: MetalRig escribe --tx/--ty con el cursor encima. Va en
+       translate y no en transform, así no pisa el hundido de :active. */
+    translate: var(--tx, 0px) var(--ty, 0px);
+    transition:
+      background-color .25s,
+      transform .18s,
+      translate .55s cubic-bezier(.16,1,.3,1),
+      box-shadow .45s cubic-bezier(.16,1,.3,1);
   }
   .btn-metal:hover { background: color-mix(in oklab, var(--color-azul) 80%, var(--color-azul-medio)); }
+  /* La acción principal se enciende: un halo de su propia tinta. */
+  .btn-metal:not(.es-suave):hover,
+  .btn-metal:not(.es-suave):focus-visible { box-shadow: 0 14px 34px -12px rgb(21 91 205 / .6); }
 
   .btn-metal::before,
   .btn-metal .canto {
@@ -558,9 +564,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
    ========================================================== */
 .marquee-band {
   background: var(--color-azul);
+  background-image: linear-gradient(90deg, var(--color-azul), color-mix(in oklab, var(--color-azul) 82%, var(--color-azul-medio)) 50%, var(--color-azul));
   color: var(--color-papel);
   overflow: hidden;
-  padding-block: 14px;
+  padding-block: clamp(14px, 1.5vw, 20px);
   margin-inline: 8px;
   border-radius: var(--radius-pills);
 }
@@ -575,8 +582,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 .marquee-band .row { display: flex; width: max-content; }
 .marquee-band span {
-  font-size: 14px; font-weight: 500; white-space: nowrap;
-  padding-inline: 20px;
+  font-size: clamp(15px, 1.35vw, 19px); font-weight: 500; white-space: nowrap;
+  letter-spacing: -0.01em;
+  padding-inline: clamp(18px, 2vw, 28px);
 }
 .marquee-band .sep { color: var(--color-bruma); padding-inline: 0; }
 /* la cinta se frena si alguien quiere leerla */
@@ -609,9 +617,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
 /* El menú del teléfono entra en capas: el lienzo aparece y los enlaces
    suben de a uno, en el orden en que se leen. */
 #menu.flex { animation: menu-in .3s cubic-bezier(.16,1,.3,1) both; }
-#menu.flex > * {
-  animation: rise .6s cubic-bezier(.16,1,.3,1) both;
-  animation-delay: calc(var(--i, 0) * 45ms + 60ms);
+#menu.flex :is(.menu-enlace, .menu-anima) {
+  animation: rise .7s cubic-bezier(.16,1,.3,1) both;
+  animation-delay: calc(var(--i, 0) * 50ms + 60ms);
 }
 @keyframes menu-in { from { opacity: 0; } to { opacity: 1; } }
 
@@ -698,6 +706,11 @@ p, li, dd, figcaption { text-wrap: pretty; }
 /* Con lugar para los siete en fila, cada uno ocupa su celda y los separa
    el punteado. Más angosto, se acomodan en renglones sin divisores: un
    punteado al principio de un renglón no divide nada. */
+/* Entre tablet y escritorio van de a cuatro y tres, centrados: con el
+   reparto libre quedaba un logo solo en el segundo renglón. */
+@media (min-width: 640px) and (max-width: 1199px) {
+  .stack-logos li { flex: 0 0 21%; }
+}
 @media (min-width: 1200px) {
   .stack-logos { flex-wrap: nowrap; gap: 0; padding-inline: 12px; }
   /* El sobrante se reparte parejo entre los siete: cada divisor queda a
@@ -858,10 +871,13 @@ p, li, dd, figcaption { text-wrap: pretty; }
   z-index: -1;
   border-radius: var(--radius-medium);
   background-color: var(--color-azul);
+  /* La primera capa es la luz: sale de donde está el cursor (--lx/--ly,
+     data-luz) y aclara la trama como una lámpara sobre la plancha. */
   background-image:
+    radial-gradient(480px circle at var(--lx, 78%) var(--ly, 10%), rgb(174 205 237 / .26), rgb(174 205 237 / 0) 62%),
     radial-gradient(circle at center, rgb(174 205 237 / .32) 1.7px, transparent 1.8px),
     linear-gradient(42deg, var(--color-azul) 6%, var(--color-azul-medio) 94%);
-  background-size: 11px 11px, 100% 100%;
+  background-size: 100% 100%, 11px 11px, 100% 100%;
   opacity: 0;
   transition: opacity .45s ease;
 }
@@ -1004,19 +1020,24 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .obras > [hidden] { display: none; }
 
 .obra {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
   border-radius: var(--radius-cards);
+  border: 1px solid var(--borde-fino);
   background-color: var(--color-papel);
-  /* la luz azul sangra desde abajo al pasar el cursor. Es luz y no
-     sombra: vive adentro de la tarjeta. */
-  background-image: radial-gradient(124% 86% at 50% 118%, rgb(21 91 205 / var(--luz)), transparent 62%);
-  transition: transform .3s cubic-bezier(.16,1,.3,1), --luz .45s ease;
+  box-shadow: var(--sombra-1);
+  /* La luz azul sale de donde está el cursor (--lx/--ly, los escribe
+     MetalRig en todo lo que lleva data-luz). Sin puntero, sangra desde
+     abajo como antes. Es luz y no mancha: vive adentro de la tarjeta. */
+  background-image: radial-gradient(560px circle at var(--lx, 50%) var(--ly, 118%), rgb(21 91 205 / var(--luz)), transparent 62%);
+  transition: transform .6s cubic-bezier(.16,1,.3,1), box-shadow .6s cubic-bezier(.16,1,.3,1), --luz .45s ease;
 }
-.obra:focus-within { transform: translateY(-5px); --luz: .14; }
-@media (hover: hover) { .obra:hover { transform: translateY(-5px); --luz: .14; } }
+.obra:focus-within { transform: translateY(-6px); box-shadow: var(--sombra-2); --luz: .12; }
+@media (hover: hover) { .obra:hover { transform: translateY(-6px); box-shadow: var(--sombra-2); --luz: .12; } }
 
 @media (min-width: 820px) {
   /* La ancha se lee de costado: ventana a la izquierda, texto a la
@@ -1146,6 +1167,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
   /* 44px de alto para el dedo; el texto sigue midiendo lo mismo. */
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   min-height: 44px;
   font-size: 14px;
   color: rgb(0 54 165 / .78);
@@ -1298,11 +1320,14 @@ p, li, dd, figcaption { text-wrap: pretty; }
    El sistema es plano y editorial: el movimiento se limita a las
    entradas, la marquesina y los estados de hover.
    ========================================================== */
-.rv { opacity: 0; transform: translateY(14px); }
+/* La entrada es más larga y más corta de recorrido que un "fade up" de
+   plantilla: 24px en .9s con salida lenta. Lo que aparece se asienta,
+   no salta. */
+.rv { opacity: 0; transform: translate3d(0, 24px, 0); }
 .rv.in {
   opacity: 1; transform: none;
-  transition: opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
-  transition-delay: calc(var(--i, 0) * 55ms);
+  transition: opacity .8s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1);
+  transition-delay: calc(var(--i, 0) * 70ms);
 }
 
 .w {
@@ -1315,7 +1340,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .w > i {
   display: inline-block; font-style: normal;
   transform: translateY(108%);
-  transition: transform .6s cubic-bezier(.16,1,.3,1);
+  transition: transform .9s cubic-bezier(.16,1,.3,1);
   transition-delay: var(--d, 0ms);
 }
 .in .w > i { transform: none; }
@@ -1446,7 +1471,6 @@ footer :focus-visible { outline-color: var(--color-papel); }
   .rv { transform: none; }
   .w > i { transform: none; }
   .wipe { clip-path: none; }
-  .display-md::after { transform: scaleX(1); }
 
   /* los hovers pierden el desplazamiento y conservan el color */
   .chip:hover,

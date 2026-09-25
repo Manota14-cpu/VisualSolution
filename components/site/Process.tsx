@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Reveal, SplitHeading } from "@/components/motion/Reveal";
+import { Eyebrow } from "@/components/site/Eyebrow";
 import { onScroll, useMotionEnv } from "@/lib/motion";
 import { steps } from "@/lib/content";
 
@@ -44,10 +45,19 @@ export function Process() {
     medir();
     window.addEventListener("resize", medir);
 
+    /* El paso que la línea acaba de alcanzar se enciende entero —una hoja
+       de papel que se levanta debajo— y los que faltan quedan en voz baja.
+       La lectura sigue a la línea: se ve en qué instancia estás. */
+    const pasos = fichas.map((f) => f.closest<HTMLElement>(".paso"));
+    el.classList.add("vivo");
     const pintar = (alcanzado: number) => {
       const p = alcanzado < 0 ? 0 : alcanzado / (fichas.length - 1);
       bar.style.setProperty("--p", p.toFixed(3));
       fichas.forEach((f, i) => f.classList.toggle("on", i <= alcanzado));
+      pasos.forEach((a, i) => {
+        a?.classList.toggle("es-alcanzado", i <= alcanzado);
+        a?.classList.toggle("es-actual", i === alcanzado);
+      });
     };
 
     if (reduce) {
@@ -71,10 +81,16 @@ export function Process() {
   }, [reduce]);
 
   return (
-    <section className="bg-fondo py-20 md:py-28" id="proceso">
-      <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-10 px-4 md:px-10 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
-        <Reveal className="self-start lg:sticky lg:top-28">
-          <SplitHeading text="Cómo trabajamos" className="display display-md" />
+    <section className="seccion" id="proceso" aria-labelledby="proceso-titulo">
+      <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-12 px-4 md:px-10 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
+        <Reveal className="self-start lg:sticky lg:top-32">
+          <Eyebrow n="03">Proceso</Eyebrow>
+          <SplitHeading
+            id="proceso-titulo"
+            text="Cómo trabajamos"
+            accent="trabajamos"
+            className="display display-md"
+          />
           <p className="mt-8 max-w-[34ch] text-base leading-relaxed text-azul/85">
             Cuatro instancias, fechas cerradas y una sola persona a cargo de la comunicación durante todo el
             proyecto.
@@ -91,7 +107,7 @@ export function Process() {
               key={step.n}
               as="article"
               delay={i}
-              className={`flex items-start gap-5 pl-7 md:gap-8 ${
+              className={`paso flex items-start gap-5 pl-7 md:gap-8 ${
                 i === 0
                   ? "pb-8"
                   : i === steps.length - 1

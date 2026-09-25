@@ -103,6 +103,38 @@ export function wakeLoop() {
 /* ---- puntero compartido ---- */
 export const pointer = { x: 0, y: 0, seen: false };
 
+/* ---- el final de la intro ----
+   La primera visita de la sesión abre con el preloader. Si el hero
+   entrara al mismo tiempo, su entrada pasaría escondida detrás. El
+   preloader avisa acá cuando se va (o enseguida, si no se muestra), y
+   recién ahí el hero se imprime. También deja html.intro-lista para lo
+   que se anima desde CSS. */
+let introLista = false;
+const introSubs = new Set<() => void>();
+
+export function terminarIntro() {
+  if (introLista) return;
+  introLista = true;
+  document.documentElement.classList.add("intro-lista");
+  introSubs.forEach((fn) => fn());
+}
+
+export function useIntroLista() {
+  const [lista, setLista] = useState(false);
+  useEffect(() => {
+    if (introLista) {
+      setLista(true);
+      return;
+    }
+    const fn = () => setLista(true);
+    introSubs.add(fn);
+    return () => {
+      introSubs.delete(fn);
+    };
+  }, []);
+  return lista;
+}
+
 /* ---- View Transitions ----
    Si ya hay una corriendo, la nueva se aborta y sus promesas rechazan.
    Se silencian acá, y donde la API no existe el cambio se aplica igual. */

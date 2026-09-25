@@ -3,9 +3,11 @@
 
 **Theme:** light
 
-*Palette replaced in September 2026. The system was previously Caldera (black canvas, magenta and violet accents); typography, spacing, radii and the no-shadow rule carry over unchanged. Only color changed.*
+*Palette replaced in September 2026. The system was previously Caldera (black canvas, magenta and violet accents); typography, spacing and radii carry over unchanged.*
 
-Tinta Azul runs on a pale blue-grey canvas (#EAF0F6) with white surfaces, and a single ink in three strengths: corporate blue (#0036A5) for text, logo and primary actions; a secondary blue (#155BCD) for accents, hovers and active lines; and a mist blue (#AECDED) for tags and soft fills. The interface stays flat and unshadowed, letting ultrabold compressed type at near-architectural scale (up to 189px) carry structural weight. The print metaphor that shaped the hero is now literal: halftone dots in blue ink on light paper, and the VS monogram printed solid in corporate blue. Full-strength blue appears as bands — the marquee, the closing call to action, the opened service and the footer — so the brand color has weight and the page never reads as pale.
+*Later in September 2026 the no-shadow rule was replaced by ink-tinted elevation (see **Elevation** and **Experience Layer** below): surfaces now lift with soft shadows and highlights in the same blue ink, never gray or black. The palette did not change.*
+
+Tinta Azul runs on a pale blue-grey canvas (#EAF0F6) with white surfaces, and a single ink in three strengths: corporate blue (#0036A5) for text, logo and primary actions; a secondary blue (#155BCD) for accents, hovers and active lines; and a mist blue (#AECDED) for tags and soft fills. Surfaces lift with soft light in the same ink — a white highlight on the top edge and a long, low-opacity blue shadow — so paper reads as paper on the canvas, letting ultrabold compressed type at near-architectural scale (up to 189px) carry structural weight. The print metaphor that shaped the hero is now literal: halftone dots in blue ink on light paper, and the VS monogram printed solid in corporate blue. Full-strength blue appears as bands — the marquee, the closing call to action, the opened service and the footer — so the brand color has weight and the page never reads as pale.
 
 ## Tokens — Colors
 
@@ -111,7 +113,7 @@ Tinta Azul runs on a pale blue-grey canvas (#EAF0F6) with white surfaces, and a 
 ### Primary CTA Button
 **Role:** Main conversion action
 
-Liquid-metal pill: Azul (#0036A5) plate with Papel (#FFFFFF) label; the metal is the rim — two counter-rotating conic rings in Azul, Azul medio, Bruma and white highlights. 800px border-radius. Padding 12px vertical, 24px horizontal. DM Sans 500 weight at 16px. No shadow. On a full-blue band the plate inverts to Papel with an Azul label.
+Liquid-metal pill: Azul (#0036A5) plate with Papel (#FFFFFF) label; the metal is the rim — two counter-rotating conic rings in Azul, Azul medio, Bruma and white highlights. 800px border-radius. Padding 12px vertical, 24px horizontal. DM Sans 500 weight at 16px. No shadow at rest; on hover it glows in its own ink (Azul medio) and drifts a few pixels toward the cursor. On a full-blue band the plate inverts to Papel with an Azul label.
 
 ### Secondary Pill Button
 **Role:** Alternative action or paired CTA
@@ -131,7 +133,7 @@ Azul (#0036A5) solid background, Papel (#FFFFFF) text. 40px border-radius. Paddi
 ### Content Card
 **Role:** Blog posts, announcements, program entries
 
-Papel (#FFFFFF) background, no border, no shadow. 40px border-radius. Padding 40px all sides. Contains a category tag, headline (PP Neue Corp Compact 26–32px in Azul), and date metadata. The image area at the top uses the image gradient (#0036A5 → #155BCD → #AECDED) with a mist halftone overlay.
+Papel (#FFFFFF) background, 1px `--borde-fino` border and `--sombra-1`; on hover it lifts 6px to `--sombra-2` and a light follows the cursor inside it and along its edge. 40px border-radius. Padding 40px all sides. Contains a category tag, headline (PP Neue Corp Compact 26–32px in Azul), and date metadata. The image area at the top uses the image gradient (#0036A5 → #155BCD → #AECDED) with a mist halftone overlay.
 
 ### Full-Blue Band
 **Role:** Emphasis surfaces — marquee, closing CTA, opened service, footer
@@ -161,7 +163,7 @@ Papel (#FFFFFF) background, 1.5px Azul border at 35% opacity, Azul medio on focu
 ### Partner Logo Strip
 **Role:** Display ecosystem partners or integrations
 
-Papel (#FFFFFF) background card, 40px radius, 40px padding. Logos arranged in a single row with consistent height, separated by vertical 1.5px Azul dotted dividers at low opacity. No individual logo containers — flat inline treatment.
+Papel (#FFFFFF) background card, 40px radius, 40px padding. Logos arranged in a single row with consistent height, separated by vertical 1.5px Azul dotted dividers at low opacity. No individual logo containers. The strip itself rests on `--sombra-1`.
 
 ### Dotted Divider
 **Role:** Section separator and decorative detail
@@ -177,11 +179,11 @@ Papel (#FFFFFF) background card, 40px radius, 40px padding. Logos arranged in a 
 - Set primary CTAs as liquid-metal pills with an Azul (#0036A5) plate and Papel label, sized at 12px/24px padding — never rectangular, always pill-shaped
 - Keep body text at DM Sans 500 (Medium) — never drop to Regular weight, which reads as anemic against the ultrabold display type
 - Use the halftone dot pattern (blue ink on light paper) as the hero/signature visual treatment — it is the system's most recognizable motif
-- Layer surfaces using value contrast (Fondo canvas → Papel cards → Azul bands) rather than shadows
+- Layer surfaces using value contrast first (Fondo canvas → Papel cards → Azul bands), then ink-tinted elevation (`--sombra-1`, `--sombra-2`) for cards that should lift
 - Put Azul text on Bruma, never white; keep Azul off Azul medio
 
 ### Don't
-- Do not add drop shadows to any element — the system is intentionally flat
+- Do not use gray or black shadows — elevation is always the blue ink at low opacity, with a white highlight on the top edge
 - Do not use rectangular (low-radius) buttons — the pill/40px-radius treatment is non-negotiable
 - Do not introduce colors beyond the one ink in three strengths — Error red is the only exception, and only for validation
 - Do not use Regular or Bold weights of DM Sans for body — Medium (500) is the only correct weight
@@ -201,7 +203,28 @@ Papel (#FFFFFF) background card, 40px radius, 40px padding. Logos arranged in a 
 
 ## Elevation
 
-Deliberately shadowless. The design relies on value contrast (pale canvas vs. white cards vs. full-strength blue bands) and generous 40px corner radii to create surface hierarchy. No element casts a shadow anywhere in the system.
+Value contrast first (pale canvas vs. white cards vs. full-strength blue bands), then light in the same ink. Tokens live in `app/experiencia.css`:
+
+| Token | Use |
+|-------|-----|
+| `--borde-fino` | `rgb(0 54 165 / .09)` 1px border on raised paper |
+| `--sombra-1` | Resting paper: white 1px top highlight + blue shadow 0 12px 32px −16px at 22% |
+| `--sombra-2` | Lifted paper (hover, the form): blue shadow 0 40px 80px −36px at 42% |
+| `--brillo` | A lit piece (active filter): 1px Azul medio ring + Azul medio glow |
+
+Primary actions glow in their own ink on hover. No gray, no black, no hard drop shadows.
+
+## Experience Layer
+
+Added September 2026 (`app/experiencia.css`). It adds depth, light and motion without touching the palette or the type.
+
+- **Section eyebrow:** `01 —— SERVICIOS`. System sans 12px, 0.16em tracking, number in Azul medio, a 34px line that draws in on reveal. Names match the nav.
+- **Headline scale:** `display-md` up to 76px, `display-lg` up to 112px, `display-xl` up to 176px (the single word "Trabajos"). The last phrase of a headline can be an **accent** in Azul medio (Bruma on blue bands).
+- **Ambient canvas:** a fixed layer behind everything with three Bruma lights drifting over 48–64s and the halftone dot grid, faded to the edges. Static on low-end devices and with reduced motion.
+- **Pointer light (`data-luz`):** cards, the hero panel, the opened service and the closing band light up from the cursor position. One delegated listener.
+- **Magnetic actions:** metal buttons drift up to 6px toward the cursor.
+- **Scroll-linked motion:** the hero frame recedes, its video comes closer and the headline leaves first; project captures drift inside their browser windows; the closing monogram settles. CSS scroll-driven animations, compositor only; where unsupported the page stays still.
+- **Rule:** every motion guides attention, confirms an action or adds depth. Nothing follows the pointer on touch screens, and with `prefers-reduced-motion` only color and light changes remain.
 
 ## Imagery
 

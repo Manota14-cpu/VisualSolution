@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Reveal, SplitHeading, useReveal } from "@/components/motion/Reveal";
+import { Eyebrow } from "@/components/site/Eyebrow";
 import { services, type Service } from "@/lib/content";
 
 /* ============================================================
@@ -43,7 +44,7 @@ function Pliego({
      el de afuera sólo revela y su className nunca cambia. */
   return (
     <div ref={ref} className="rv" style={{ ["--i" as string]: indice } as React.CSSProperties}>
-      <div className={`pliego ${abierto ? "is-open" : ""}`}>
+      <div className={`pliego ${abierto ? "is-open" : ""}`} data-luz>
         <h3>
           <button
             type="button"
@@ -52,7 +53,14 @@ function Pliego({
             aria-controls={id}
             onClick={onToggle}
           >
-            <span className="pliego-titulo">{service.title}</span>
+            {/* El número ordena la lista como un índice; el título sigue
+                siendo lo único que se lee. */}
+            <span className="pliego-cab">
+              <span className="pliego-n" aria-hidden="true">
+                {String(indice + 1).padStart(2, "0")}
+              </span>
+              <span className="pliego-titulo">{service.title}</span>
+            </span>
             <span className="pliego-mas" aria-hidden="true">
               +
             </span>
@@ -106,14 +114,22 @@ export function Services() {
   const [abierto, setAbierto] = useState<string | null>(inicial);
 
   return (
-    <section className="bg-fondo py-20 md:py-28" id="servicios">
+    <section className="seccion" id="servicios" aria-labelledby="servicios-titulo">
       <div className="mx-auto w-full max-w-[1200px] px-4 md:px-10">
-        <Reveal className="mb-10 max-w-[44ch] md:mb-14">
-          <SplitHeading
-            text="Todo lo que tu marca necesita para verse y funcionar bien."
-            className="display display-md"
-          />
-          <p className="mt-8 max-w-[62ch] text-base leading-relaxed text-azul/85">
+        {/* Cabecera en dos columnas: la frase a la izquierda, el párrafo
+            abajo a la derecha. En una sola columna quedaba medio ancho
+            vacío al lado de cada titular. */}
+        <Reveal className="cabecera">
+          <div>
+            <Eyebrow n="01">Servicios</Eyebrow>
+            <SplitHeading
+              id="servicios-titulo"
+              text="Todo lo que tu marca necesita para verse y funcionar bien."
+              accent="verse y funcionar bien."
+              className="display display-md max-w-[16ch]"
+            />
+          </div>
+          <p className="cabecera-texto">
             Trabajamos las dos mitades del mismo problema: la pieza técnica que sostiene el negocio y el
             contenido que lo hace visible.
           </p>

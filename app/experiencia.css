@@ -1,0 +1,760 @@
+/* ==========================================================
+   LA CAPA DE EXPERIENCIA
+   Todo lo que le da al sitio profundidad, luz y movimiento sin
+   tocar su identidad: la misma tinta en tres fuerzas, el mismo
+   papel, la misma DM Sans. Lo que cambia es cómo se apoya cada
+   cosa sobre la otra.
+
+   Se carga después de globals.css (app/layout.tsx), así que gana
+   en empates. Las reglas que fijan display van dentro de
+   @layer components por el mismo motivo que en globals: fuera de
+   una capa le ganan a las utilidades de Tailwind.
+
+   Tres principios:
+   1. La luz es de la tinta. Sombras y brillos usan el azul a muy
+      baja opacidad; nunca gris ni negro.
+   2. Cada movimiento tiene un trabajo: guiar la mirada, confirmar
+      una acción o dar profundidad. Si no, no va.
+   3. Lo continuo corre en el compositor (transform y opacity), lo
+      que sigue al puntero sólo existe con puntero fino, y con
+      movimiento reducido se queda quieto.
+   ========================================================== */
+
+:root {
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+
+  /* Elevación. El filo blanco de arriba es el canto del papel que
+     agarra la luz; la sombra es azul y larga, nunca un halo gris. */
+  --borde-fino: rgb(0 54 165 / .09);
+  --sombra-1:
+    inset 0 1px 0 rgb(255 255 255 / .9),
+    0 1px 2px rgb(0 54 165 / .05),
+    0 12px 32px -16px rgb(0 54 165 / .22);
+  --sombra-2:
+    inset 0 1px 0 rgb(255 255 255 / .9),
+    0 2px 6px rgb(0 54 165 / .06),
+    0 40px 80px -36px rgb(0 54 165 / .42);
+  /* El brillo de una pieza encendida: un aro de azul medio y su luz. */
+  --brillo:
+    0 0 0 1px rgb(21 91 205 / .22),
+    0 16px 44px -14px rgb(21 91 205 / .55);
+}
+
+/* ==========================================================
+   EL AMBIENTE
+   El lienzo deja de ser un color plano: tres luces de bruma que
+   derivan muy despacio y la trama de puntos de la marca, fija,
+   desvanecida hacia los bordes. El contenido pasa por encima y la
+   trama queda quieta: eso es lo que da profundidad al scroll.
+   Es una sola capa fija, pintada una vez; las luces se mueven con
+   transform, en el compositor. En equipos modestos quedan quietas.
+   ========================================================== */
+.ambiente {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+.ambiente::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at center, rgb(0 54 165 / .16) 1px, transparent 1.5px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(75% 65% at 50% 45%, #000 0%, rgb(0 0 0 / .35) 55%, transparent 85%);
+          mask-image: radial-gradient(75% 65% at 50% 45%, #000 0%, rgb(0 0 0 / .35) 55%, transparent 85%);
+  opacity: .55;
+}
+.ambiente i {
+  position: absolute;
+  width: 64vmax;
+  height: 64vmax;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(174 205 237 / .62), rgb(174 205 237 / 0));
+  will-change: transform;
+}
+.ambiente i:nth-child(1) { left: -22vmax; top: -26vmax; animation: deriva-a 48s var(--ease-in-out) infinite alternate; }
+.ambiente i:nth-child(2) {
+  right: -26vmax; top: 18vh;
+  background: radial-gradient(closest-side, rgb(21 91 205 / .11), rgb(21 91 205 / 0));
+  animation: deriva-b 56s var(--ease-in-out) infinite alternate;
+}
+.ambiente i:nth-child(3) { left: 8vw; bottom: -40vmax; animation: deriva-c 64s var(--ease-in-out) infinite alternate; }
+@keyframes deriva-a { to { transform: translate3d(18vmax, 12vmax, 0) scale(1.08); } }
+@keyframes deriva-b { to { transform: translate3d(-14vmax, 16vmax, 0) scale(.92); } }
+@keyframes deriva-c { to { transform: translate3d(12vmax, -14vmax, 0) scale(1.12); } }
+html.lite .ambiente i { animation: none; }
+
+/* ==========================================================
+   EL RÓTULO DE SECCIÓN
+   Micro-rótulo del sistema (sans del sistema, 12px, versalitas
+   abiertas), con el número en la segunda fuerza de la tinta y un
+   trazo que se dibuja cuando el bloque entra.
+   ========================================================== */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: clamp(18px, 2vw, 26px);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: rgb(0 54 165 / .82);
+}
+.eyebrow-n { color: var(--color-azul-medio); font-variant-numeric: tabular-nums; letter-spacing: .08em; }
+.eyebrow-l {
+  width: 34px;
+  height: 1.5px;
+  background: var(--color-azul-medio);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform .9s var(--ease-out) .2s;
+}
+.in .eyebrow-l { transform: scaleX(1); }
+.inundado .eyebrow { color: rgb(255 255 255 / .85); }
+.inundado .eyebrow-n { color: var(--color-bruma); }
+.inundado .eyebrow-l { background: var(--color-bruma); }
+
+/* ==========================================================
+   EL HERO
+   Tres ideas, cada una en su capa para que no se pisen:
+   - La entrada: el marco se abre desde apenas adentro y el video
+     retrocede despacio hasta su lugar. Espera a html.intro-lista,
+     que llega cuando el preloader se va.
+   - La profundidad: --hx/--hy (de -1 a 1, los escribe Hero.tsx con
+     el cursor) corren cada capa una distancia distinta. El video,
+     que está lejos, va al revés.
+   - La salida: al bajar, el marco se achica hacia su base, el video
+     se acerca y el título se va antes que el panel. Es una
+     animación ligada al scroll: corre en el compositor, sin JS.
+     Donde el navegador no la tiene, el hero queda quieto.
+   ========================================================== */
+.hero-marco { --r: 1rem; }
+@media (min-width: 768px) { .hero-marco { --r: 2rem; } }
+
+.hero-fondo { transform-origin: 50% 40%; }
+.hero-video {
+  scale: 1.04;
+  translate: calc(var(--hx, 0) * -16px) calc(var(--hy, 0) * -10px);
+}
+.hero-titulo { translate: calc(var(--hx, 0) * 8px) calc(var(--hy, 0) * 5px); }
+.hero-capa-panel { translate: calc(var(--hx, 0) * 12px) calc(var(--hy, 0) * 8px); }
+@media (min-width: 768px) {
+  .hero-marca { translate: calc(var(--hx, 0) * 22px) calc(var(--hy, 0) * 14px); }
+}
+
+/* El nombre lleva luz: blanco arriba, un poco de cielo abajo, y una
+   sombra de su propia tinta que lo despega de las nubes. El degradé va
+   por palabra (cada una se mueve sola); el relleno de arriba y abajo
+   estira la caja para que la luz alcance ascendentes y descendentes. */
+.hero-palabra {
+  padding-block: .14em;
+  margin-block: -.14em;
+  background-image: linear-gradient(180deg, #fff 38%, rgb(212 229 248) 100%);
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+}
+.hero-titulo { filter: drop-shadow(0 18px 42px rgb(0 28 100 / .38)); }
+html.lite .hero-titulo { filter: none; }
+
+/* El panel de vidrio: un canto que agarra la luz arriba a la
+   izquierda, y un reflejo que sigue al cursor por adentro. */
+.hero-panel {
+  position: relative;
+  isolation: isolate;
+  border-color: transparent;
+  box-shadow: 0 40px 90px -40px rgb(0 22 90 / .55);
+}
+.hero-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(460px circle at var(--lx, 85%) var(--ly, -10%), rgb(255 255 255 / .16), rgb(255 255 255 / 0) 60%);
+  transition: opacity .5s ease;
+}
+.hero-panel::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(150deg, rgb(255 255 255 / .55), rgb(255 255 255 / .08) 36%, rgb(174 205 237 / .05) 64%, rgb(174 205 237 / .38));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Estado de partida: el marco apenas cerrado y el video cerca. Sin
+     JavaScript se queda así, que también se lee bien. */
+  .hero-marco { clip-path: inset(2.2% 1.6% 2.2% 1.6% round var(--r)); }
+  .hero-video { scale: 1.2; }
+
+  html.intro-lista .hero-marco { animation: marco-entra 1.7s var(--ease-out) both; }
+  html.intro-lista .hero-video { animation: video-entra 3.2s var(--ease-out) both; }
+
+  @supports (animation-timeline: scroll()) {
+    html.intro-lista .hero-marco {
+      transform-origin: 50% 100%;
+      animation: marco-entra 1.7s var(--ease-out) both, marco-sale linear both;
+      animation-timeline: auto, scroll(root);
+      animation-range: normal, 0px 100vh;
+    }
+    .hero-fondo {
+      animation: fondo-sale linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0px 100vh;
+    }
+    .hero-titulo {
+      animation: titulo-sale linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0px 75vh;
+    }
+    .hero-capa-panel {
+      animation: panel-sale linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0px 100vh;
+    }
+  }
+}
+@keyframes marco-entra { to { clip-path: inset(0 0 0 0 round var(--r)); } }
+@keyframes video-entra { to { scale: 1.04; } }
+@keyframes marco-sale { to { transform: scale(.94); } }
+@keyframes fondo-sale { to { transform: translateY(12%) scale(1.08); } }
+@keyframes titulo-sale { to { transform: translateY(-22%); opacity: 0; } }
+@keyframes panel-sale { to { transform: translateY(-14%); } }
+
+/* ==========================================================
+   LA NAV
+   Una píldora de vidrio: deja ver lo que pasa por debajo, borroso,
+   y el texto se apoya igual en tinta sobre papel. Arriba de todo es
+   más ancha y liviana; al bajar se compacta, se asienta con un poco
+   más de papel y levanta su sombra azul. Va por encima del menú del
+   teléfono, así el botón de cerrar queda siempre a mano.
+   ========================================================== */
+.nav-shell {
+  z-index: 50;
+  max-width: 1200px;
+  padding-block: 8px;
+  border-color: rgb(255 255 255 / .75);
+  background: rgb(255 255 255 / .74);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+          backdrop-filter: blur(20px) saturate(1.6);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .7), 0 12px 32px -20px rgb(0 54 165 / .3);
+  transition:
+    max-width .8s var(--ease-out),
+    padding .6s var(--ease-out),
+    background-color .5s ease,
+    border-color .5s ease,
+    box-shadow .6s var(--ease-out);
+}
+.nav-shell.is-stuck {
+  max-width: 1080px;
+  padding-block: 5px;
+  border-color: var(--borde-fino);
+  background: rgb(255 255 255 / .86);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .9), 0 18px 44px -24px rgb(0 54 165 / .42);
+}
+.nav-shell.is-abierta { background: var(--color-papel); }
+/* Sin backdrop-filter, el vidrio sería un papel casi transparente sobre
+   el video: ahí va opaco. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .nav-shell { background: var(--color-papel); }
+}
+
+/* ---------- el menú del teléfono ---------- */
+.menu {
+  background:
+    radial-gradient(90% 60% at 100% 0%, rgb(174 205 237 / .55), rgb(174 205 237 / 0) 70%),
+    var(--color-fondo);
+  overflow-y: auto;
+}
+.menu-enlace {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-block: 14px;
+  border-bottom: 1.5px dotted rgb(0 54 165 / .25);
+  color: var(--color-azul);
+}
+.menu-enlace .display { flex: 1; font-size: clamp(34px, 11vw, 58px); line-height: 1; }
+.menu-n {
+  align-self: flex-start;
+  padding-top: .5em;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  letter-spacing: .08em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-azul-medio);
+}
+.menu-enlace .flecha { width: 20px; height: 20px; color: rgb(0 54 165 / .5); }
+.menu-enlace:active { color: var(--color-azul-medio); }
+.menu-pie {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 32px;
+}
+.menu-pie a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--radius-pills);
+  border: 1px solid var(--borde-fino);
+  background: rgb(255 255 255 / .8);
+  box-shadow: var(--sombra-1);
+  font-size: 15px;
+  color: var(--color-azul);
+}
+
+/* ==========================================================
+   RITMO Y CABECERAS
+   Todas las secciones respiran lo mismo, y cada una abre con el
+   rótulo, la frase y —en escritorio— el párrafo a la derecha,
+   apoyado en la base de la frase. Así el ancho completo trabaja y
+   la frase se lleva la escena.
+   ========================================================== */
+@layer components {
+  .seccion { position: relative; padding-block: clamp(76px, 9vw, 128px); }
+
+  .cabecera {
+    display: grid;
+    gap: clamp(20px, 2.4vw, 28px);
+    margin-bottom: clamp(40px, 5vw, 72px);
+  }
+  @media (min-width: 1024px) {
+    .cabecera {
+      grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+      align-items: end;
+      column-gap: clamp(40px, 6vw, 96px);
+    }
+    .cabecera-texto { padding-bottom: .55em; }
+  }
+  .cabecera-texto {
+    max-width: 46ch;
+    font-size: clamp(16px, 1.2vw, 18px);
+    line-height: 1.6;
+    color: rgb(0 54 165 / .85);
+  }
+
+  /* Papel que se levanta del lienzo: filo de luz arriba, sombra azul
+     larga abajo. .es-alta es la que más pesa en su sección. */
+  .superficie { border: 1px solid var(--borde-fino); box-shadow: var(--sombra-1); }
+  .superficie.es-alta { box-shadow: var(--sombra-2); }
+}
+
+/* ==========================================================
+   FLECHAS
+   Avanzan en su dirección cuando el cursor llega a la acción.
+   ========================================================== */
+.flecha { flex: none; transition: transform .45s var(--ease-out); }
+:is(a, button):is(:hover, :focus-visible) > .flecha { transform: translateX(3px); }
+:is(a, button):is(:hover, :focus-visible) > .flecha.es-externa { transform: translate(2px, -2px); }
+.link-flecha { display: inline-flex; align-items: center; gap: 8px; }
+
+/* ==========================================================
+   EL FILTRO DEL CATÁLOGO
+   Una sola píldora azul que viaja hasta la opción elegida, con el
+   brillo de una pieza encendida.
+   ========================================================== */
+@layer components {
+  .filtros { position: relative; display: flex; flex-wrap: wrap; gap: 8px; }
+  .filtros .pill { position: relative; z-index: 1; background: rgb(255 255 255 / .55); }
+  .filtros-luz {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 0;
+    width: var(--fw, 0px);
+    height: var(--fh, 0px);
+    border-radius: var(--radius-pills);
+    background: var(--color-azul);
+    box-shadow: var(--brillo);
+    transform: translate(var(--fx, 0px), var(--fy, 0px));
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform .6s var(--ease-out),
+      width .6s var(--ease-out),
+      height .6s var(--ease-out),
+      opacity .3s ease;
+  }
+  .filtros:not(.listo) .filtros-luz { transition: none; }
+  .filtros.listo .filtros-luz { opacity: 1; }
+  .filtros.listo .pill[aria-pressed="true"] {
+    background: transparent;
+    border-color: transparent;
+    color: var(--color-papel);
+  }
+}
+
+/* ==========================================================
+   LAS TARJETAS DEL CATÁLOGO
+   El canto se enciende donde está el cursor: un aro de un píxel
+   que sólo existe cerca del puntero. La luz de adentro ya la pinta
+   .obra con --lx/--ly (globals.css).
+   ========================================================== */
+.obra::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: radial-gradient(340px circle at var(--lx, 50%) var(--ly, 0%), rgb(21 91 205 / .7), rgb(21 91 205 / 0) 60%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity .45s ease;
+}
+@media (hover: hover) { .obra:hover::after { opacity: 1; } }
+
+/* ==========================================================
+   SERVICIOS
+   El número ordena la lista como un índice. Al pasar el cursor, una
+   hoja de papel sube desde la base del pliego —la tinta todavía no
+   cae, eso pasa al abrirlo—.
+   ========================================================== */
+.pliego-cab { display: flex; align-items: flex-start; gap: clamp(14px, 2.6vw, 40px); min-width: 0; }
+/* A la altura de las mayúsculas, como el número de un índice: sobre la
+   línea de base se leía como una nota al pie. */
+.pliego-n {
+  flex: none;
+  padding-top: clamp(4px, .55vw, 9px);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  letter-spacing: .08em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-azul-medio);
+  transition: color .3s ease .16s;
+}
+.pliego.is-open .pliego-n { color: var(--color-bruma); }
+.pliego:not(.is-open) .pliego-n { transition-delay: 0s; }
+.pliego::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: var(--radius-medium);
+  background: linear-gradient(100deg, rgb(255 255 255 / .85), rgb(255 255 255 / .45));
+  box-shadow: var(--sombra-1);
+  transform: scaleY(0);
+  transform-origin: 50% 100%;
+  opacity: 0;
+  transition: transform .6s var(--ease-out), opacity .3s ease;
+}
+@media (hover: hover) {
+  .pliego:not(.is-open):hover::after { transform: none; opacity: 1; }
+}
+
+/* ==========================================================
+   LAS CAPTURAS
+   Cada captura deriva unos puntos dentro de su ventana mientras
+   cruza la pantalla: la ventana queda fija y el sitio se mueve
+   detrás, como mirar por un vidrio. Ligado al scroll, sin JS.
+   ========================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .ventana-vista img {
+      scale: 1.08;
+      animation: vista-deriva linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+@keyframes vista-deriva {
+  from { translate: 0 -3.5%; }
+  to   { translate: 0 3.5%; }
+}
+
+/* La captura se imprime: cuando la tarjeta entra, la imagen baja de
+   arriba hacia abajo como una pasada de la prensa. Es lo mismo que dice
+   la marca —las cosas se imprimen, no se deslizan— en voz baja. */
+@media (prefers-reduced-motion: no-preference) {
+  .rv .ventana-vista { clip-path: inset(0 0 100% 0); }
+  .rv.in .ventana-vista {
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 1.2s var(--ease-out) .18s;
+  }
+}
+
+/* "Trabajos" con su cuenta arriba a la derecha. */
+.titulo-con-cuenta { display: flex; align-items: flex-start; gap: .4em; }
+.titulo-cuenta {
+  margin-top: clamp(8px, 1.4vw, 22px);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(13px, 1.1vw, 16px);
+  letter-spacing: .08em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-azul-medio);
+}
+
+/* ==========================================================
+   CON QUÉ TRABAJAMOS
+   ========================================================== */
+.stack-logos svg { transition: transform .45s var(--ease-out); }
+@media (hover: hover) { .stack-logos li:hover svg { transform: translateY(-2px) scale(1.08); } }
+
+/* ==========================================================
+   EL CIERRE
+   La luz del cursor aclara la trama (::after, con --lx/--ly), y el
+   monograma, enorme y en filete, se asienta mientras la sección
+   cruza la pantalla.
+   ========================================================== */
+.cierre::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(620px circle at var(--lx, 50%) var(--ly, 40%), rgb(174 205 237 / .28), rgb(174 205 237 / 0) 62%);
+}
+.cierre-marca {
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 50%;
+  width: min(130%, 1500px);
+  height: auto;
+  translate: -50% -50%;
+  pointer-events: none;
+}
+.cierre-marca path { fill: none; stroke: rgb(255 255 255 / .1); stroke-width: .28; }
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .cierre-marca {
+      animation: marca-asienta linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+@keyframes marca-asienta {
+  from { transform: scale(1.18) rotate(-4deg); }
+  to   { transform: scale(.96) rotate(2deg); }
+}
+
+/* ==========================================================
+   EL PIE
+   La firma: el nombre a todo el ancho, en la trama de la 404
+   (puntos de papel sobre un relleno apenas visible), recortado por
+   el borde de abajo.
+   ========================================================== */
+.pie-firma {
+  margin: clamp(28px, 4vw, 56px) 0 -0.2em;
+  padding-inline: clamp(12px, 2vw, 28px);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 13.2vw;
+  line-height: .8;
+  letter-spacing: -0.07em;
+  white-space: nowrap;
+  text-align: center;
+  color: transparent;
+  /* Puntos gruesos y apretados sobre un relleno tenue: a esta escala la
+     trama tiene que armar la letra, no deshacerla. */
+  background-image:
+    radial-gradient(circle at center, rgb(255 255 255 / .55) 1.9px, transparent 2.2px),
+    linear-gradient(rgb(255 255 255 / .14), rgb(255 255 255 / .14));
+  background-size: 6px 6px, 100% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  user-select: none;
+}
+@media (min-width: 1500px) { .pie-firma { font-size: 12.6vw; } }
+
+/* ==========================================================
+   PROCESO
+   El paso que la línea acaba de alcanzar se levanta en una hoja de
+   papel; los que faltan quedan a media voz. Sólo con JavaScript
+   (.vivo): sin él, todo se lee parejo.
+   ========================================================== */
+.paso { position: relative; isolation: isolate; }
+.paso::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 12px;
+  bottom: 12px;
+  left: 16px;
+  right: -8px;
+  border-radius: 24px;
+  background: var(--color-papel);
+  border: 1px solid var(--borde-fino);
+  box-shadow: var(--sombra-1);
+  opacity: 0;
+  transform: scale(.985);
+  transition: opacity .55s ease, transform .7s var(--ease-out);
+}
+.paso:first-of-type::before { top: -18px; }
+.paso:last-of-type::before { bottom: -18px; }
+@media (min-width: 1280px) { .paso::before { right: -20px; } }
+.steps.vivo .paso.es-actual::before { opacity: 1; transform: none; }
+.steps.vivo .paso > div { transition: opacity .5s ease; }
+.steps.vivo .paso:not(.es-alcanzado) > div { opacity: .55; }
+
+/* ==========================================================
+   PREGUNTAS
+   ========================================================== */
+.faq-otra {
+  display: grid;
+  justify-items: start;
+  gap: 14px;
+  margin-top: clamp(28px, 3vw, 40px);
+}
+.faq-otra p { font-size: 15px; color: rgb(0 54 165 / .8); }
+/* Sólo la fila abierta se vuelve hoja: con radio en todas, los
+   divisores punteados se curvaban en las puntas. */
+.faq-row { transition: background-color .25s ease, box-shadow .45s var(--ease-out), border-radius .3s ease; }
+.faq-row.is-open { border-radius: var(--radius-medium); border-color: transparent; box-shadow: var(--sombra-1); }
+/* El chevrón lleva text-azul/85 de Tailwind, que le ganaba a las reglas
+   de la capa de componentes: abierto quedaba la cruz azul sobre el
+   círculo azul, invisible. Desde acá (fuera de capa) manda el estado. */
+.faq-row.is-open .chev { color: var(--color-papel); }
+@media (hover: hover) {
+  .faq-row:not(.is-open):hover .chev { color: var(--color-azul-medio); border-color: var(--color-azul-medio); }
+}
+
+/* ==========================================================
+   CONTACTO
+   Cada canal es una fila entera: el enlace se estira sobre toda
+   la fila (::after), así el blanco del toque es la fila y no una
+   línea de texto. El botón de copiar va por encima.
+   ========================================================== */
+.contacto-filas { display: grid; margin-top: clamp(32px, 3.5vw, 44px); }
+.contacto-fila {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-inline: -14px;
+  padding: 16px 14px;
+  border-radius: var(--radius-medium);
+  transition: background-color .3s ease;
+}
+.contacto-fila + .contacto-fila::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 14px;
+  right: 14px;
+  border-top: 1.5px dotted rgb(0 54 165 / .2);
+}
+.contacto-icono {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-pills);
+  border: 1px solid var(--borde-fino);
+  background: var(--color-papel);
+  box-shadow: var(--sombra-1);
+  color: var(--color-azul);
+  transition: background-color .35s ease, color .35s ease, transform .5s var(--ease-out);
+}
+.contacto-icono > svg:not(.lucide) { width: 18px; height: 18px; fill: currentColor; }
+.contacto-dato { display: grid; gap: 5px; flex: 1; min-width: 0; }
+.contacto-rotulo { color: rgb(0 54 165 / .8); }
+.contacto-enlace,
+.contacto-valor { font-size: 17px; line-height: 1.3; overflow-wrap: anywhere; }
+.contacto-enlace { color: var(--color-azul); outline: none; }
+.contacto-enlace::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.contacto-enlace:focus-visible::after { outline: 2px solid var(--color-azul-medio); outline-offset: 2px; }
+.contacto-valor { color: rgb(0 54 165 / .85); }
+.contacto-flecha { color: rgb(0 54 165 / .55); transition: transform .45s var(--ease-out), color .3s ease; }
+@media (hover: hover) {
+  .contacto-fila:not(.es-nota):hover { background: rgb(255 255 255 / .72); }
+  .contacto-fila:not(.es-nota):hover .contacto-icono { background: var(--color-azul); color: var(--color-papel); transform: rotate(-8deg); }
+  .contacto-fila:hover .contacto-flecha { color: var(--color-azul-medio); transform: translate(2px, -2px); }
+}
+.contacto-copiar {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-pills);
+  border: 1px solid rgb(0 54 165 / .2);
+  background: var(--color-papel);
+  font-size: 13px;
+  color: var(--color-azul);
+  cursor: pointer;
+  transition: background-color .25s ease, border-color .25s ease, color .25s ease, transform .18s ease;
+}
+.contacto-copiar:hover { border-color: var(--color-azul-medio); color: var(--color-azul-medio); }
+.contacto-copiar:active { transform: scale(.96); }
+.contacto-copiar.es-hecho { background: var(--color-azul); border-color: var(--color-azul); color: var(--color-papel); }
+
+/* En un teléfono el botón de copiar queda en ícono (el nombre lo
+   sigue diciendo aria-label): con la palabra, el correo se partía en
+   dos renglones. */
+@media (max-width: 479px) {
+  .contacto-copiar { width: 36px; padding: 0; justify-content: center; }
+  .contacto-copiar-texto { display: none; }
+  .contacto-enlace, .contacto-valor { font-size: 16px; }
+}
+
+/* Los flotantes también se levantan: el aro de papel los separa del
+   pie azul y la sombra de tinta, del lienzo. */
+#btt, .wsp-flotante { box-shadow: 0 14px 34px -12px rgb(0 54 165 / .5); }
+#btt:hover, .wsp-flotante:hover { box-shadow: 0 18px 40px -12px rgb(21 91 205 / .6); }
+
+/* ==========================================================
+   CAMPOS
+   El campo enfocado se enciende: el borde pasa a azul medio (ya
+   estaba) y suma un aro de luz de la misma tinta, que se ve sin
+   depender del color del borde.
+   ========================================================== */
+.field-input {
+  transition: border-color .2s, --luz .4s ease, box-shadow .35s var(--ease-out);
+}
+.field-input:focus { box-shadow: 0 0 0 4px rgb(21 91 205 / .12); }
+.has-error .field-input:focus { box-shadow: 0 0 0 4px rgb(198 40 40 / .12); }
+@media (hover: hover) {
+  .field-input:not(:focus):hover { border-color: rgb(0 54 165 / .55); }
+}
+
+/* Los filtros y las píldoras de etiqueta también responden al tacto. */
+.pill { transition: background-color .2s, color .2s, border-color .2s, transform .18s ease; }
+.pill:active { transform: scale(.96); }
+
+/* ==========================================================
+   MOVIMIENTO REDUCIDO
+   ========================================================== */
+/* Menos movimiento, no ninguno: se quedan los cambios de color y de
+   luz que confirman una acción; se van los desplazamientos, los giros y
+   todo lo ligado al scroll o al cursor (eso ya no corre: está dentro de
+   prefers-reduced-motion: no-preference, y el JS no escribe --hx ni el
+   imán). */
+@media (prefers-reduced-motion: reduce) {
+  .ambiente i { animation: none; }
+  .eyebrow-l { transform: scaleX(1); }
+  .stack-logos li:hover svg,
+  .contacto-fila:hover .contacto-icono,
+  .contacto-fila:hover .contacto-flecha,
+  :is(a, button):hover > .flecha,
+  .pliego:not(.is-open):hover::after,
+  .paso::before { transform: none; }
+}

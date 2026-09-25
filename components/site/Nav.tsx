@@ -4,8 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Mark } from "@/components/brand/Mark";
 import { lockScroll } from "@/components/motion/MotionProvider";
 import { useMotionEnv } from "@/lib/motion";
-import { hero, nav } from "@/lib/content";
+import { hero, nav, site, whatsappUrl } from "@/lib/content";
 import { MetalFaz } from "@/components/brand/MetalRig";
+import { Flecha } from "@/components/ui/Flecha";
 
 export function Nav() {
   const [open, setOpen] = useState(false);
@@ -113,9 +114,9 @@ export function Nav() {
       />
 
       <header
-        className={`nav-shell fixed inset-x-0 top-4 z-40 mx-auto flex w-[calc(100%-2rem)] max-w-[1200px] items-center justify-between gap-6 rounded-pills border border-azul/15 bg-papel py-2 pl-4 pr-2 ${
+        className={`nav-shell fixed inset-x-0 top-4 z-40 mx-auto flex w-[calc(100%-2rem)] items-center justify-between gap-6 rounded-pills border pl-4 pr-2 ${
           stuck ? "is-stuck" : ""
-        }`}
+        } ${open ? "is-abierta" : ""}`}
       >
         <a className="inline-flex items-center gap-2" href="#top" aria-label="Visual Solution, inicio">
           <Mark className={`block h-auto w-[26px] text-azul ${pop ? "nav-pop" : ""}`} />
@@ -197,25 +198,29 @@ export function Nav() {
         </div>
       </header>
 
-      <div
-        id="menu"
-        className={`fixed inset-0 z-40 flex-col bg-fondo px-4 pb-10 pt-24  ${
-          open ? "flex" : "hidden"
-        }`}
-      >
-        {nav.map((item, i) => (
-          <a
-            key={item.href}
-            className="display border-b border-dotted border-azul/30 py-4 text-[clamp(34px,12vw,60px)] text-azul"
-            href={item.href}
-            onClick={() => setOpen(false)}
-            style={{ ["--i" as string]: i } as React.CSSProperties}
-          >
-            {item.label}
-          </a>
-        ))}
+      {/* El menú del teléfono es un índice: número, sección y flecha, como
+          los rótulos de la página. Abajo, los tres canales de contacto a un
+          toque, que es lo que más se busca desde un teléfono. */}
+      <div id="menu" className={`menu fixed inset-0 z-40 flex-col px-5 pb-8 pt-24 ${open ? "flex" : "hidden"}`}>
+        <nav aria-label="Menú">
+          {nav.map((item, i) => (
+            <a
+              key={item.href}
+              className="menu-enlace"
+              href={item.href}
+              onClick={() => setOpen(false)}
+              style={{ ["--i" as string]: i } as React.CSSProperties}
+            >
+              <span className="menu-n" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="display">{item.label}</span>
+              <Flecha />
+            </a>
+          ))}
+        </nav>
         <a
-          className="btn btn-metal mt-8 self-start"
+          className="btn btn-metal menu-anima mt-8 self-start"
           href="#contacto"
           onClick={() => setOpen(false)}
           style={{ ["--i" as string]: nav.length } as React.CSSProperties}
@@ -224,6 +229,23 @@ export function Nav() {
           <i className="diamond" aria-hidden="true" />
           {hero.primaryCta}
         </a>
+        <ul className="menu-pie menu-anima" style={{ ["--i" as string]: nav.length + 1 } as React.CSSProperties}>
+          <li>
+            <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer">
+              WhatsApp
+              <span className="sr-only"> (se abre en una pestaña nueva)</span>
+            </a>
+          </li>
+          <li>
+            <a href={`mailto:${site.email}`}>Correo</a>
+          </li>
+          <li>
+            <a href={site.instagram.url} target="_blank" rel="noopener">
+              Instagram
+              <span className="sr-only"> (se abre en una pestaña nueva)</span>
+            </a>
+          </li>
+        </ul>
       </div>
     </>
   );

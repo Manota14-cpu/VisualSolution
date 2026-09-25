@@ -1,26 +1,49 @@
+import { siWhatsapp } from "simple-icons";
 import { Mark } from "@/components/brand/Mark";
 import { Reveal, SplitHeading } from "@/components/motion/Reveal";
 import { hero, legal, nav, site, siteHost, siteUrl, whatsappUrl } from "@/lib/content";
 import { MetalFaz } from "@/components/brand/MetalRig";
+import { Flecha } from "@/components/ui/Flecha";
 
 export function Closer() {
   return (
     /* La página abre con una plancha y cierra con otra: el último
        bloque antes del pie es el mismo material que el hero, para que
        el remate no sea un párrafo más sobre negro. */
-    <section className="inundado mx-2 mt-2 overflow-hidden rounded-2xl py-24 text-center md:mx-3 md:rounded-[2rem] md:py-32">
+    /* El monograma vuelve, enorme y en filete, detrás de la frase: la
+       página abre con la marca en el cielo y cierra con la marca en la
+       tinta. La luz del cursor recorre la trama (data-luz). */
+    <section className="cierre inundado mx-2 mt-2 overflow-hidden rounded-2xl py-28 text-center md:mx-3 md:rounded-[2rem] md:py-40" data-luz>
+      <Mark className="cierre-marca" />
       <div className="relative mx-auto w-full max-w-[1200px] px-4 md:px-10">
         <SplitHeading
           text="Tu marca merece verse tan bien como funciona."
-          className="mx-auto max-w-[18ch] display display-lg"
+          accent="tan bien como funciona."
+          className="mx-auto max-w-[16ch] display display-lg"
         />
-        <Reveal as="p" delay={1} className="mx-auto mt-5 max-w-[52ch] text-[17px] leading-relaxed text-papel/85">
+        <Reveal as="p" delay={1} className="mx-auto mt-7 max-w-[52ch] text-[17px] leading-relaxed text-papel/85 md:text-lg">
           Contanos la idea. La primera propuesta no se cobra.
         </Reveal>
-        <Reveal as="a" delay={2} className="btn btn-metal mt-8" href="#contacto">
-          <MetalFaz />
-          <i className="diamond" aria-hidden="true" />
-          {hero.primaryCta}
+        <Reveal delay={2} className="mt-9 flex flex-wrap items-center justify-center gap-3">
+          <a className="btn btn-metal" href="#contacto">
+            <MetalFaz />
+            <i className="diamond" aria-hidden="true" />
+            {hero.primaryCta}
+          </a>
+          <a
+            className="btn btn-metal es-suave"
+            href={whatsappUrl("Hola Visual Solution, quiero hacer una consulta.")}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <MetalFaz />
+            <svg className="size-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+              <path d={siWhatsapp.path} />
+            </svg>
+            Escribinos por WhatsApp
+            <Flecha externa />
+            <span className="sr-only"> (se abre en una pestaña nueva)</span>
+          </a>
         </Reveal>
       </div>
     </section>
@@ -49,7 +72,7 @@ const columns = [
 
 export function Footer() {
   return (
-    <footer className="mx-2 mb-2 mt-2 rounded-2xl bg-azul pb-10 pt-14 text-papel md:mx-3 md:mb-3 md:rounded-[2rem]">
+    <footer className="pie relative mx-2 mb-2 mt-2 overflow-hidden rounded-2xl bg-azul pt-14 text-papel md:mx-3 md:mb-3 md:rounded-[2rem]">
       <div className="mx-auto w-full max-w-[1200px] px-4 md:px-10">
         <div className="flex flex-wrap justify-between gap-10">
           <div className="grid max-w-[34ch] content-start gap-4">
@@ -107,6 +130,13 @@ export function Footer() {
           </a>
         </small>
       </div>
+
+      {/* La firma: el nombre a todo el ancho, impreso con la trama y
+          recortado por el borde inferior, como un sello que no entra
+          entero en la hoja. Es decorado: el nombre ya está arriba. */}
+      <p className="pie-firma" aria-hidden="true">
+        Visual Solution
+      </p>
     </footer>
   );
 }

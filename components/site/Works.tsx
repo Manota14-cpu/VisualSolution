@@ -9,6 +9,8 @@ import { scrollToId } from "@/components/motion/MotionProvider";
 import { useMotionEnv, withTransition } from "@/lib/motion";
 import { etiquetaEnlace, workFilters, works, type Work } from "@/lib/content";
 import { MetalFaz } from "@/components/brand/MetalRig";
+import { Eyebrow } from "@/components/site/Eyebrow";
+import { Flecha } from "@/components/ui/Flecha";
 
 /* ============================================================
    EL CATÁLOGO
@@ -89,7 +91,7 @@ function Tarjeta({
 
   return (
     <div ref={ref} className={`rv ${ancha ? "md:col-span-2" : ""}`} hidden={hidden}>
-      <article className={`obra ${ancha ? "es-ancha" : ""} ${work.pending ? "es-pendiente" : ""}`}>
+      <article className={`obra ${ancha ? "es-ancha" : ""} ${work.pending ? "es-pendiente" : ""}`} data-luz>
         <Ventana work={work} morphing={morphing} />
 
         <div className="obra-cuerpo">
@@ -117,10 +119,12 @@ function Tarjeta({
                   <MetalFaz />
                   <i className="diamond" aria-hidden="true" />
                   {etiquetaEnlace(work.url!)}
+                  <Flecha externa />
                   <span className="sr-only"> (se abre en una pestaña nueva)</span>
                 </a>
                 <button className="obra-ficha" type="button" onClick={() => onOpen(work)}>
                   Ver ficha
+                  <Flecha />
                 </button>
               </>
             ) : (
@@ -128,6 +132,7 @@ function Tarjeta({
                 <MetalFaz />
                 <i className="diamond" aria-hidden="true" />
                 {etiquetaFicha}
+                <Flecha />
               </button>
             )}
           </div>
@@ -146,6 +151,31 @@ export function Works() {
   const [morphId, setMorphId] = useState<string | null>(null);
   const { reduce } = useMotionEnv();
   const pushedUrl = useRef(false);
+  const filtros = useRef<HTMLDivElement>(null);
+
+  /* El filtro elegido no se pinta solo: una píldora azul viaja hasta él,
+     como la luz de la nav. Se mide el botón y se mueve con transform. Hasta
+     que esto corre, el botón elegido tiene su propio fondo (sin JS también
+     se ve cuál está puesto). */
+  useEffect(() => {
+    const cont = filtros.current;
+    if (!cont) return;
+    const mover = () => {
+      const b = cont.querySelector<HTMLElement>('button[aria-pressed="true"]');
+      if (!b) return;
+      cont.style.setProperty("--fx", `${b.offsetLeft}px`);
+      cont.style.setProperty("--fy", `${b.offsetTop}px`);
+      cont.style.setProperty("--fw", `${b.offsetWidth}px`);
+      cont.style.setProperty("--fh", `${b.offsetHeight}px`);
+      /* La primera vez se ubica sin transición y recién después se
+         encienden: si no, la píldora entraba volando desde la izquierda. */
+      if (!cont.classList.contains("listo")) void cont.offsetWidth;
+      cont.classList.add("listo");
+    };
+    mover();
+    window.addEventListener("resize", mover);
+    return () => window.removeEventListener("resize", mover);
+  }, [filter]);
 
   const visible = works.filter((w) => filter === "todos" || w.category === filter);
   /* La primera tarjeta ocupa el ancho completo sólo cuando quedan
@@ -202,33 +232,49 @@ export function Works() {
   }, [close]);
 
   return (
-    <section className="bg-fondo py-20 md:py-28" id="trabajos">
+    <section className="seccion" id="trabajos" aria-labelledby="trabajos-titulo">
       <div className="mx-auto w-full max-w-[1200px] px-4 md:px-10">
-        <div className="mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+        {/* Una sola palabra a escala de cartel: es la sección que vende, y
+            el titular más grande de la página después del hero. */}
+        <div className="cabecera">
           <Reveal>
-            <SplitHeading text="Trabajos" className="display display-md" />
-            <p className="mt-8 max-w-[54ch] text-base leading-relaxed text-azul/85">
+            <Eyebrow n="02">Proyectos</Eyebrow>
+            <div className="titulo-con-cuenta">
+              <SplitHeading id="trabajos-titulo" text="Trabajos" className="display display-xl" />
+              {/* La cuenta, en superíndice como en un índice editorial. Es
+                  decorado: la grilla de abajo ya la dice. */}
+              <span className="titulo-cuenta" aria-hidden="true">
+                {String(works.length).padStart(2, "0")}
+              </span>
+            </div>
+          </Reveal>
+          <Reveal delay={1} className="cabecera-texto">
+            <p>
               Sitios web, tiendas online y software a medida. Los que están publicados se pueden
               recorrer desde acá: preferimos mostrarlos funcionando antes que contarlos.
             </p>
-          </Reveal>
-          <Reveal as="a" delay={1} className="link shrink-0" href="#contacto">
-            Contanos tu proyecto
+            <a className="link link-flecha mt-5" href="#contacto">
+              Contanos tu proyecto
+              <Flecha />
+            </a>
           </Reveal>
         </div>
 
-        <Reveal className="mb-10 flex flex-wrap gap-2" role="group" aria-label="Filtrar trabajos por tipo">
-          {workFilters.map((f) => (
-            <button
-              key={f.id}
-              className="pill"
-              type="button"
-              aria-pressed={filter === f.id}
-              onClick={() => pick(f.id)}
-            >
-              {f.label}
-            </button>
-          ))}
+        <Reveal className="mb-10">
+          <div className="filtros" ref={filtros} role="group" aria-label="Filtrar trabajos por tipo">
+            <i className="filtros-luz" aria-hidden="true" />
+            {workFilters.map((f) => (
+              <button
+                key={f.id}
+                className="pill"
+                type="button"
+                aria-pressed={filter === f.id}
+                onClick={() => pick(f.id)}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
         </Reveal>
 
         {/* Con un número impar de trabajos el primero ocupa el ancho

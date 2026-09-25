@@ -27,12 +27,12 @@ const herramientas = [siNextdotjs, siReact, siThreedotjs, siShopify, siWoocommer
 
 export function Stack() {
   return (
-    <section className="stack py-14 md:py-20" aria-labelledby="stack-titulo">
+    <section className="stack py-4 md:py-8" aria-labelledby="stack-titulo">
       <div className="mx-auto w-full max-w-[1200px] px-4 md:px-10">
         <h2 id="stack-titulo" className="label text-center text-azul/80">
           Con qué trabajamos
         </h2>
-        <ul className="stack-logos mt-7">
+        <ul className="stack-logos superficie mt-6">
           {herramientas.map((h) => (
             <li key={h.slug} data-logo={h.slug}>
               <svg viewBox="0 0 24 24" aria-hidden="true">

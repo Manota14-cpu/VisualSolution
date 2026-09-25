@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
+/* La capa de experiencia va después: gana en los empates. */
+import "./experiencia.css";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { MetalRig } from "@/components/brand/MetalRig";
 import { BackToTop, Grain, Preloader, ScrollProgress } from "@/components/motion/Chrome";
@@ -100,6 +102,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
              nada de lo que escribe un visitante acá adentro. */
           dangerouslySetInnerHTML={{ __html: JSON.stringify(datosDelEstudio) }}
         />
+        {/* El lienzo vivo: luces de bruma que derivan y la trama fija. Va
+            detrás de todo y no se anuncia. */}
+        <div className="ambiente" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </div>
         <Preloader />
         <ScrollProgress />
         <Grain />

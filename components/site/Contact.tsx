@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Check, Copy, Mail, MessagesSquare } from "lucide-react";
+import { siInstagram, siWhatsapp } from "simple-icons";
 import { Reveal, SplitHeading } from "@/components/motion/Reveal";
+import { Eyebrow } from "@/components/site/Eyebrow";
+import { Flecha } from "@/components/ui/Flecha";
 import { useMotionEnv } from "@/lib/motion";
 import { onAskAbout, onAskForServices } from "@/lib/consult";
 import { serviceOptions, site, whatsappUrl } from "@/lib/content";
@@ -34,6 +38,19 @@ export function Contact() {
   const [failed, setFailed] = useState("");
   const { reduce } = useMotionEnv();
   const mensajeRef = useRef<HTMLTextAreaElement>(null);
+  const [copiado, setCopiado] = useState(false);
+
+  /* Copiar el correo: quien escribe desde otra cuenta o desde el
+     teléfono no quiere que se abra el cliente de mail. */
+  const copiarCorreo = async () => {
+    try {
+      await navigator.clipboard.writeText(site.email);
+      setCopiado(true);
+      window.setTimeout(() => setCopiado(false), 1800);
+    } catch {
+      /* sin permiso de portapapeles queda el enlace de siempre */
+    }
+  };
 
   /* Si alguien pidió consultar por un proyecto del catálogo, el mensaje
      llega precargado y el foco va al final del texto para que siga
@@ -159,52 +176,94 @@ export function Contact() {
   }
 
   return (
-    <section className="bg-fondo py-20 md:py-28" id="contacto">
-      <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 items-start gap-10 px-4 md:px-10 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
+    <section className="seccion" id="contacto" aria-labelledby="contacto-titulo">
+      <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 items-start gap-12 px-4 md:px-10 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
         <Reveal>
+          <Eyebrow n="05">Contacto</Eyebrow>
           <SplitHeading
+            id="contacto-titulo"
             text="Hablemos de tu proyecto."
+            accent="tu proyecto."
             className="display display-md"
           />
-          <p className="mt-8 max-w-[62ch] text-base leading-relaxed text-azul/85">
+          <p className="mt-8 max-w-[46ch] text-[17px] leading-relaxed text-azul/85">
             Contanos qué necesitás y te respondemos con una propuesta concreta: alcance, plazo y precio.
           </p>
 
-          <dl className="mt-10 grid gap-6">
-            <div>
-              <dt className="label mb-2 block text-azul/80">WhatsApp</dt>
-              <dd className="m-0">
-                <a className="link" href={whatsappUrl()} target="_blank" rel="noopener noreferrer">
+          {/* Cada canal es una fila entera que se toca: el ícono dice qué
+              es, la flecha adónde lleva. Antes eran enlaces sueltos de una
+              línea, chicos para el dedo. */}
+          <ul className="contacto-filas">
+            <li className="contacto-fila">
+              <span className="contacto-icono" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d={siWhatsapp.path} />
+                </svg>
+              </span>
+              <span className="contacto-dato">
+                <span className="label contacto-rotulo">WhatsApp</span>
+                <a className="contacto-enlace" href={whatsappUrl()} target="_blank" rel="noopener noreferrer">
                   {site.whatsappVisible}
+                  <span className="sr-only"> (se abre en una pestaña nueva)</span>
                 </a>
-              </dd>
-            </div>
-            <div>
-              <dt className="label mb-2 block text-azul/80">Correo</dt>
-              <dd className="m-0">
-                <a className="link" href={`mailto:${site.email}`}>
+              </span>
+              <Flecha externa className="contacto-flecha" />
+            </li>
+            <li className="contacto-fila">
+              <span className="contacto-icono" aria-hidden="true">
+                <Mail size={18} strokeWidth={1.8} />
+              </span>
+              <span className="contacto-dato">
+                <span className="label contacto-rotulo">Correo</span>
+                <a className="contacto-enlace" href={`mailto:${site.email}`}>
                   {site.email}
                 </a>
-              </dd>
-            </div>
-            <div>
-              <dt className="label mb-2 block text-azul/80">Instagram</dt>
-              <dd className="m-0">
-                <a className="link" href={site.instagram.url} target="_blank" rel="noopener">
+              </span>
+              <button
+                className={`contacto-copiar ${copiado ? "es-hecho" : ""}`}
+                type="button"
+                onClick={copiarCorreo}
+                aria-label={copiado ? "Correo copiado" : "Copiar el correo"}
+              >
+                {copiado ? <Check size={15} strokeWidth={2.2} /> : <Copy size={15} strokeWidth={1.9} />}
+                <span className="contacto-copiar-texto" aria-hidden="true">
+                  {copiado ? "Copiado" : "Copiar"}
+                </span>
+              </button>
+              <span className="sr-only" aria-live="polite">
+                {copiado ? "Correo copiado" : ""}
+              </span>
+            </li>
+            <li className="contacto-fila">
+              <span className="contacto-icono" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d={siInstagram.path} />
+                </svg>
+              </span>
+              <span className="contacto-dato">
+                <span className="label contacto-rotulo">Instagram</span>
+                <a className="contacto-enlace" href={site.instagram.url} target="_blank" rel="noopener">
                   {site.instagram.handle}
+                  <span className="sr-only"> (se abre en una pestaña nueva)</span>
                 </a>
-              </dd>
-            </div>
-            <div>
-              <dt className="label mb-2 block text-azul/80">Respuesta</dt>
-              <dd className="m-0 text-base text-azul/80">Contestamos todos los mensajes.</dd>
-            </div>
-          </dl>
+              </span>
+              <Flecha externa className="contacto-flecha" />
+            </li>
+            <li className="contacto-fila es-nota">
+              <span className="contacto-icono" aria-hidden="true">
+                <MessagesSquare size={18} strokeWidth={1.8} />
+              </span>
+              <span className="contacto-dato">
+                <span className="label contacto-rotulo">Respuesta</span>
+                <span className="contacto-valor">Contestamos todos los mensajes.</span>
+              </span>
+            </li>
+          </ul>
         </Reveal>
 
         <Reveal delay={1}>
           {sent ? (
-            <div className="rounded-cards bg-papel p-6 sm:p-8" role="status">
+            <div className="superficie rounded-cards bg-papel p-6 sm:p-8" role="status">
               <h3 className="display display-sm">Mensaje listo para enviar</h3>
               <p className="mt-2 max-w-[44ch] text-base leading-relaxed text-azul/85">{sent}</p>
               {waUrl && (
@@ -229,7 +288,7 @@ export function Contact() {
               </button>
             </div>
           ) : (
-            <form className="grid gap-4 rounded-cards bg-papel p-5 sm:p-6 lg:p-8" onSubmit={onSubmit} noValidate>
+            <form className="superficie es-alta grid gap-4 rounded-cards bg-papel p-5 sm:p-6 lg:p-8" onSubmit={onSubmit} noValidate>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className={`grid gap-2 ${errors.nombre ? "has-error" : ""}`}>
                   <div className="fl">
