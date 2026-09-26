@@ -1,13 +1,18 @@
 # Cómo se instala App Visual
 
-Animación de 5 segundos, cuadrada (1080 x 1080, 30 cuadros por segundo),
-para mostrarle a un local cómo se instala la app:
+Animación de 8 segundos, vertical 9:16 (1080 x 1920, 30 cuadros por
+segundo), para historias, reels y estados. Le muestra a un local cómo se
+instala la app:
 
-1. **Conectás el pendrive** (0 a 1,1 s)
-2. **Abrís el instalador**: doble clic en «Instalar App Visual» (1,1 a 2,1 s)
-3. **Se instala todo solo**: la barra llega al 100% y tilda Stock, Caja y Ventas (2,1 a 3,8 s)
+1. **Conectás el pendrive** (0 a 2 s)
+2. **Abrís el instalador**: doble clic en «Instalar App Visual» (2 a 3,6 s)
+3. **Se instala todo solo**: la barra llega al 100% y tilda Stock, Caja y Ventas (3,6 a 6,1 s)
 4. **Listo para vender**: queda el ícono en la compu, con «Sin internet»,
-   «Los datos quedan en tu compu» y «Sin cuota» (3,8 a 5 s)
+   «Los datos quedan en tu compu» y «Sin cuota» (6,1 a 8 s)
+
+Cada texto queda quieto al menos un segundo y medio, para que se lea de
+una. Lo importante va entre los 250 y los 1620 px de alto: arriba y
+abajo queda aire para lo que tapan Instagram y WhatsApp.
 
 ```
 index.html                   la animación: se abre en el navegador y corre en bucle
@@ -23,8 +28,9 @@ adelanta y atrasa.
 
 ## Cambiarla y volver a sacar el video
 
-Los textos de cada paso están en `PASOS` y los tiempos en `render(t)`,
-los dos en `index.html`. Después:
+Todo está en `index.html`: los textos de cada paso en `PASOS`, los
+tiempos en `render(t)` y el tamaño y la duración en `ANCHO`, `ALTO` y
+`DURACION`. Después:
 
 ```bash
 node render.cjs                         # instalacion-app-visual.mp4

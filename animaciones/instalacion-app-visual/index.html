@@ -5,15 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Instalación App Visual</title>
 <!--
-  Animación de 5 segundos: cómo se instala App Visual en un local.
-  Conectás el pendrive, abrís el instalador y se instala todo solo.
+  Animación de 8 segundos, vertical (9:16): cómo se instala App Visual en
+  un local. Conectás el pendrive, abrís el instalador y se instala todo solo.
 
   Abierta en el navegador se reproduce en bucle (espacio pausa, la barra
   de abajo adelanta y atrasa). Con ?render queda quieta en un cuadro de
-  1080 x 1080 y render.cjs la recorre cuadro a cuadro para armar el MP4.
+  1080 x 1920 y render.cjs la recorre cuadro a cuadro para armar el MP4.
 
   Todo el movimiento sale de una sola función, render(t), con t en
   segundos: así el navegador y el video muestran exactamente lo mismo.
+
+  Lo importante va entre los 250 y los 1620 px de alto: arriba y abajo
+  quedan libres para lo que tapan las historias, los reels y los estados.
 -->
 <style>
   @font-face {
@@ -49,7 +52,7 @@
   #stage {
     position: relative;
     width: 1080px;
-    height: 1080px;
+    height: 1920px;
     flex: none;
     overflow: hidden;
     background: var(--fondo);
@@ -59,40 +62,54 @@
   .abs { position: absolute; }
   svg { display: block; overflow: visible; }
 
-  /* La trama de puntos de la marca, sólo en la esquina. */
-  #dots {
+  /* La trama de puntos de la marca, sólo en dos esquinas. */
+  .dots {
     inset: 0;
     background-image: radial-gradient(circle, var(--bruma) 0 2px, transparent 2.6px);
     background-size: 18px 18px;
-    -webkit-mask-image: radial-gradient(circle at 100% 100%, #000 0%, transparent 42%);
-    mask-image: radial-gradient(circle at 100% 100%, #000 0%, transparent 42%);
+  }
+  #dotsAbajo {
+    -webkit-mask-image: radial-gradient(circle at 100% 100%, #000 0%, transparent 40%);
+    mask-image: radial-gradient(circle at 100% 100%, #000 0%, transparent 40%);
+  }
+  #dotsArriba {
+    -webkit-mask-image: radial-gradient(circle at 0% 0%, #000 0%, transparent 22%);
+    mask-image: radial-gradient(circle at 0% 0%, #000 0%, transparent 22%);
   }
 
   /* ---------- Encabezado y pie ---------- */
   #head {
-    left: 64px; right: 64px; top: 52px; height: 56px;
-    display: flex; align-items: center; gap: 16px;
+    left: 64px; right: 64px; top: 250px; height: 64px;
+    display: flex; align-items: center; gap: 18px;
   }
-  #head .name { font-size: 32px; letter-spacing: -0.04em; }
+  #head .name { font-size: 38px; letter-spacing: -0.04em; }
   #head .tag {
     margin-left: auto;
-    padding: 10px 22px;
+    padding: 12px 26px;
     border-radius: 800px;
     background: var(--bruma);
-    font-size: 22px;
+    font-size: 26px;
     letter-spacing: -0.01em;
   }
 
   #foot {
-    left: 64px; right: 64px; bottom: 52px;
+    left: 64px; right: 64px; top: 1570px;
     display: flex; align-items: center; gap: 14px;
-    font-size: 21px; letter-spacing: -0.01em;
+    font-size: 25px; letter-spacing: -0.01em;
   }
   #foot .handle { margin-left: auto; opacity: 0.8; }
 
-  /* ---------- La compu ---------- */
+  /* ---------- La compu ----------
+     Se dibuja a la medida de siempre y se agranda entera un 10%, así en
+     el celular se alcanza a leer lo que pasa en la pantalla. Con el
+     pendrive puesto ocupa de 65 a 1015 px de ancho. */
+  #compu {
+    left: 0; top: 0; width: 1080px; height: 1920px;
+    transform-origin: 0 0;
+    transform: translate(-89px, -74px) scale(1.1);
+  }
   #lid {
-    left: 200px; top: 150px; width: 600px; height: 380px;
+    left: 200px; top: 440px; width: 600px; height: 380px;
     border-radius: 26px;
     background: var(--azul);
   }
@@ -101,7 +118,7 @@
     border-radius: 50%; background: var(--medio);
   }
   #base {
-    left: 140px; top: 530px; width: 720px; height: 40px;
+    left: 140px; top: 820px; width: 720px; height: 40px;
     border-radius: 3px 3px 22px 22px;
     background: var(--medio);
   }
@@ -115,9 +132,9 @@
     border-radius: 3px 0 0 3px;
     background: var(--azul);
   }
-  #pendrive { left: 826px; top: 525px; width: 178px; height: 50px; }
+  #pendrive { left: 826px; top: 815px; width: 178px; height: 50px; }
   #ring {
-    left: 836px; top: 526px; width: 48px; height: 48px;
+    left: 836px; top: 816px; width: 48px; height: 48px;
     border-radius: 50%;
     border: 3px solid var(--medio);
   }
@@ -151,7 +168,7 @@
     height: 38px; padding: 0 14px;
     display: flex; align-items: center; gap: 8px;
     border-bottom: 1.5px dotted rgba(0, 54, 165, 0.25);
-    font-size: 12px; letter-spacing: 0.08em;
+    font-size: 13px; letter-spacing: 0.08em;
   }
   #explorer .bar .dots { margin-left: auto; display: flex; gap: 6px; }
   #explorer .bar .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--bruma); }
@@ -164,27 +181,27 @@
   #tile svg { position: relative; }
   #tile .lbl {
     position: relative; margin-top: 8px;
-    font-size: 14px; line-height: 1.2; text-align: center; letter-spacing: -0.01em;
+    font-size: 16px; line-height: 1.2; text-align: center; letter-spacing: -0.01em;
   }
 
   #installer { left: 74px; top: 43px; width: 420px; height: 232px; padding: 22px 24px; }
   #installer .top { display: flex; align-items: center; gap: 16px; }
-  #installer .title { font-size: 22px; letter-spacing: -0.03em; }
-  #installer .sub { margin-top: 4px; font-size: 14px; opacity: 0.8; }
+  #installer .title { font-size: 26px; letter-spacing: -0.03em; }
+  #installer .sub { margin-top: 4px; font-size: 17px; opacity: 0.8; }
   #installer .prog { margin-top: 22px; display: flex; align-items: center; gap: 14px; }
   #installer .track {
     flex: 1; height: 12px; border-radius: 6px;
     background: var(--bruma); overflow: hidden;
   }
   #fill { height: 100%; width: 100%; background: var(--azul); transform-origin: left; }
-  #pct { width: 48px; text-align: right; font-size: 16px; font-variant-numeric: tabular-nums; }
+  #pct { width: 54px; text-align: right; font-size: 19px; font-variant-numeric: tabular-nums; }
   #installer .items { margin-top: 22px; display: flex; gap: 10px; }
   .item {
     display: flex; align-items: center; gap: 8px;
     padding: 6px 14px 6px 8px;
     border-radius: 800px;
     border: 1.5px solid rgba(0, 54, 165, 0.35);
-    font-size: 15px;
+    font-size: 17px;
   }
   .item .chk {
     width: 20px; height: 20px; border-radius: 50%;
@@ -199,7 +216,7 @@
   #appIcon { left: 232px; top: 64px; width: 104px; }
   #appIcon .lbl {
     margin-top: 10px; width: 160px; margin-left: -28px;
-    text-align: center; font-size: 16px; letter-spacing: -0.02em;
+    text-align: center; font-size: 19px; letter-spacing: -0.02em;
   }
   #badge {
     left: 78px; top: -12px; width: 38px; height: 38px;
@@ -214,7 +231,7 @@
     right: 12px; bottom: 42px;
     display: flex; align-items: center; gap: 10px;
     padding: 9px 16px 9px 9px;
-    font-size: 14px;
+    font-size: 16px;
   }
   #toast .ico {
     width: 30px; height: 30px; border-radius: 50%;
@@ -231,7 +248,7 @@
 
   /* ---------- El texto de cada paso ---------- */
   #num {
-    left: 64px; top: 638px; width: 88px; height: 88px;
+    left: 64px; top: 960px; width: 96px; height: 96px;
     border-radius: 50%;
     overflow: hidden;
     background: var(--azul);
@@ -240,31 +257,41 @@
   #num .n {
     inset: 0;
     display: grid; place-items: center;
-    font-size: 42px; letter-spacing: -0.04em;
+    font-size: 46px; letter-spacing: -0.04em;
+  }
+  #paso {
+    left: 186px; top: 960px; width: 600px; height: 96px;
+    overflow: hidden;
+  }
+  #paso .p {
+    left: 0; top: 0;
+    font-size: 34px; line-height: 96px; letter-spacing: -0.02em;
+    white-space: nowrap;
   }
   #caps {
-    left: 176px; top: 630px; width: 860px; height: 104px;
+    left: 64px; top: 1074px; width: 1000px; height: 142px;
     overflow: hidden;
   }
   .cap {
     left: 0; top: 0;
     white-space: nowrap;
-    font-size: 80px; line-height: 104px; letter-spacing: -0.035em;
+    font-size: 108px; line-height: 142px; letter-spacing: -0.04em;
   }
   .cap .w { display: inline-block; margin-right: 0.24em; }
 
-  #rail { left: 64px; top: 776px; width: 952px; display: flex; gap: 14px; }
+  #rail { left: 64px; top: 1262px; width: 952px; display: flex; gap: 16px; }
   .seg { flex: 1; }
-  .seg .track { height: 8px; border-radius: 4px; background: var(--bruma); overflow: hidden; }
+  .seg .track { height: 10px; border-radius: 5px; background: var(--bruma); overflow: hidden; }
   .seg .fill { height: 100%; background: var(--azul); transform-origin: left; }
-  .seg .lbl { margin-top: 14px; font-size: 21px; letter-spacing: -0.01em; }
+  .seg .lbl { margin-top: 16px; font-size: 26px; letter-spacing: -0.01em; }
 
-  #pills { left: 64px; top: 872px; display: flex; gap: 12px; }
+  #pills { left: 64px; top: 1380px; display: flex; gap: 12px; }
   .pill {
-    padding: 10px 22px;
+    padding: 12px 24px;
     border-radius: 800px;
     background: var(--bruma);
-    font-size: 24px; letter-spacing: -0.02em;
+    font-size: 29px; letter-spacing: -0.02em;
+    white-space: nowrap;
   }
 
   /* ---------- Controles del navegador (no salen en el video) ---------- */
@@ -323,14 +350,16 @@
 
 <div id="stage" role="img"
   aria-label="Animación: se conecta el pendrive a la computadora, se abre el instalador de App Visual y la app queda instalada, lista para vender.">
-  <div id="dots" class="abs"></div>
+  <div id="dotsArriba" class="dots abs"></div>
+  <div id="dotsAbajo" class="dots abs"></div>
 
   <div id="head" class="abs">
-    <svg width="56" height="56"><use href="#va"/></svg>
+    <svg width="64" height="64"><use href="#va"/></svg>
     <span class="name">App Visual</span>
     <span class="tag">Cómo se instala</span>
   </div>
 
+  <div id="compu" class="abs">
   <!-- El pendrive va antes que la base: al enchufarlo, el conector se esconde detrás. -->
   <svg id="pendrive" class="abs" viewBox="0 0 178 50">
     <rect x="1.5" y="14" width="46" height="22" rx="2" fill="#FFFFFF" stroke="#0036A5" stroke-width="3"/>
@@ -409,8 +438,10 @@
 
   <div id="base" class="abs"><i class="notch abs"></i><i class="port abs"></i></div>
   <div id="ring" class="abs"></div>
+  </div>
 
   <div id="num" class="abs"></div>
+  <div id="paso" class="abs"></div>
   <div id="caps" class="abs"></div>
 
   <div id="rail" class="abs">
@@ -426,7 +457,7 @@
   </div>
 
   <div id="foot" class="abs">
-    <svg width="46" height="24" viewBox="0 0 143.5 76" color="#0036A5">
+    <svg width="54" height="29" viewBox="0 0 143.5 76" color="#0036A5">
       <path fill="currentColor" d="M 0.0,0.0 L 34.48,58.27 L 47.35,40.55 L 23.31,0.0 Z M 143.5,5.34 L 76.24,7.16 L 35.57,61.19 L 45.16,76.0 L 85.71,22.1 L 128.45,21.73 Z M 133.18,43.34 L 123.47,32.29 L 86.81,32.05 L 76.0,46.13 L 114.24,47.35 L 104.29,58.4 L 67.14,58.76 L 53.78,75.15 L 112.3,73.94 L 131.24,52.45 Z"/>
     </svg>
     <span>Visual Solution</span>
@@ -436,12 +467,13 @@
 
 <div id="ctrl">
   <button id="play" aria-label="Pausar">❚❚</button>
-  <input id="scrub" type="range" min="0" max="5" step="0.001" value="0" aria-label="Momento de la animación">
+  <input id="scrub" type="range" min="0" max="8" step="0.001" value="0" aria-label="Momento de la animación">
   <output id="clock">0.00 s</output>
 </div>
 
 <script>
-  const DURACION = 5;
+  const DURACION = 8;
+  const ANCHO = 1080, ALTO = 1920;
 
   /* ---------- Herramientas de tiempo ---------- */
   const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -462,16 +494,18 @@
     el.style.opacity = o;
   };
 
-  /* ---------- Los cuatro momentos ---------- */
+  /* ---------- Los cuatro momentos ----------
+     Cada texto entra en a y se va en b: queda quieto casi dos segundos,
+     lo justo para leerlo de una. */
   const PASOS = [
-    { a: -1,   b: 1.08, n: "1", texto: "Conectás el pendrive" },
-    { a: 1.2,  b: 2.06, n: "2", texto: "Abrís el instalador" },
-    { a: 2.18, b: 3.78, n: "3", texto: "Se instala todo solo" },
-    { a: 3.9,  b: 99,   n: "✓", texto: "Listo para vender" },
+    { a: -1,  b: 1.95, n: "1", paso: "Paso 1 de 3", texto: "Conectás el pendrive" },
+    { a: 2.1, b: 3.55, n: "2", paso: "Paso 2 de 3", texto: "Abrís el instalador" },
+    { a: 3.7, b: 6.05, n: "3", paso: "Paso 3 de 3", texto: "Se instala todo solo" },
+    { a: 6.2, b: 99,   n: "✓", paso: "Instalada",   texto: "Listo para vender" },
   ];
-  const TRAMOS = [[0, 1.1], [1.1, 2.1], [2.1, 3.6]];
+  const TRAMOS = [[0, 2], [2, 3.6], [3.6, 5.8]];
 
-  const caps = $("caps"), num = $("num");
+  const caps = $("caps"), num = $("num"), paso = $("paso");
   const palabras = PASOS.map(p => {
     const cap = document.createElement("div");
     cap.className = "cap abs";
@@ -488,14 +522,21 @@
   const numeros = PASOS.map(p => {
     const n = document.createElement("div");
     n.className = "n abs";
-    if (p.n === "✓") n.innerHTML = '<svg width="44" height="44"><use href="#check"/></svg>';
+    if (p.n === "✓") n.innerHTML = '<svg width="48" height="48"><use href="#check"/></svg>';
     else n.textContent = p.n;
     num.appendChild(n);
     return n;
   });
+  const etiquetas = PASOS.map(p => {
+    const e = document.createElement("div");
+    e.className = "p abs";
+    e.textContent = p.paso;
+    paso.appendChild(e);
+    return e;
+  });
 
   /* ---------- La barra del instalador ---------- */
-  const INS = [2.36, 3.56];
+  const INS = [3.85, 5.75];
   const avance = t => {
     const k = prog(t, INS[0], INS[1]);
     return 0.8 * k + 0.2 * ease.inOut(k);
@@ -510,25 +551,26 @@
     return hi;
   };
   const items = [...document.querySelectorAll(".item")];
-  const tildes = [0.34, 0.67, 1].map(cruce);
+  const tildes = [0.335, 0.665, 1].map(cruce);
 
   const segs = [...document.querySelectorAll(".seg")];
   const pills = [...document.querySelectorAll(".pill")];
-  const CLICS = [1.78, 1.92];
+  const CLICS = [3.08, 3.23];
   const OBJETIVO = { x: 308, y: 168 };
 
   function render(t) {
     /* Texto de cada paso: las palabras suben de a una y se van por arriba. */
     PASOS.forEach((p, i) => {
-      const fuera = ease.in(prog(t, p.b, p.b + 0.2)) * 115;
+      const fuera = ease.in(prog(t, p.b, p.b + 0.22)) * 115;
       palabras[i].forEach((w, j) => {
-        const d = p.a + j * 0.05;
-        const dentro = (1 - ease.out(prog(t, d, d + 0.42))) * 115;
+        const d = p.a + j * 0.06;
+        const dentro = (1 - ease.out(prog(t, d, d + 0.45))) * 115;
         w.style.transform = `translateY(${dentro - fuera}%)`;
       });
-      const nIn = (1 - ease.out(prog(t, p.a, p.a + 0.36))) * 100;
-      const nOut = ease.in(prog(t, p.b, p.b + 0.2)) * 100;
-      numeros[i].style.transform = `translateY(${nIn - nOut}%)`;
+      const kIn = (1 - ease.out(prog(t, p.a, p.a + 0.4))) * 100;
+      const kOut = ease.in(prog(t, p.b, p.b + 0.22)) * 100;
+      numeros[i].style.transform = `translateY(${kIn - kOut}%)`;
+      etiquetas[i].style.transform = `translateY(${kIn - kOut}%)`;
     });
 
     TRAMOS.forEach(([a, b], i) => {
@@ -538,45 +580,45 @@
 
     /* 1 · El pendrive entra, frena y hace clic. */
     let px;
-    if (t < 0.72) px = lerp(300, 16, ease.out(prog(t, 0.12, 0.72)));
-    else px = lerp(16, 0, ease.inOut(prog(t, 0.76, 0.86)));
-    pose($("pendrive"), { x: px, r: lerp(-4, 0, ease.out(prog(t, 0.12, 0.72))) });
+    if (t < 1.05) px = lerp(300, 16, ease.out(prog(t, 0.25, 1.05)));
+    else px = lerp(16, 0, ease.inOut(prog(t, 1.1, 1.22)));
+    pose($("pendrive"), { x: px, r: lerp(-4, 0, ease.out(prog(t, 0.25, 1.05))) });
 
-    const enchufado = t >= 0.86;
+    const enchufado = t >= 1.22;
     const instalando = t >= INS[0] && t < INS[1];
     $("led").setAttribute("fill",
       !enchufado ? "#AECDED" : instalando && Math.floor(t * 9) % 2 ? "#155BCD" : "#FFFFFF");
 
-    const kr = prog(t, 0.86, 1.3);
+    const kr = prog(t, 1.22, 1.72);
     pose($("ring"), { s: lerp(0.4, 2.6, ease.out(kr)), o: kr > 0 && kr < 1 ? (1 - kr) * 0.9 : 0 });
 
-    const kt = ease.out(prog(t, 0.92, 1.1));
-    pose($("toast"), { y: lerp(16, 0, kt), o: kt * (1 - prog(t, 1.34, 1.5)) });
+    const kt = ease.out(prog(t, 1.3, 1.5));
+    pose($("toast"), { y: lerp(16, 0, kt), o: kt * (1 - prog(t, 2.05, 2.25)) });
 
     /* 2 · Se abre el pendrive y el cursor hace doble clic en el instalador. */
-    const ke = prog(t, 1.1, 1.36), keo = prog(t, 2.0, 2.18);
+    const ke = prog(t, 2.15, 2.45), keo = prog(t, 3.4, 3.6);
     pose($("explorer"), {
       s: lerp(0.88, 1, ease.back(ke)) * lerp(1, 0.96, keo),
       o: ease.out(ke) * (1 - keo),
     });
 
-    const kc = ease.inOut(prog(t, 1.3, 1.74));
+    const kc = ease.inOut(prog(t, 2.45, 3.0));
     const apreta = Math.max(...CLICS.map(c => pulse(t, c, 0.1)));
     pose($("cursor"), {
       x: lerp(470, OBJETIVO.x, kc),
       y: lerp(300, OBJETIVO.y, kc) - Math.sin(kc * Math.PI) * 24,
       s: 1 - 0.16 * apreta,
-      o: prog(t, 1.26, 1.36) * (1 - prog(t, 2.06, 2.2)),
+      o: prog(t, 2.4, 2.52) * (1 - prog(t, 3.4, 3.55)),
     });
-    $("tileSel").style.opacity = prog(t, 1.78, 1.84);
+    $("tileSel").style.opacity = prog(t, CLICS[0], CLICS[0] + 0.06);
     pose($("tile"), { s: 1 - 0.06 * apreta });
     CLICS.forEach((c, i) => {
-      const k = prog(t, c, c + 0.34);
+      const k = prog(t, c, c + 0.36);
       pose($("rip" + (i + 1)), { s: lerp(0.3, 1.8, ease.out(k)), o: k > 0 && k < 1 ? (1 - k) * 0.8 : 0 });
     });
 
     /* 3 · El instalador copia todo y va tildando lo que trae. */
-    const ki = prog(t, 2.1, 2.38), kio = prog(t, 3.72, 3.9);
+    const ki = prog(t, 3.5, 3.8), kio = prog(t, 6.05, 6.25);
     pose($("installer"), {
       s: lerp(0.9, 1, ease.back(ki)) * lerp(1, 0.92, ease.in(kio)),
       o: ease.out(ki) * (1 - kio),
@@ -594,20 +636,20 @@
     });
 
     /* 4 · Queda el ícono en el escritorio. */
-    const ka = prog(t, 3.86, 4.26);
+    const ka = prog(t, 6.2, 6.6);
     pose($("appIcon"), { s: ease.back(ka), o: clamp(ka * 4) });
-    const kl = ease.out(prog(t, 4.02, 4.22));
+    const kl = ease.out(prog(t, 6.36, 6.56));
     pose($("appIcon").querySelector(".lbl"), { y: lerp(8, 0, kl), o: kl });
-    pose($("badge"), { s: ease.back(prog(t, 4.12, 4.4)) });
+    pose($("badge"), { s: ease.back(prog(t, 6.46, 6.74)) });
     ["sp1", "sp2", "sp3"].forEach((id, i) => {
-      const k = prog(t, 4.06 + i * 0.07, 4.46 + i * 0.07);
-      const brillo = t > 4.6 ? 1 + 0.1 * Math.sin((t - 4.6) * 9 + i * 2) : 1;
+      const k = prog(t, 6.4 + i * 0.07, 6.8 + i * 0.07);
+      const brillo = t > 6.95 ? 1 + 0.1 * Math.sin((t - 6.95) * 9 + i * 2) : 1;
       pose($(id), { s: ease.back(k) * brillo, r: lerp(-60, 0, ease.out(k)), o: clamp(k * 3) });
     });
-    pose($("taskVA"), { s: ease.back(prog(t, 4.18, 4.44)) });
+    pose($("taskVA"), { s: ease.back(prog(t, 6.52, 6.78)) });
 
     pills.forEach((p, i) => {
-      const k = ease.out(prog(t, 4.1 + i * 0.08, 4.45 + i * 0.08));
+      const k = ease.out(prog(t, 6.5 + i * 0.1, 6.9 + i * 0.1));
       pose(p, { y: lerp(18, 0, k), o: k });
     });
   }
@@ -616,19 +658,22 @@
   const modoRender = new URLSearchParams(location.search).has("render");
   window.render = render;
   window.DURACION = DURACION;
+  window.TAMANO = { ancho: ANCHO, alto: ALTO };
 
   if (modoRender) {
     document.documentElement.classList.add("render");
     render(0);
   } else {
     const stage = $("stage"), scrub = $("scrub"), play = $("play"), clock = $("clock");
+    scrub.max = DURACION;
     const PAUSA_FINAL = 1.2;
     let t = 0, corriendo = true, antes = performance.now();
 
     const encajar = () => {
-      const s = Math.min(innerWidth / 1080, (innerHeight - 64) / 1080);
+      const s = Math.min(innerWidth / ANCHO, (innerHeight - 64) / ALTO);
       stage.style.transform = `scale(${s})`;
-      stage.style.margin = `${(1080 * s - 1080) / 2}px ${(1080 * s - 1080) / 2}px ${(1080 * s - 1080) / 2 + 48}px`;
+      const mx = (ANCHO * s - ANCHO) / 2, my = (ALTO * s - ALTO) / 2;
+      stage.style.margin = `${my}px ${mx}px ${my + 48}px`;
     };
     addEventListener("resize", encajar);
     encajar();

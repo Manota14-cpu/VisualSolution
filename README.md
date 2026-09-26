@@ -24,7 +24,7 @@ lib/
   motion.ts         base compartida: preferencias, scroll, bucle de rAF
 public/             logo.svg, íconos de la pestaña, video del hero
 legacy/             la versión anterior en HTML plano, por si hace falta
-animaciones/        piezas animadas sueltas, con su video (cómo se instala App Visual)
+animaciones/        piezas animadas sueltas, con su video (cómo se instala App Visual, 9:16)
 ```
 
 ## Trabajar en el sitio

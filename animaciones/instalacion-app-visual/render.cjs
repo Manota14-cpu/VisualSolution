@@ -34,14 +34,18 @@ const FFMPEG = process.env.FFMPEG || "ffmpeg";
 (async () => {
   const { chromium } = cargarPlaywright();
   const browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: { width: 1080, height: 1080 } });
+  const page = await browser.newPage();
   await page.goto("file://" + path.join(__dirname, "index.html") + "?render");
   await page.evaluate(async () => {
     await document.fonts.load('500 80px "DM Sans"');
     await document.fonts.ready;
   });
 
-  const duracion = await page.evaluate(() => window.DURACION);
+  /* El tamaño y la duración los dice la página. */
+  const { duracion, ancho, alto } = await page.evaluate(() => ({
+    duracion: window.DURACION, ...window.TAMANO,
+  }));
+  await page.setViewportSize({ width: ancho, height: alto });
   const cuadros = Math.round(duracion * FPS);
 
   const ff = spawn(FFMPEG, [
