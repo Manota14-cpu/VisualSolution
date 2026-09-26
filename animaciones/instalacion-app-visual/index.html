@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instalación App Visual</title>
+<!--
+  Animación de 5 segundos: cómo se instala App Visual en un local.
+  Conectás el pendrive, abrís el instalador y se instala todo solo.
+
+  Abierta en el navegador se reproduce en bucle (espacio pausa, la barra
+  de abajo adelanta y atrasa). Con ?render queda quieta en un cuadro de
+  1080 x 1080 y render.cjs la recorre cuadro a cuadro para armar el MP4.
+
+  Todo el movimiento sale de una sola función, render(t), con t en
+  segundos: así el navegador y el video muestran exactamente lo mismo.
+-->
+<style>
+  @font-face {
+    font-family: "DM Sans";
+    src: url(fonts/dm-sans-latin.woff2) format("woff2");
+    font-weight: 100 1000;
+    font-style: normal;
+  }
+
+  :root {
+    --fondo: #EAF0F6;
+    --papel: #FFFFFF;
+    --azul: #0036A5;
+    --medio: #155BCD;
+    --bruma: #AECDED;
+    --borde: rgba(0, 54, 165, 0.18);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; height: 100%; }
+
+  body {
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: #D6E1ED;
+    color: var(--azul);
+    font-family: "DM Sans", system-ui, sans-serif;
+    font-weight: 500;
+  }
+
+  #stage {
+    position: relative;
+    width: 1080px;
+    height: 1080px;
+    flex: none;
+    overflow: hidden;
+    background: var(--fondo);
+    transform-origin: center;
+  }
+
+  .abs { position: absolute; }
+  svg { display: block; overflow: visible; }
+
+  /* La trama de puntos de la marca, sólo en la esquina. */
+  #dots {
+    inset: 0;
+    background-image: radial-gradient(circle, var(--bruma) 0 2px, transparent 2.6px);
+    background-size: 18px 18px;
+    -webkit-mask-image: radial-gradient(circle at 100% 100%, #000 0%, transparent 42%);
+    mask-image: radial-gradient(circle at 100% 100%, #000 0%, transparent 42%);
+  }
+
+  /* ---------- Encabezado y pie ---------- */
+  #head {
+    left: 64px; right: 64px; top: 52px; height: 56px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  #head .name { font-size: 32px; letter-spacing: -0.04em; }
+  #head .tag {
+    margin-left: auto;
+    padding: 10px 22px;
+    border-radius: 800px;
+    background: var(--bruma);
+    font-size: 22px;
+    letter-spacing: -0.01em;
+  }
+
+  #foot {
+    left: 64px; right: 64px; bottom: 52px;
+    display: flex; align-items: center; gap: 14px;
+    font-size: 21px; letter-spacing: -0.01em;
+  }
+  #foot .handle { margin-left: auto; opacity: 0.8; }
+
+  /* ---------- La compu ---------- */
+  #lid {
+    left: 200px; top: 150px; width: 600px; height: 380px;
+    border-radius: 26px;
+    background: var(--azul);
+  }
+  #lid .cam {
+    left: 296px; top: 6px; width: 8px; height: 8px;
+    border-radius: 50%; background: var(--medio);
+  }
+  #base {
+    left: 140px; top: 530px; width: 720px; height: 40px;
+    border-radius: 3px 3px 22px 22px;
+    background: var(--medio);
+  }
+  #base .notch {
+    left: 295px; top: 0; width: 130px; height: 9px;
+    border-radius: 0 0 10px 10px;
+    background: var(--azul);
+  }
+  #base .port {
+    right: 0; top: 12px; width: 9px; height: 16px;
+    border-radius: 3px 0 0 3px;
+    background: var(--azul);
+  }
+  #pendrive { left: 826px; top: 525px; width: 178px; height: 50px; }
+  #ring {
+    left: 836px; top: 526px; width: 48px; height: 48px;
+    border-radius: 50%;
+    border: 3px solid var(--medio);
+  }
+
+  /* ---------- Lo que pasa en la pantalla ---------- */
+  #display {
+    left: 16px; top: 16px; width: 568px; height: 348px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: linear-gradient(35deg, var(--bruma) 0%, var(--fondo) 62%, #F7FAFD 100%);
+  }
+
+  #taskbar {
+    left: 0; right: 0; bottom: 0; height: 30px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--papel);
+  }
+  #taskbar .start { width: 14px; height: 14px; border-radius: 50%; background: var(--azul); }
+  #taskbar .app { width: 16px; height: 16px; border-radius: 4px; background: var(--bruma); }
+  #taskbar .clock { position: absolute; right: 14px; font-size: 12px; letter-spacing: 0.02em; }
+  #taskVA { width: 18px; height: 18px; }
+
+  .win {
+    background: var(--papel);
+    border: 1.5px solid var(--borde);
+    border-radius: 16px;
+  }
+
+  #explorer { left: 104px; top: 52px; width: 360px; height: 214px; }
+  #explorer .bar {
+    height: 38px; padding: 0 14px;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1.5px dotted rgba(0, 54, 165, 0.25);
+    font-size: 12px; letter-spacing: 0.08em;
+  }
+  #explorer .bar .dots { margin-left: auto; display: flex; gap: 6px; }
+  #explorer .bar .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--bruma); }
+  #tile {
+    left: 110px; top: 50px; width: 140px; height: 150px;
+    display: flex; flex-direction: column; align-items: center;
+    padding-top: 12px;
+  }
+  #tileSel { inset: 0; border-radius: 14px; background: var(--bruma); }
+  #tile svg { position: relative; }
+  #tile .lbl {
+    position: relative; margin-top: 8px;
+    font-size: 14px; line-height: 1.2; text-align: center; letter-spacing: -0.01em;
+  }
+
+  #installer { left: 74px; top: 43px; width: 420px; height: 232px; padding: 22px 24px; }
+  #installer .top { display: flex; align-items: center; gap: 16px; }
+  #installer .title { font-size: 22px; letter-spacing: -0.03em; }
+  #installer .sub { margin-top: 4px; font-size: 14px; opacity: 0.8; }
+  #installer .prog { margin-top: 22px; display: flex; align-items: center; gap: 14px; }
+  #installer .track {
+    flex: 1; height: 12px; border-radius: 6px;
+    background: var(--bruma); overflow: hidden;
+  }
+  #fill { height: 100%; width: 100%; background: var(--azul); transform-origin: left; }
+  #pct { width: 48px; text-align: right; font-size: 16px; font-variant-numeric: tabular-nums; }
+  #installer .items { margin-top: 22px; display: flex; gap: 10px; }
+  .item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 14px 6px 8px;
+    border-radius: 800px;
+    border: 1.5px solid rgba(0, 54, 165, 0.35);
+    font-size: 15px;
+  }
+  .item .chk {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 1.5px solid rgba(0, 54, 165, 0.35);
+    display: grid; place-items: center;
+  }
+  .item .chk svg { opacity: 0; }
+  .item.done { background: var(--azul); border-color: var(--azul); color: var(--papel); }
+  .item.done .chk { background: var(--papel); border-color: var(--papel); }
+  .item.done .chk svg { opacity: 1; }
+
+  #appIcon { left: 232px; top: 64px; width: 104px; }
+  #appIcon .lbl {
+    margin-top: 10px; width: 160px; margin-left: -28px;
+    text-align: center; font-size: 16px; letter-spacing: -0.02em;
+  }
+  #badge {
+    left: 78px; top: -12px; width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--papel);
+    border: 3px solid var(--azul);
+    display: grid; place-items: center;
+  }
+  .spark { color: var(--medio); }
+
+  #toast {
+    right: 12px; bottom: 42px;
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 16px 9px 9px;
+    font-size: 14px;
+  }
+  #toast .ico {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--bruma);
+    display: grid; place-items: center;
+  }
+
+  .ripple {
+    left: 290px; top: 150px; width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 2.5px solid var(--medio);
+  }
+  #cursor { left: 0; top: 0; width: 24px; height: 30px; transform-origin: 0 0; }
+
+  /* ---------- El texto de cada paso ---------- */
+  #num {
+    left: 64px; top: 638px; width: 88px; height: 88px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--azul);
+    color: var(--papel);
+  }
+  #num .n {
+    inset: 0;
+    display: grid; place-items: center;
+    font-size: 42px; letter-spacing: -0.04em;
+  }
+  #caps {
+    left: 176px; top: 630px; width: 860px; height: 104px;
+    overflow: hidden;
+  }
+  .cap {
+    left: 0; top: 0;
+    white-space: nowrap;
+    font-size: 80px; line-height: 104px; letter-spacing: -0.035em;
+  }
+  .cap .w { display: inline-block; margin-right: 0.24em; }
+
+  #rail { left: 64px; top: 776px; width: 952px; display: flex; gap: 14px; }
+  .seg { flex: 1; }
+  .seg .track { height: 8px; border-radius: 4px; background: var(--bruma); overflow: hidden; }
+  .seg .fill { height: 100%; background: var(--azul); transform-origin: left; }
+  .seg .lbl { margin-top: 14px; font-size: 21px; letter-spacing: -0.01em; }
+
+  #pills { left: 64px; top: 872px; display: flex; gap: 12px; }
+  .pill {
+    padding: 10px 22px;
+    border-radius: 800px;
+    background: var(--bruma);
+    font-size: 24px; letter-spacing: -0.02em;
+  }
+
+  /* ---------- Controles del navegador (no salen en el video) ---------- */
+  #ctrl {
+    position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 14px;
+    border-radius: 800px;
+    background: var(--papel);
+    font-size: 14px;
+  }
+  #ctrl button {
+    width: 32px; height: 32px; border: 0; border-radius: 50%;
+    background: var(--azul); color: var(--papel);
+    font: inherit; cursor: pointer;
+  }
+  #ctrl input { width: min(360px, 50vw); accent-color: var(--azul); }
+  #ctrl output { width: 44px; font-variant-numeric: tabular-nums; }
+  .render #ctrl { display: none; }
+  .render body { background: var(--fondo); }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- Las letras VA del ícono de App Visual, en una caja de 100 x 100. -->
+    <symbol id="va-letras" viewBox="0 0 100 100">
+      <g transform="translate(50 50) scale(0.92) skewX(-10) translate(-51.5 -50)">
+        <path fill="currentColor" fill-rule="evenodd"
+          d="M14 30 H27 L35 56 L43 30 H56 L42 70 H28 Z
+             M48 70 L62 30 H75 L89 70 H76 L73.4 62 H63.6 L61 70 Z
+             M66.3 55 H70.7 L68.5 48.6 Z"/>
+      </g>
+    </symbol>
+    <symbol id="va" viewBox="0 0 100 100">
+      <rect width="100" height="100" rx="24" fill="#0036A5"/>
+      <use href="#va-letras" width="100" height="100" color="#FFFFFF"/>
+    </symbol>
+    <symbol id="check" viewBox="0 0 24 24">
+      <path d="M5 12.5 L10 17.5 L19 7" fill="none" stroke="currentColor"
+        stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="usb" viewBox="0 0 24 24">
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3 V19"/><path d="M9 6 L12 3 L15 6"/>
+        <path d="M12 14 L7 11 V8"/><path d="M12 16 L17 13 V10"/>
+        <circle cx="12" cy="20" r="1.6" fill="currentColor"/>
+      </g>
+    </symbol>
+    <symbol id="spark" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M12 0 C12 7 17 12 24 12 C17 12 12 17 12 24 C12 17 7 12 0 12 C7 12 12 7 12 0 Z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="stage" role="img"
+  aria-label="Animación: se conecta el pendrive a la computadora, se abre el instalador de App Visual y la app queda instalada, lista para vender.">
+  <div id="dots" class="abs"></div>
+
+  <div id="head" class="abs">
+    <svg width="56" height="56"><use href="#va"/></svg>
+    <span class="name">App Visual</span>
+    <span class="tag">Cómo se instala</span>
+  </div>
+
+  <!-- El pendrive va antes que la base: al enchufarlo, el conector se esconde detrás. -->
+  <svg id="pendrive" class="abs" viewBox="0 0 178 50">
+    <rect x="1.5" y="14" width="46" height="22" rx="2" fill="#FFFFFF" stroke="#0036A5" stroke-width="3"/>
+    <rect x="13" y="21" width="7" height="7" fill="#0036A5"/>
+    <rect x="28" y="21" width="7" height="7" fill="#0036A5"/>
+    <rect x="42" y="0" width="136" height="50" rx="14" fill="#0036A5"/>
+    <use href="#va-letras" x="62" y="0" width="50" height="50" color="#FFFFFF"/>
+    <circle id="led" cx="158" cy="25" r="5.5" fill="#AECDED"/>
+  </svg>
+
+  <div id="lid" class="abs">
+    <i class="cam abs"></i>
+    <div id="display" class="abs">
+
+      <div id="appIcon" class="abs">
+        <svg width="104" height="104"><use href="#va"/></svg>
+        <div id="badge" class="abs"><svg width="22" height="22"><use href="#check"/></svg></div>
+        <div class="lbl">App Visual</div>
+      </div>
+      <svg class="spark abs" id="sp1" style="left:176px;top:92px" width="30" height="30"><use href="#spark"/></svg>
+      <svg class="spark abs" id="sp2" style="left:366px;top:74px" width="22" height="22"><use href="#spark"/></svg>
+      <svg class="spark abs" id="sp3" style="left:378px;top:150px" width="14" height="14"><use href="#spark"/></svg>
+
+      <div id="explorer" class="win abs">
+        <div class="bar">
+          <svg width="16" height="16"><use href="#usb"/></svg>
+          <span>PENDRIVE (E:)</span>
+          <span class="dots"><i></i><i></i><i></i></span>
+        </div>
+        <div id="tile" class="abs">
+          <div id="tileSel" class="abs"></div>
+          <svg width="76" height="76"><use href="#va"/></svg>
+          <div class="lbl">Instalar<br>App Visual</div>
+        </div>
+      </div>
+
+      <div id="installer" class="win abs">
+        <div class="top">
+          <svg width="60" height="60"><use href="#va"/></svg>
+          <div>
+            <div id="insTitle" class="title">Instalando App Visual</div>
+            <div id="insSub" class="sub">Copiando archivos…</div>
+          </div>
+        </div>
+        <div class="prog">
+          <div class="track"><div id="fill"></div></div>
+          <div id="pct">0%</div>
+        </div>
+        <div class="items">
+          <div class="item"><span class="chk"><svg width="14" height="14" color="#0036A5"><use href="#check"/></svg></span>Stock</div>
+          <div class="item"><span class="chk"><svg width="14" height="14" color="#0036A5"><use href="#check"/></svg></span>Caja</div>
+          <div class="item"><span class="chk"><svg width="14" height="14" color="#0036A5"><use href="#check"/></svg></span>Ventas</div>
+        </div>
+      </div>
+
+      <div id="toast" class="win abs">
+        <span class="ico"><svg width="18" height="18"><use href="#usb"/></svg></span>
+        Pendrive conectado
+      </div>
+
+      <div id="rip1" class="ripple abs"></div>
+      <div id="rip2" class="ripple abs"></div>
+
+      <svg id="cursor" class="abs" viewBox="0 0 24 30">
+        <path d="M2 2 L2 24 L8 18.5 L12 27 L16 25.2 L12 16.8 L19.5 16.8 Z"
+          fill="#0036A5" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+
+      <div id="taskbar" class="abs">
+        <i class="start"></i><i class="app"></i><i class="app"></i><i class="app"></i>
+        <svg id="taskVA"><use href="#va"/></svg>
+        <span class="clock">09:30</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="base" class="abs"><i class="notch abs"></i><i class="port abs"></i></div>
+  <div id="ring" class="abs"></div>
+
+  <div id="num" class="abs"></div>
+  <div id="caps" class="abs"></div>
+
+  <div id="rail" class="abs">
+    <div class="seg"><div class="track"><div class="fill"></div></div><div class="lbl">1 · Pendrive</div></div>
+    <div class="seg"><div class="track"><div class="fill"></div></div><div class="lbl">2 · Instalador</div></div>
+    <div class="seg"><div class="track"><div class="fill"></div></div><div class="lbl">3 · Instalación</div></div>
+  </div>
+
+  <div id="pills" class="abs">
+    <span class="pill">Sin internet</span>
+    <span class="pill">Los datos quedan en tu compu</span>
+    <span class="pill">Sin cuota</span>
+  </div>
+
+  <div id="foot" class="abs">
+    <svg width="46" height="24" viewBox="0 0 143.5 76" color="#0036A5">
+      <path fill="currentColor" d="M 0.0,0.0 L 34.48,58.27 L 47.35,40.55 L 23.31,0.0 Z M 143.5,5.34 L 76.24,7.16 L 35.57,61.19 L 45.16,76.0 L 85.71,22.1 L 128.45,21.73 Z M 133.18,43.34 L 123.47,32.29 L 86.81,32.05 L 76.0,46.13 L 114.24,47.35 L 104.29,58.4 L 67.14,58.76 L 53.78,75.15 L 112.3,73.94 L 131.24,52.45 Z"/>
+    </svg>
+    <span>Visual Solution</span>
+    <span class="handle">@visualsolution.com.ar</span>
+  </div>
+</div>
+
+<div id="ctrl">
+  <button id="play" aria-label="Pausar">❚❚</button>
+  <input id="scrub" type="range" min="0" max="5" step="0.001" value="0" aria-label="Momento de la animación">
+  <output id="clock">0.00 s</output>
+</div>
+
+<script>
+  const DURACION = 5;
+
+  /* ---------- Herramientas de tiempo ---------- */
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const prog = (t, a, b) => clamp((t - a) / (b - a));
+  const lerp = (a, b, k) => a + (b - a) * k;
+  const ease = {
+    out: k => 1 - Math.pow(1 - k, 3),
+    in: k => k * k * k,
+    inOut: k => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2),
+    back: k => { const c1 = 1.7, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); },
+  };
+  /* Un rebote corto entre a y a + d: 0 → 1 → 0. */
+  const pulse = (t, a, d) => Math.sin(prog(t, a, a + d) * Math.PI);
+
+  const $ = id => document.getElementById(id);
+  const pose = (el, { x = 0, y = 0, s = 1, r = 0, o = 1 } = {}) => {
+    el.style.transform = `translate(${x}px, ${y}px) scale(${s}) rotate(${r}deg)`;
+    el.style.opacity = o;
+  };
+
+  /* ---------- Los cuatro momentos ---------- */
+  const PASOS = [
+    { a: -1,   b: 1.08, n: "1", texto: "Conectás el pendrive" },
+    { a: 1.2,  b: 2.06, n: "2", texto: "Abrís el instalador" },
+    { a: 2.18, b: 3.78, n: "3", texto: "Se instala todo solo" },
+    { a: 3.9,  b: 99,   n: "✓", texto: "Listo para vender" },
+  ];
+  const TRAMOS = [[0, 1.1], [1.1, 2.1], [2.1, 3.6]];
+
+  const caps = $("caps"), num = $("num");
+  const palabras = PASOS.map(p => {
+    const cap = document.createElement("div");
+    cap.className = "cap abs";
+    const ws = p.texto.split(" ").map(w => {
+      const s = document.createElement("span");
+      s.className = "w";
+      s.textContent = w;
+      cap.appendChild(s);
+      return s;
+    });
+    caps.appendChild(cap);
+    return ws;
+  });
+  const numeros = PASOS.map(p => {
+    const n = document.createElement("div");
+    n.className = "n abs";
+    if (p.n === "✓") n.innerHTML = '<svg width="44" height="44"><use href="#check"/></svg>';
+    else n.textContent = p.n;
+    num.appendChild(n);
+    return n;
+  });
+
+  /* ---------- La barra del instalador ---------- */
+  const INS = [2.36, 3.56];
+  const avance = t => {
+    const k = prog(t, INS[0], INS[1]);
+    return 0.8 * k + 0.2 * ease.inOut(k);
+  };
+  /* Cuándo cruza la barra cada tercio: ahí se tilda Stock, Caja y Ventas. */
+  const cruce = umbral => {
+    let lo = INS[0], hi = INS[1];
+    for (let i = 0; i < 40; i++) {
+      const mid = (lo + hi) / 2;
+      if (avance(mid) < umbral) lo = mid; else hi = mid;
+    }
+    return hi;
+  };
+  const items = [...document.querySelectorAll(".item")];
+  const tildes = [0.34, 0.67, 1].map(cruce);
+
+  const segs = [...document.querySelectorAll(".seg")];
+  const pills = [...document.querySelectorAll(".pill")];
+  const CLICS = [1.78, 1.92];
+  const OBJETIVO = { x: 308, y: 168 };
+
+  function render(t) {
+    /* Texto de cada paso: las palabras suben de a una y se van por arriba. */
+    PASOS.forEach((p, i) => {
+      const fuera = ease.in(prog(t, p.b, p.b + 0.2)) * 115;
+      palabras[i].forEach((w, j) => {
+        const d = p.a + j * 0.05;
+        const dentro = (1 - ease.out(prog(t, d, d + 0.42))) * 115;
+        w.style.transform = `translateY(${dentro - fuera}%)`;
+      });
+      const nIn = (1 - ease.out(prog(t, p.a, p.a + 0.36))) * 100;
+      const nOut = ease.in(prog(t, p.b, p.b + 0.2)) * 100;
+      numeros[i].style.transform = `translateY(${nIn - nOut}%)`;
+    });
+
+    TRAMOS.forEach(([a, b], i) => {
+      segs[i].querySelector(".fill").style.transform = `scaleX(${prog(t, a, b)})`;
+      segs[i].querySelector(".lbl").style.opacity = t >= a ? 1 : 0.55;
+    });
+
+    /* 1 · El pendrive entra, frena y hace clic. */
+    let px;
+    if (t < 0.72) px = lerp(300, 16, ease.out(prog(t, 0.12, 0.72)));
+    else px = lerp(16, 0, ease.inOut(prog(t, 0.76, 0.86)));
+    pose($("pendrive"), { x: px, r: lerp(-4, 0, ease.out(prog(t, 0.12, 0.72))) });
+
+    const enchufado = t >= 0.86;
+    const instalando = t >= INS[0] && t < INS[1];
+    $("led").setAttribute("fill",
+      !enchufado ? "#AECDED" : instalando && Math.floor(t * 9) % 2 ? "#155BCD" : "#FFFFFF");
+
+    const kr = prog(t, 0.86, 1.3);
+    pose($("ring"), { s: lerp(0.4, 2.6, ease.out(kr)), o: kr > 0 && kr < 1 ? (1 - kr) * 0.9 : 0 });
+
+    const kt = ease.out(prog(t, 0.92, 1.1));
+    pose($("toast"), { y: lerp(16, 0, kt), o: kt * (1 - prog(t, 1.34, 1.5)) });
+
+    /* 2 · Se abre el pendrive y el cursor hace doble clic en el instalador. */
+    const ke = prog(t, 1.1, 1.36), keo = prog(t, 2.0, 2.18);
+    pose($("explorer"), {
+      s: lerp(0.88, 1, ease.back(ke)) * lerp(1, 0.96, keo),
+      o: ease.out(ke) * (1 - keo),
+    });
+
+    const kc = ease.inOut(prog(t, 1.3, 1.74));
+    const apreta = Math.max(...CLICS.map(c => pulse(t, c, 0.1)));
+    pose($("cursor"), {
+      x: lerp(470, OBJETIVO.x, kc),
+      y: lerp(300, OBJETIVO.y, kc) - Math.sin(kc * Math.PI) * 24,
+      s: 1 - 0.16 * apreta,
+      o: prog(t, 1.26, 1.36) * (1 - prog(t, 2.06, 2.2)),
+    });
+    $("tileSel").style.opacity = prog(t, 1.78, 1.84);
+    pose($("tile"), { s: 1 - 0.06 * apreta });
+    CLICS.forEach((c, i) => {
+      const k = prog(t, c, c + 0.34);
+      pose($("rip" + (i + 1)), { s: lerp(0.3, 1.8, ease.out(k)), o: k > 0 && k < 1 ? (1 - k) * 0.8 : 0 });
+    });
+
+    /* 3 · El instalador copia todo y va tildando lo que trae. */
+    const ki = prog(t, 2.1, 2.38), kio = prog(t, 3.72, 3.9);
+    pose($("installer"), {
+      s: lerp(0.9, 1, ease.back(ki)) * lerp(1, 0.92, ease.in(kio)),
+      o: ease.out(ki) * (1 - kio),
+    });
+    const v = avance(t);
+    $("fill").style.transform = `scaleX(${v})`;
+    $("pct").textContent = Math.round(v * 100) + "%";
+    const listo = v >= 1;
+    $("insTitle").textContent = listo ? "App Visual instalada" : "Instalando App Visual";
+    $("insSub").textContent = listo ? "Instalación completa" : "Copiando archivos…";
+    items.forEach((it, i) => {
+      const hecho = t >= tildes[i];
+      it.classList.toggle("done", hecho);
+      it.style.transform = `scale(${hecho ? lerp(0.86, 1, ease.back(prog(t, tildes[i], tildes[i] + 0.28))) : 1})`;
+    });
+
+    /* 4 · Queda el ícono en el escritorio. */
+    const ka = prog(t, 3.86, 4.26);
+    pose($("appIcon"), { s: ease.back(ka), o: clamp(ka * 4) });
+    const kl = ease.out(prog(t, 4.02, 4.22));
+    pose($("appIcon").querySelector(".lbl"), { y: lerp(8, 0, kl), o: kl });
+    pose($("badge"), { s: ease.back(prog(t, 4.12, 4.4)) });
+    ["sp1", "sp2", "sp3"].forEach((id, i) => {
+      const k = prog(t, 4.06 + i * 0.07, 4.46 + i * 0.07);
+      const brillo = t > 4.6 ? 1 + 0.1 * Math.sin((t - 4.6) * 9 + i * 2) : 1;
+      pose($(id), { s: ease.back(k) * brillo, r: lerp(-60, 0, ease.out(k)), o: clamp(k * 3) });
+    });
+    pose($("taskVA"), { s: ease.back(prog(t, 4.18, 4.44)) });
+
+    pills.forEach((p, i) => {
+      const k = ease.out(prog(t, 4.1 + i * 0.08, 4.45 + i * 0.08));
+      pose(p, { y: lerp(18, 0, k), o: k });
+    });
+  }
+
+  /* ---------- Reproducción ---------- */
+  const modoRender = new URLSearchParams(location.search).has("render");
+  window.render = render;
+  window.DURACION = DURACION;
+
+  if (modoRender) {
+    document.documentElement.classList.add("render");
+    render(0);
+  } else {
+    const stage = $("stage"), scrub = $("scrub"), play = $("play"), clock = $("clock");
+    const PAUSA_FINAL = 1.2;
+    let t = 0, corriendo = true, antes = performance.now();
+
+    const encajar = () => {
+      const s = Math.min(innerWidth / 1080, (innerHeight - 64) / 1080);
+      stage.style.transform = `scale(${s})`;
+      stage.style.margin = `${(1080 * s - 1080) / 2}px ${(1080 * s - 1080) / 2}px ${(1080 * s - 1080) / 2 + 48}px`;
+    };
+    addEventListener("resize", encajar);
+    encajar();
+
+    const alternar = () => {
+      corriendo = !corriendo;
+      play.textContent = corriendo ? "❚❚" : "▶";
+      play.setAttribute("aria-label", corriendo ? "Pausar" : "Reproducir");
+    };
+    play.addEventListener("click", alternar);
+    addEventListener("keydown", e => { if (e.code === "Space") { e.preventDefault(); alternar(); } });
+    scrub.addEventListener("input", () => { t = +scrub.value; if (corriendo) alternar(); });
+
+    const cuadro = ahora => {
+      if (corriendo) t = (t + (ahora - antes) / 1000) % (DURACION + PAUSA_FINAL);
+      antes = ahora;
+      const tv = Math.min(t, DURACION);
+      render(tv);
+      scrub.value = tv;
+      clock.textContent = tv.toFixed(2) + " s";
+      requestAnimationFrame(cuadro);
+    };
+    requestAnimationFrame(cuadro);
+  }
+</script>
+</body>
+</html>
