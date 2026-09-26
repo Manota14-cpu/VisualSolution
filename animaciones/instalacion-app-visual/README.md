@@ -4,10 +4,10 @@ Animación de 8 segundos, vertical 9:16 (1080 x 1920, 30 cuadros por
 segundo), para historias, reels y estados. Le muestra a un local cómo se
 instala la app:
 
-1. **Conectás el pendrive** (0 a 2 s)
-2. **Abrís el instalador**: doble clic en «Instalar App Visual» (2 a 3,6 s)
-3. **Se instala todo solo**: la barra llega al 100% y tilda Stock, Caja y Ventas (3,6 a 6,1 s)
-4. **Listo para vender**: queda el ícono en la compu, con «Sin internet»,
+1. **Conectamos el pendrive** (0 a 2 s)
+2. **Instalamos**: doble clic en «Instalar App Visual», la barra llega al
+   100% y tilda Stock, Caja y Ventas (2 a 6,1 s)
+3. **Listo para usar**: queda el ícono en la compu, con «Sin internet»,
    «Los datos quedan en tu compu» y «Sin cuota» (6,1 a 8 s)
 
 Cada texto queda quieto al menos un segundo y medio, para que se lea de

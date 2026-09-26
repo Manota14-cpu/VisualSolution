@@ -6,7 +6,7 @@
 <title>Instalación App Visual</title>
 <!--
   Animación de 8 segundos, vertical (9:16): cómo se instala App Visual en
-  un local. Conectás el pendrive, abrís el instalador y se instala todo solo.
+  un local. Conectamos el pendrive, instalamos y listo para usar.
 
   Abierta en el navegador se reproduce en bucle (espacio pausa, la barra
   de abajo adelanta y atrasa). Con ?render queda quieta en un cuadro de
@@ -275,7 +275,7 @@
   .cap {
     left: 0; top: 0;
     white-space: nowrap;
-    font-size: 108px; line-height: 142px; letter-spacing: -0.04em;
+    font-size: 96px; line-height: 142px; letter-spacing: -0.04em;
   }
   .cap .w { display: inline-block; margin-right: 0.24em; }
 
@@ -446,8 +446,7 @@
 
   <div id="rail" class="abs">
     <div class="seg"><div class="track"><div class="fill"></div></div><div class="lbl">1 · Pendrive</div></div>
-    <div class="seg"><div class="track"><div class="fill"></div></div><div class="lbl">2 · Instalador</div></div>
-    <div class="seg"><div class="track"><div class="fill"></div></div><div class="lbl">3 · Instalación</div></div>
+    <div class="seg"><div class="track"><div class="fill"></div></div><div class="lbl">2 · Instalación</div></div>
   </div>
 
   <div id="pills" class="abs">
@@ -494,16 +493,15 @@
     el.style.opacity = o;
   };
 
-  /* ---------- Los cuatro momentos ----------
+  /* ---------- Los tres momentos ----------
      Cada texto entra en a y se va en b: queda quieto casi dos segundos,
      lo justo para leerlo de una. */
   const PASOS = [
-    { a: -1,  b: 1.95, n: "1", paso: "Paso 1 de 3", texto: "Conectás el pendrive" },
-    { a: 2.1, b: 3.55, n: "2", paso: "Paso 2 de 3", texto: "Abrís el instalador" },
-    { a: 3.7, b: 6.05, n: "3", paso: "Paso 3 de 3", texto: "Se instala todo solo" },
-    { a: 6.2, b: 99,   n: "✓", paso: "Instalada",   texto: "Listo para vender" },
+    { a: -1,  b: 1.95, n: "1", paso: "Paso 1 de 2", texto: "Conectamos el pendrive" },
+    { a: 2.1, b: 6.05, n: "2", paso: "Paso 2 de 2", texto: "Instalamos" },
+    { a: 6.2, b: 99,   n: "✓", paso: "Instalada",   texto: "Listo para usar" },
   ];
-  const TRAMOS = [[0, 2], [2, 3.6], [3.6, 5.8]];
+  const TRAMOS = [[0, 2], [2, 5.8]];
 
   const caps = $("caps"), num = $("num"), paso = $("paso");
   const palabras = PASOS.map(p => {
