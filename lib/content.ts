@@ -248,6 +248,21 @@ export type Work = {
   chapters?: Chapter[];
   /* Imágenes sueltas al pie del caso, en una tira que se desliza. */
   gallery?: string[];
+  /* Un video corto del producto en uso: vertical, sin sonido y en loop.
+     Los pasos cuentan en texto lo mismo que muestra el video, para que
+     se entienda sin reproducirlo y lo pueda leer un lector de pantalla. */
+  demo?: {
+    title: string;
+    intro?: string;
+    steps: { title: string; body: string }[];
+    result?: { title: string; tags: string[] };
+    /* Las fuentes en orden de preferencia: el navegador toma la primera
+       que sabe reproducir. */
+    videos: { src: string; type: string }[];
+    poster: string;
+    /* Qué se ve en el video, en una frase. */
+    label: string;
+  };
 };
 
 /* Un chat de WhatsApp con el estudio, con el mensaje ya escrito si se
@@ -397,9 +412,9 @@ export const works: Work[] = [
     previewPosition: "50% 52%",
     previewEntera: { fondo: "#E5E6E8" },
     alt: "Pieza de App Visual: «Todo tu negocio en una sola app», con el ícono VA entre dos estrellas",
-    /* Todo lo de acá sale del post de Instagram y de la pieza, en las
-       palabras del estudio. No se afirma nada más: el stack no está
-       publicado, así que no va. */
+    /* Todo lo de acá sale del post de Instagram, de la pieza y del video
+       de instalación, en las palabras del estudio. No se afirma nada
+       más: el stack no está publicado, así que no va. */
     short:
       "Stock, caja y ventas en una sola app. Funciona sin internet, los datos quedan en tu computadora y no se paga cuota.",
     summary: "Todo tu negocio en una sola app.",
@@ -410,6 +425,27 @@ export const works: Work[] = [
       { label: "Costo", value: "Sin cuota" },
       { label: "Estado", value: "Disponible" },
     ],
+    /* El video es la animación de la instalación que hizo el estudio
+       (1080×1920, 8 s). Los pasos repiten sus textos tal cual. Va en
+       AV1 (182 KB) y, para quien no lo decodifica, en H.264 (431 KB). */
+    demo: {
+      title: "Cómo se instala",
+      intro: "La instalamos nosotros en tu computadora, en dos pasos.",
+      steps: [
+        { title: "Conectamos el pendrive", body: "Enchufamos a tu computadora el pendrive con App Visual." },
+        { title: "Instalamos", body: "Se copian los archivos y quedan listos el stock, la caja y las ventas." },
+      ],
+      result: {
+        title: "Listo para usar",
+        tags: ["Sin internet", "Los datos quedan en tu computadora", "Sin cuota"],
+      },
+      videos: [
+        { src: "/trabajos/app-visual-instalacion-av1.mp4", type: 'video/mp4; codecs="av01.0.08M.08"' },
+        { src: "/trabajos/app-visual-instalacion.mp4", type: 'video/mp4; codecs="avc1.640032"' },
+      ],
+      poster: "/trabajos/app-visual-instalacion.webp",
+      label: "Animación de la instalación de App Visual: se conecta el pendrive, se instala y queda lista para usar.",
+    },
   },
 ];
 

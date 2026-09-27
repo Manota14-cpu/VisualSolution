@@ -9,9 +9,9 @@
    ============================================================ */
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { askAbout } from "@/lib/consult";
-import { clamp01 } from "@/lib/motion";
+import { clamp01, useMotionEnv } from "@/lib/motion";
 import { etiquetaEnlace, type Work } from "@/lib/content";
 import { MetalFaz } from "@/components/brand/MetalRig";
 
@@ -102,6 +102,129 @@ function Chapter({ chapter, index }: { chapter: NonNullable<Work["chapters"]>[nu
           </span>
         </div>
       )}
+    </section>
+  );
+}
+
+/* El producto en uso: los pasos a un lado y el video al otro, como un
+   capítulo. El video es vertical; se recorta el aire de arriba y de
+   abajo (sólo fondo) para que no quede una columna eterna.
+   Corre solo, mudo y en loop mientras está a la vista, y se frena al
+   salir. Con movimiento reducido no arranca: queda el primer cuadro y
+   el botón para verlo. El botón está siempre, porque un video en loop
+   tiene que poder pausarse (WCAG 2.2.2). */
+function Demo({ demo }: { demo: NonNullable<Work["demo"]> }) {
+  const video = useRef<HTMLVideoElement>(null);
+  const pausadoAMano = useRef(false);
+  const [enPausa, setEnPausa] = useState(true);
+  const { reduce, ready } = useMotionEnv();
+  const titulo = useId();
+
+  useEffect(() => {
+    const v = video.current;
+    if (!v || !ready || reduce || !("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) v.pause();
+        else if (!pausadoAMano.current) v.play().catch(() => {});
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(v);
+    return () => io.disconnect();
+  }, [ready, reduce]);
+
+  const alternar = () => {
+    const v = video.current;
+    if (!v) return;
+    pausadoAMano.current = !v.paused;
+    if (v.paused) v.play().catch(() => {});
+    else v.pause();
+  };
+
+  return (
+    <section
+      className="grid grid-cols-1 gap-10 border-b border-dotted border-azul/30 py-14 md:grid-cols-[1fr_1.1fr] md:gap-16 md:py-20"
+      aria-labelledby={titulo}
+    >
+      <div className="md:sticky md:top-24 md:self-start">
+        <h2 id={titulo} className="display display-sm">
+          {demo.title}
+        </h2>
+        {demo.intro && <p className="mt-5 max-w-[58ch] text-base leading-relaxed text-azul/85">{demo.intro}</p>}
+
+        <ol className="demo-pasos">
+          {demo.steps.map((p, i) => (
+            <li key={p.title}>
+              <span className="demo-n" aria-hidden="true">
+                {i + 1}
+              </span>
+              <div>
+                <h3>{p.title}</h3>
+                <p>{p.body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        {demo.result && (
+          <div className="demo-listo">
+            <p className="demo-listo-t">
+              <span className="demo-n" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="m3.5 8.4 3 3 6-6.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+              {demo.result.title}
+            </p>
+            <ul className="obra-tech">
+              {demo.result.tags.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      <figure className="demo-video">
+        <div className="demo-marco">
+          <video
+            ref={video}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster={demo.poster}
+            disablePictureInPicture
+            disableRemotePlayback
+            aria-label={demo.label}
+            onPlay={() => setEnPausa(false)}
+            onPause={() => setEnPausa(true)}
+          >
+            {demo.videos.map((f) => (
+              <source key={f.src} src={f.src} type={f.type} />
+            ))}
+          </video>
+        </div>
+        {/* El control va debajo y no encima: el video tiene texto en
+            los cuatro bordes y cualquier botón le tapaba algo. */}
+        <figcaption className="demo-pie">
+          <button className="demo-control" type="button" onClick={alternar}>
+            {enPausa ? (
+              <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" />
+              </svg>
+            ) : (
+              <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true">
+                <rect x="3.5" y="2.5" width="3" height="11" rx="1" fill="currentColor" />
+                <rect x="9.5" y="2.5" width="3" height="11" rx="1" fill="currentColor" />
+              </svg>
+            )}
+            {enPausa ? "Reproducir" : "Pausar"}
+            <span className="sr-only"> el video</span>
+          </button>
+        </figcaption>
+      </figure>
     </section>
   );
 }
@@ -219,6 +342,8 @@ export function CaseStudy({
       <div className="mt-10">
         <Facts work={work} />
       </div>
+
+      {work.demo && <Demo demo={work.demo} />}
 
       {hasStory ? (
         <div className="divide-y divide-dotted divide-azul/30">
