@@ -47,6 +47,7 @@ export const metadata: Metadata = {
      nombrarla acá, Next la engancha sola. */
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
+  verification: site.googleVerification ? { google: site.googleVerification } : undefined,
   /* El ícono sale de la pieza del estudio: el VS azul sobre papel
      cuadriculado. Los tamaños chicos van recortados más cerca de la marca
      para que a 32px no sea casi todo fondo; el de 180 es la pieza entera. */

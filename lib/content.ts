@@ -6,7 +6,14 @@
 
 export const site = {
   name: "Visual Solution",
-  title: "Visual Solution",
+  /* Lo que Google muestra como título de la portada. Con el nombre solo,
+     el sitio aparece únicamente a quien ya busca "Visual Solution"; con
+     lo que hace, también a quien busca el servicio. Menos de 60
+     caracteres para que no lo corten. */
+  title: "Visual Solution — Desarrollo web, tiendas online y video",
+  /* El código de verificación de Google Search Console (la etiqueta HTML:
+     sólo lo que va en content="…"). Vacío, no se agrega nada. */
+  googleVerification: "",
   description:
     "Visual Solution es un estudio de desarrollo web y producción de contenido. Sitios, tiendas online, video e identidad visual para marcas que quieren vender mejor.",
   shortDescription: "Estudio de desarrollo web y producción de contenido.",
