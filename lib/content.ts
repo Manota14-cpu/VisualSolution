@@ -13,7 +13,7 @@ export const site = {
   title: "Visual Solution — Desarrollo web, tiendas online y video",
   /* El código de verificación de Google Search Console (la etiqueta HTML:
      sólo lo que va en content="…"). Vacío, no se agrega nada. */
-  googleVerification: "",
+  googleVerification: "MH1NQj3p6UpKMhZt3sfpeR_cGPpKbVuC18MT6r32syk",
   description:
     "Visual Solution es un estudio de desarrollo web y producción de contenido. Sitios, tiendas online, video e identidad visual para marcas que quieren vender mejor.",
   shortDescription: "Estudio de desarrollo web y producción de contenido.",
