@@ -905,47 +905,178 @@ body {
 
 /* ==========================================================
    EL CATÁLOGO
-   Tres trabajos, tres tarjetas. Con esta cantidad una grilla de
-   piezas iguales no ayuda: el primero ocupa el ancho completo y
-   los otros dos van a la par, para que la sección tenga una
-   entrada clara en vez de tres cosas del mismo peso.
-
-   Cada trabajo se muestra adentro de una ventana de navegador.
-   Es lo que dice, sin explicarlo, que esto es un sitio que
-   funciona y no una maqueta.
+   Un carrusel a todo el ancho: un proyecto grande en el centro y los
+   vecinos asomando, más chicos y apagados, para que se note que hay
+   más. La pista es scroll nativo con imanes, así el dedo la mueve
+   sin ninguna librería.
    ========================================================== */
-.obras {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: clamp(20px, 2.6vw, 34px);
+.carrusel {
+  --ancho: min(82vw, 1040px);
+  --hueco: clamp(14px, 2.4vw, 32px);
+  position: relative;
 }
-@media (min-width: 820px) {
-  .obras { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.carrusel-pista {
+  position: relative;
+  display: flex;
+  gap: var(--hueco);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  /* el relleno deja centrar la primera y la última */
+  padding: 14px calc((100% - var(--ancho)) / 2) 28px;
 }
-.obras > [hidden] { display: none; }
+.carrusel-pista::-webkit-scrollbar { display: none; }
+
+.diapo {
+  flex: 0 0 var(--ancho);
+  scroll-snap-align: center;
+  opacity: .42;
+  transform: scale(.92);
+  transition: opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1);
+  cursor: pointer;
+}
+.diapo.is-activa { opacity: 1; transform: none; cursor: auto; }
+.diapo:not(.is-activa):hover { opacity: .62; }
 
 .obra {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
   border-radius: var(--radius-cards);
   background-color: var(--color-papel);
-  /* la luz azul sangra desde abajo al pasar el cursor. Es luz y no
-     sombra: vive adentro de la tarjeta. */
+  /* la luz azul sangra desde abajo. Es luz y no sombra: vive adentro
+     de la tarjeta. */
   background-image: radial-gradient(124% 86% at 50% 118%, rgb(21 91 205 / var(--luz)), transparent 62%);
-  transition: transform .3s cubic-bezier(.16,1,.3,1), --luz .45s ease;
+  transform: perspective(1400px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform .5s cubic-bezier(.16,1,.3,1), --luz .45s ease;
 }
-.obra:hover,
-.obra:focus-within { transform: translateY(-5px); --luz: .14; }
+.is-activa .obra { --luz: .1; }
+.is-activa .obra:hover { --luz: .18; transition: transform .12s linear, --luz .45s ease; }
+/* el brillo que sigue al cursor */
+.obra::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(520px circle at var(--gx, 50%) var(--gy, 0%), rgb(255 255 255 / .28), transparent 60%);
+  opacity: 0;
+  transition: opacity .4s ease;
+}
+.is-activa .obra:hover::after { opacity: 1; }
 
-@media (min-width: 820px) {
-  /* La ancha se lee de costado: ventana a la izquierda, texto a la
-     derecha, para que no quede una foto enorme y un párrafo perdido. */
-  .obra.es-ancha { display: grid; grid-template-columns: 1.15fr 1fr; align-items: stretch; }
-  .obra.es-ancha .ventana { height: 100%; }
-  .obra.es-ancha .ventana-vista { aspect-ratio: auto; height: 100%; }
+@media (min-width: 900px) {
+  /* De costado: ventana grande a la izquierda, lo justo a la derecha. */
+  .obra { display: grid; grid-template-columns: 1.55fr 1fr; align-items: stretch; }
+  .obra .ventana { height: 100%; }
+  .obra .ventana-vista { aspect-ratio: auto; height: 100%; min-height: 380px; }
 }
+
+/* El texto de la activa entra escalonado cada vez que llega al centro. */
+.obra-cuerpo > :not(.obra-numero) {
+  opacity: .4;
+  transform: translateY(14px);
+  transition: opacity .5s ease, transform .6s cubic-bezier(.16,1,.3,1);
+}
+.is-activa .obra-cuerpo > :not(.obra-numero) { opacity: 1; transform: none; }
+.is-activa .obra-cuerpo > :nth-child(3) { transition-delay: .08s; }
+.is-activa .obra-cuerpo > :nth-child(4) { transition-delay: .16s; }
+.is-activa .obra-cuerpo > :nth-child(5) { transition-delay: .24s; }
+
+/* La captura se acerca despacio mientras el proyecto está en pantalla. */
+.is-activa .ventana-vista img { animation: acercar 9s cubic-bezier(.25,.1,.25,1) both; }
+@keyframes acercar { from { transform: scale(1.0); } to { transform: scale(1.09); } }
+
+/* ---------------- los controles ---------------- */
+.carrusel-controles {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.4vw, 32px);
+}
+.carrusel-cuenta {
+  flex: none;
+  font-size: 14px;
+  letter-spacing: .04em;
+  color: rgb(0 54 165 / .7);
+  font-variant-numeric: tabular-nums;
+}
+.carrusel-cuenta span {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 30px;
+  letter-spacing: -0.04em;
+  color: var(--color-azul);
+  animation: rise .5s cubic-bezier(.16,1,.3,1) both;
+}
+.carrusel-indices {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 10px;
+  flex: 1;
+}
+.indice {
+  display: grid;
+  gap: 8px;
+  min-height: 44px;
+  align-content: center;
+  text-align: left;
+  cursor: pointer;
+  background: none;
+}
+.indice-nombre {
+  overflow: hidden;
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: rgb(0 54 165 / .6);
+  transition: color .3s ease;
+}
+.indice:hover .indice-nombre,
+.indice.is-activo .indice-nombre { color: var(--color-azul); }
+.indice-barra {
+  position: relative;
+  display: block;
+  height: 3px;
+  overflow: hidden;
+  border-radius: var(--radius-pills);
+  background: rgb(0 54 165 / .14);
+}
+.indice-barra i,
+.indice.is-visto .indice-barra::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--color-azul-medio);
+  transform-origin: 0 50%;
+}
+.indice.is-visto .indice-barra::after { background: rgb(0 54 165 / .34); }
+.indice-barra i { animation: grow var(--carrusel-paso, 6s) linear both; }
+.carrusel.is-pausado .indice-barra i { animation-play-state: paused; }
+@media (max-width: 639px) {
+  .indice-nombre { display: none; }
+}
+
+.carrusel-flechas { display: flex; flex: none; gap: 8px; }
+.flecha {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-pills);
+  border: 1.5px solid rgb(0 54 165 / .25);
+  color: var(--color-azul);
+  cursor: pointer;
+  background: var(--color-papel);
+  transition: background-color .25s ease, color .25s ease, border-color .25s ease, transform .3s cubic-bezier(.16,1,.3,1);
+}
+.flecha svg { width: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.flecha:hover { background: var(--color-azul); border-color: var(--color-azul); color: var(--color-papel); transform: scale(1.06); }
+.flecha:active { transform: scale(.94); }
 
 /* ---------------- la ventana ---------------- */
 .ventana {
@@ -980,9 +1111,6 @@ body {
   overflow: hidden;
   background: var(--color-fondo);
 }
-.ventana-vista img { transition: transform .7s cubic-bezier(.16,1,.3,1); }
-.obra:hover .ventana-vista img,
-.obra:focus-within .ventana-vista img { transform: scale(1.035); }
 
 /* Sin captura la ventana no queda vacía ni rota: se llena con el
    degradado de las maquetas —azul, azul medio, bruma— y el nombre del
@@ -1031,7 +1159,33 @@ body {
   color: var(--color-azul);
   transition: color .3s ease;
 }
-.obra:hover .obra-titulo { color: var(--color-azul-medio); }
+.is-activa .obra:hover .obra-titulo { color: var(--color-azul-medio); }
+@media (min-width: 900px) {
+  .obra-titulo { font-size: clamp(36px, 4.2vw, 60px); }
+  .obra-texto { font-size: 18px; }
+}
+/* El número del proyecto, enorme y en contorno, detrás del texto. */
+.obra-numero {
+  position: absolute;
+  right: -0.06em;
+  bottom: -0.2em;
+  z-index: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(120px, 15vw, 220px);
+  line-height: 1;
+  letter-spacing: -0.06em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgb(0 54 165 / .12);
+  pointer-events: none;
+  user-select: none;
+  transform: translateX(30%);
+  opacity: 0;
+  transition: transform 1s cubic-bezier(.16,1,.3,1), opacity .6s ease;
+}
+.is-activa .obra-numero { transform: none; opacity: 1; }
+.obra-cuerpo { position: relative; }
+.obra-cuerpo > :not(.obra-numero) { position: relative; z-index: 1; }
 
 .obra-texto {
   max-width: 52ch;
@@ -1039,18 +1193,6 @@ body {
   line-height: 1.5;
   color: rgb(0 54 165 / .82);
 }
-
-.obra-tech { display: flex; flex-wrap: wrap; gap: 6px; }
-.obra-tech li {
-  padding: 4px 11px;
-  border: 1.5px solid rgb(0 54 165 / .22);
-  border-radius: var(--radius-pills);
-  font-size: 12px;
-  letter-spacing: .03em;
-  color: rgb(0 54 165 / .78);
-  transition: border-color .3s ease, color .3s ease;
-}
-.obra:hover .obra-tech li { border-color: rgb(0 54 165 / .34); color: rgb(0 54 165 / .92); }
 
 .obra-acciones {
   display: flex;
@@ -1334,6 +1476,37 @@ input, textarea, select { caret-color: var(--color-azul-medio); }
 :focus-visible { outline: 2px solid var(--color-azul-medio); outline-offset: 3px; border-radius: 4px; }
 
 /* ==========================================================
+   ENTRADAS ATADAS AL SCROLL
+   Donde el navegador sabe atar una animación al scroll, el cierre
+   azul se agranda mientras llega y los logos del stack suben de a
+   uno. Sin soporte, simplemente están quietos en su lugar.
+   ========================================================== */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .se-acerca {
+      animation: acercarse linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+    .stack-logos li {
+      animation: asomar linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 30%;
+    }
+    .stack-logos li:nth-child(2n) { animation-range: entry 20% cover 36%; }
+    .stack-logos li:nth-child(3n) { animation-range: entry 30% cover 42%; }
+  }
+}
+@keyframes acercarse {
+  from { transform: scale(.9); border-radius: 64px; opacity: .5; }
+  to   { transform: none; opacity: 1; }
+}
+@keyframes asomar {
+  from { transform: translateY(24px) scale(.9); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+/* ==========================================================
    MOVIMIENTO REDUCIDO
    Menos movimiento y más suave, no la ausencia de movimiento: si se
    apaga todo, también se apaga la señal de que algo pasó. Se van los
@@ -1360,8 +1533,13 @@ input, textarea, select { caret-color: var(--color-azul-medio); }
   .pliego:hover .pliego-titulo,
   .pliego-dentro,
   .faq-row:hover .q,
-  .obra:hover, .obra:focus-within { transform: none; }
-  .obra:hover .ventana-vista img { transform: none; }
+  .diapo,
+  .obra-cuerpo > *,
+  .obra { transform: none; }
+  .obra-numero { transition: none; }
+  .is-activa .ventana-vista img { animation: none; }
+  /* sin autoplay, la barra de la activa queda llena */
+  .indice-barra i { animation: none; }
 
   /* El metal se queda quieto pero sigue siendo metal: los anillos
      frenan en una posición cualquiera y el canto conserva sus

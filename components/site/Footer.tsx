@@ -8,7 +8,7 @@ export function Closer() {
     /* La página abre con una plancha y cierra con otra: el último
        bloque antes del pie es el mismo material que el hero, para que
        el remate no sea un párrafo más sobre negro. */
-    <section className="inundado mx-2 mt-2 overflow-hidden rounded-2xl py-24 text-center md:mx-3 md:rounded-[2rem] md:py-32">
+    <section className="inundado se-acerca mx-2 mt-2 overflow-hidden rounded-2xl py-24 text-center md:mx-3 md:rounded-[2rem] md:py-32">
       <div className="relative mx-auto w-full max-w-[1200px] px-4 md:px-10">
         <SplitHeading
           text="Tu marca merece verse tan bien como funciona."
