@@ -2,6 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
+    // 90 para las portadas del carrusel, que llevan texto; el resto sigue en 75.
+    qualities: [75, 90],
     // Las fotos del catalogo son de relleno. Al reemplazarlas por archivos
     // propios en /public, este bloque se puede borrar entero.
     //

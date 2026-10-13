@@ -47,7 +47,16 @@ function Ventana({ work, morphing }: { work: Work; morphing: boolean }) {
     return (
       <div className="ventana es-portada" aria-hidden="true">
         <div className="ventana-vista" style={morph}>
-          <Image src={work.portada} alt="" fill sizes="(max-width: 900px) 90vw, 640px" className="object-cover" />
+          {/* Calidad alta a propósito: las portadas tienen texto y capturas
+              chicas, y con la compresión de siempre se veían borrosas. */}
+          <Image
+            src={work.portada}
+            alt=""
+            fill
+            quality={90}
+            sizes="(max-width: 900px) 90vw, 680px"
+            className="object-cover"
+          />
         </div>
       </div>
     );
