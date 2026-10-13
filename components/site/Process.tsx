@@ -92,8 +92,7 @@ export function Process() {
             className="display display-md"
           />
           <p className="mt-8 max-w-[34ch] text-base leading-relaxed text-azul/85">
-            Cuatro instancias, fechas cerradas y una sola persona a cargo de la comunicación durante todo el
-            proyecto.
+            Cuatro pasos, fechas cerradas y un solo contacto.
           </p>
         </Reveal>
 

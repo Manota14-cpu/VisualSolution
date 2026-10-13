@@ -192,7 +192,7 @@ export function Contact() {
             className="display display-md"
           />
           <p className="mt-8 max-w-[46ch] text-[17px] leading-relaxed text-azul/85">
-            Contanos qué necesitás y te respondemos con una propuesta concreta: alcance, plazo y precio.
+            Te respondemos con alcance, plazo y precio.
           </p>
 
           {/* Cada canal es una fila entera que se toca: el ícono dice qué

@@ -112,7 +112,7 @@ export const hero = {
   headline: "Donde la idea toca la máquina.",
   /* El reclamo del hero, partido en las dos lineas del afiche. */
   claim: ["Donde la idea", "toca la", "máquina."],
-  sub: "Estudio de desarrollo web y producción audiovisual. Un solo equipo para toda tu presencia digital.",
+  sub: "Webs, tiendas online y video, hechos por un solo equipo.",
   pick: "Elegí lo que necesitás",
   primaryCta: "Empezar proyecto",
   secondaryCta: "Ver trabajos",
@@ -164,7 +164,7 @@ export const services: Service[] = [
   {
     id: "web",
     title: "Desarrollo web a medida",
-    body: "Sitios institucionales, landings y aplicaciones. Código propio, rápido, indexable y fácil de editar sin depender de nosotros.",
+    body: "Sitios y landings rápidos, a medida y fáciles de editar.",
     image: { src: "https://picsum.photos/seed/visualsolution-code-editor/1000/560", alt: "" },
     tags: ["Next.js", "React", "WordPress", "Integraciones"],
     span: "xl:col-span-6",
@@ -172,7 +172,7 @@ export const services: Service[] = [
   {
     id: "tiendas",
     title: "Tiendas online",
-    body: "Catálogo, medios de pago, envíos y stock. Montamos la tienda y dejamos el flujo de venta funcionando de punta a punta.",
+    body: "Catálogo, pagos y envíos, listos para vender.",
     token: "SHP",
     tags: ["Shopify", "WooCommerce", "Mercado Pago"],
     span: "xl:col-span-6",
@@ -181,35 +181,25 @@ export const services: Service[] = [
   {
     id: "audiovisual",
     title: "Producción audiovisual",
-    body: "Guion, rodaje y edición. Piezas cortas para redes, videos de producto y material institucional.",
+    body: "Videos para redes, producto y marca. De la idea a la edición.",
     image: { src: "https://picsum.photos/seed/visualsolution-camera-rig/800/450", alt: "" },
     span: "xl:col-span-5",
   },
   {
     id: "identidad",
     title: "Identidad visual",
-    body: "Logo, paleta, tipografía y las plantillas para que todo el equipo publique parejo.",
+    body: "Logo, colores y plantillas para que todo se vea igual de bien.",
     token: "IDV",
     span: "xl:col-span-4",
   },
   {
     id: "automatizacion",
     title: "Automatización",
-    body: "Formularios, chatbots y reportes conectados a las herramientas que ya usás.",
+    body: "Formularios, chatbots y reportes que trabajan solos.",
     token: "AUT",
     span: "xl:col-span-3",
   },
 ];
-
-/* Las tres disciplinas del estudio. Con pocos proyectos un filtro no
-   sirve para filtrar, pero sí para decir de una qué se hace acá:
-   páginas web, tiendas online y software a medida. */
-export const workFilters = [
-  { id: "todos", label: "Todo" },
-  { id: "web", label: "Desarrollo web" },
-  { id: "ecommerce", label: "E-commerce" },
-  { id: "software", label: "Software" },
-] as const;
 
 export type Fact = { label: string; value: string };
 export type Chapter = { title: string; body: string; image?: string };
@@ -300,8 +290,7 @@ export const works: Work[] = [
        vivo: las secciones, las piezas y el stack salen de la página,
        no de una suposición. */
     tech: ["Next.js", "React", "Animación", "Diseño responsive"],
-    short:
-      "Una experiencia web inmersiva para recorrer el sistema solar: planetas, comparador, línea de tiempo y datos del universo.",
+    short: "Recorré el sistema solar como una película.",
     summary:
       "Un sitio de exploración espacial construido como experiencia: se recorre, se compara y se descubre. Todo el peso está puesto en el diseño, la interacción y el ritmo de lectura.",
     facts: [
@@ -336,8 +325,7 @@ export const works: Work[] = [
     preview: "/trabajos/pack-distribuidora.webp",
     alt: "Portada del sitio de Pack Distribuidora, catálogo de productos descartables",
     tech: ["Next.js", "Turbopack", "Catálogo", "Carrito"],
-    short:
-      "Catálogo comercial para una distribuidora de descartables: diez categorías, buscador, combos y precios, con la venta minorista y mayorista en el mismo lugar.",
+    short: "Catálogo mayorista y minorista, listo para pedir.",
     summary:
       "Un catálogo pensado para vender: encontrar el producto rápido, ver el precio y armar el pedido sin fricción, tanto para un cliente de mostrador como para un mayorista.",
     facts: [
@@ -377,8 +365,7 @@ export const works: Work[] = [
     preview: "/trabajos/recuperar-el-planeta.webp",
     alt: "Recuperar el planeta, infografía web sobre informática y medio ambiente",
     tech: ["Three.js", "Vanta.js", "Lenis", "Sitio estático"],
-    short:
-      "Infografía web sobre cómo la informática interviene en la recuperación ambiental: medir, predecir, optimizar y restaurar, con cada cifra citando su fuente y su año.",
+    short: "Una infografía sobre tecnología y ambiente que se lee de un tirón.",
     summary:
       "Una pieza editorial de una sola página, construida alrededor de un argumento y no de un listado: cuatro capacidades concretas, tres mediciones con fuente y un circuito que se cierra sobre sí mismo.",
     facts: [
@@ -422,8 +409,7 @@ export const works: Work[] = [
     /* Todo lo de acá sale del post de Instagram, de la pieza y del video
        de instalación, en las palabras del estudio. No se afirma nada
        más: el stack no está publicado, así que no va. */
-    short:
-      "Stock, caja y ventas en una sola app. Funciona sin internet, los datos quedan en tu computadora y no se paga cuota.",
+    short: "Stock, caja y ventas. Sin internet y sin cuota.",
     summary: "Todo tu negocio en una sola app.",
     facts: [
       { label: "Hace", value: "Stock, caja y ventas" },
@@ -460,22 +446,22 @@ export const steps = [
   {
     n: "01",
     title: "Entendemos el negocio",
-    body: "Una reunión para saber qué vendés, a quién y contra quién competís. De ahí sale el alcance, el presupuesto cerrado y la fecha de entrega.",
+    body: "Qué vendés, a quién y un presupuesto cerrado.",
   },
   {
     n: "02",
     title: "Diseñamos la pieza",
-    body: "Mostramos el diseño completo antes de escribir código. Lo revisamos juntos hasta que esté aprobado, sin sorpresas después.",
+    body: "Ves el diseño completo antes de programar.",
   },
   {
     n: "03",
     title: "Programamos y producimos",
-    body: "Desarrollo, rodaje y edición en paralelo. Vas viendo avances reales en un enlace privado, no capturas sueltas.",
+    body: "Desarrollo y rodaje en paralelo, con avances en vivo.",
   },
   {
     n: "04",
     title: "Lanzamos y medimos",
-    body: "Publicación, analítica configurada y una capacitación grabada para que tu equipo cargue contenido solo. Después seguimos con soporte.",
+    body: "Publicamos, medimos y te enseñamos a usarlo.",
   },
 ] as const;
 
@@ -483,23 +469,23 @@ export const steps = [
 export const faqs = [
   {
     q: "¿Cuánto tarda un proyecto?",
-    a: "Una landing sale en dos semanas. Un sitio institucional, entre cuatro y seis. Una tienda depende del tamaño del catálogo. La fecha queda cerrada antes de empezar, no sobre la marcha.",
+    a: "Una landing, dos semanas. Un sitio completo, de cuatro a seis. La fecha queda cerrada antes de empezar.",
   },
   {
     q: "¿Cómo cobran?",
-    a: "Presupuesto cerrado por proyecto, en dos pagos: uno al aprobar el diseño y otro al publicar. Sin horas sueltas ni adicionales que aparecen al final.",
+    a: "Precio cerrado, en dos pagos: al aprobar el diseño y al publicar. Sin sorpresas.",
   },
   {
     q: "¿El código y las cuentas quedan a mi nombre?",
-    a: "Sí. El dominio, el hosting y el repositorio se abren a tu nombre desde el primer día. Si algún día seguís sin nosotros, no perdés nada.",
+    a: "Sí. Dominio, hosting y código a tu nombre desde el primer día.",
   },
   {
     q: "¿Puedo editar el contenido después?",
-    a: "Sí. Dejamos un panel de carga y una capacitación grabada para que tu equipo publique novedades, productos o fotos sin tocar código.",
+    a: "Sí. Te dejamos un panel y una capacitación grabada para que cargues todo solo.",
   },
   {
     q: "¿Trabajan a distancia?",
-    a: "Sí. Todo el proceso va por videollamada y un enlace privado donde seguís los avances. Para rodajes y fotos coordinamos la locación.",
+    a: "Sí. Todo por videollamada. Para rodajes coordinamos la locación.",
   },
 ] as const;
 

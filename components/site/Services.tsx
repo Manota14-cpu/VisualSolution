@@ -124,14 +124,13 @@ export function Services() {
             <Eyebrow n="01">Servicios</Eyebrow>
             <SplitHeading
               id="servicios-titulo"
-              text="Todo lo que tu marca necesita para verse y funcionar bien."
-              accent="verse y funcionar bien."
+              text="Todo lo que tu marca necesita."
+              accent="necesita."
               className="display display-md max-w-[16ch]"
             />
           </div>
           <p className="cabecera-texto">
-            Trabajamos las dos mitades del mismo problema: la pieza técnica que sostiene el negocio y el
-            contenido que lo hace visible.
+            La web que vende y el contenido que la hace ver.
           </p>
         </Reveal>
 

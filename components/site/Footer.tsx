@@ -14,7 +14,7 @@ export function Closer() {
     /* El monograma vuelve, enorme y en filete, detrás de la frase: la
        página abre con la marca en el cielo y cierra con la marca en la
        tinta. La luz del cursor recorre la trama (data-luz). */
-    <section className="cierre inundado mx-2 mt-2 overflow-hidden rounded-2xl py-28 text-center md:mx-3 md:rounded-[2rem] md:py-40" data-luz>
+    <section className="cierre inundado se-acerca mx-2 mt-2 overflow-hidden rounded-2xl py-28 text-center md:mx-3 md:rounded-[2rem] md:py-40" data-luz>
       <Mark className="cierre-marca" />
       <div className="relative mx-auto w-full max-w-[1200px] px-4 md:px-10">
         <SplitHeading
