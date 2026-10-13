@@ -41,6 +41,18 @@ function Ventana({ work, morphing }: { work: Work; morphing: boolean }) {
     ? ({ viewTransitionName: morphNameFor(work.id) } as React.CSSProperties)
     : undefined;
 
+  /* Con portada, la ventana es la portada entera: ya trae su propio
+     marco de navegador, el número y el nombre, así que no lleva barra. */
+  if (work.portada) {
+    return (
+      <div className="ventana es-portada" aria-hidden="true">
+        <div className="ventana-vista" style={morph}>
+          <Image src={work.portada} alt="" fill sizes="(max-width: 900px) 90vw, 640px" className="object-cover" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="ventana" aria-hidden="true">
       <div className="ventana-barra">
@@ -76,13 +88,11 @@ const dosCifras = (n: number) => String(n).padStart(2, "0");
 
 function Tarjeta({
   work,
-  numero,
   morphing,
   inclinar,
   onOpen,
 }: {
   work: Work;
-  numero: string;
   morphing: boolean;
   inclinar: boolean;
   onOpen: (w: Work) => void;
@@ -128,14 +138,11 @@ function Tarjeta({
       <Ventana work={work} morphing={morphing} />
 
       <div className="obra-cuerpo">
-        <span className="obra-numero" aria-hidden="true">
-          {numero}
-        </span>
-        <div className="obra-meta">
-          <span className="badge">{work.kind}</span>
-          {work.pending && <span className="badge obra-espera">En preparación</span>}
-          <span className="obra-anio">{work.year}</span>
-        </div>
+        {work.pending && (
+          <div className="obra-meta">
+            <span className="badge obra-espera">En preparación</span>
+          </div>
+        )}
 
         <h3 className="obra-titulo">{work.title}</h3>
         {work.short && <p className="obra-texto">{work.short}</p>}
@@ -386,7 +393,7 @@ export function Works() {
                 }}
                 onFocus={() => i !== activa && ir(i)}
               >
-                <Tarjeta work={w} numero={dosCifras(i + 1)} morphing={morphId === w.id} inclinar={fine && !reduce && i === activa} onOpen={show} />
+                <Tarjeta work={w} morphing={morphId === w.id} inclinar={fine && !reduce && i === activa} onOpen={show} />
               </li>
             ))}
           </ul>
