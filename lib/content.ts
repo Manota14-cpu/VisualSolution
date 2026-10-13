@@ -224,6 +224,11 @@ export type Work = {
      sitios se recortan desde arriba, que es donde está el hero; una pieza
      gráfica necesita su propio punto. */
   previewPosition?: string;
+  /* La portada del carrusel, en /public/trabajos/portadas: todas con el
+     mismo fondo azul, el mismo marco y el número, el tipo y el nombre
+     arriba a la izquierda, para que se lean como una serie. La ficha
+     sigue usando preview. */
+  portada?: string;
   /* La captura es una pieza gráfica —un afiche cuadrado— y no una
      pantalla. En la portada del caso, que es muy ancha, se muestra entera
      sobre el color de su papel en vez de recortarla hasta perder el
@@ -285,6 +290,7 @@ export const works: Work[] = [
        la tarjeta dibuja la plancha del sistema con el nombre, que es
        material de marca y no una imagen rota. */
     preview: "/trabajos/neweb.webp",
+    portada: "/trabajos/portadas/neweb.webp",
     alt: "Portada del sitio NEWEB, una experiencia web sobre el sistema solar",
     /* Lo único que se afirma acá está verificado contra el sitio en
        vivo: las secciones, las piezas y el stack salen de la página,
@@ -323,6 +329,7 @@ export const works: Work[] = [
     url: "https://packdistribuidoraar.vercel.app",
     /* Captura: public/trabajos/pack-distribuidora.webp */
     preview: "/trabajos/pack-distribuidora.webp",
+    portada: "/trabajos/portadas/pack-distribuidora.webp",
     alt: "Portada del sitio de Pack Distribuidora, catálogo de productos descartables",
     tech: ["Next.js", "Turbopack", "Catálogo", "Carrito"],
     short: "Catálogo mayorista y minorista, listo para pedir.",
@@ -363,6 +370,7 @@ export const works: Work[] = [
     url: "https://noir-studio-seven.vercel.app",
     /* Captura: public/trabajos/recuperar-el-planeta.webp */
     preview: "/trabajos/recuperar-el-planeta.webp",
+    portada: "/trabajos/portadas/recuperar-el-planeta.webp",
     alt: "Recuperar el planeta, infografía web sobre informática y medio ambiente",
     tech: ["Three.js", "Vanta.js", "Lenis", "Sitio estático"],
     short: "Una infografía sobre tecnología y ambiente que se lee de un tirón.",
@@ -403,6 +411,7 @@ export const works: Work[] = [
        al 52%, que entra justo de "Todo tu" a "En una sola app"; en la
        ficha se ve entera sobre el gris de su papel. */
     preview: "/trabajos/app-visual.webp",
+    portada: "/trabajos/portadas/app-visual.webp",
     previewPosition: "50% 52%",
     previewEntera: { fondo: "#E5E6E8" },
     alt: "Pieza de App Visual: «Todo tu negocio en una sola app», con el ícono VA entre dos estrellas",

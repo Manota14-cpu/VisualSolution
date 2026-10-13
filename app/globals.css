@@ -1068,15 +1068,18 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 
 /* El texto de la activa entra escalonado cada vez que llega al centro. */
-.obra-cuerpo > :not(.obra-numero) {
+.obra-cuerpo > * {
   opacity: .4;
   transform: translateY(14px);
   transition: opacity .5s ease, transform .6s cubic-bezier(.16,1,.3,1);
 }
-.is-activa .obra-cuerpo > :not(.obra-numero) { opacity: 1; transform: none; }
-.is-activa .obra-cuerpo > :nth-child(3) { transition-delay: .08s; }
-.is-activa .obra-cuerpo > :nth-child(4) { transition-delay: .16s; }
-.is-activa .obra-cuerpo > :nth-child(5) { transition-delay: .24s; }
+.is-activa .obra-cuerpo > * { opacity: 1; transform: none; }
+.is-activa .obra-cuerpo > :nth-child(2) { transition-delay: .08s; }
+.is-activa .obra-cuerpo > :nth-child(3) { transition-delay: .16s; }
+
+/* La portada se ve entera y quieta: ya trae su composición. */
+.es-portada .ventana-vista { aspect-ratio: 16 / 10; }
+.es-portada .ventana-vista img { animation: none !important; scale: 1 !important; translate: none !important; }
 
 /* ---------------- los controles ---------------- */
 .carrusel-controles {
@@ -1257,28 +1260,6 @@ p, li, dd, figcaption { text-wrap: pretty; }
   .obra-titulo { font-size: clamp(36px, 4.2vw, 60px); }
   .obra-texto { font-size: 18px; }
 }
-/* El número del proyecto, enorme y en contorno, detrás del texto. */
-.obra-numero {
-  position: absolute;
-  right: -0.06em;
-  bottom: -0.2em;
-  z-index: 0;
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(120px, 15vw, 220px);
-  line-height: 1;
-  letter-spacing: -0.06em;
-  color: transparent;
-  -webkit-text-stroke: 1.5px rgb(0 54 165 / .12);
-  pointer-events: none;
-  user-select: none;
-  transform: translateX(30%);
-  opacity: 0;
-  transition: transform 1s cubic-bezier(.16,1,.3,1), opacity .6s ease;
-}
-.is-activa .obra-numero { transform: none; opacity: 1; }
-.obra-cuerpo { position: relative; }
-.obra-cuerpo > :not(.obra-numero) { position: relative; z-index: 1; }
 
 .obra-texto {
   max-width: 52ch;
@@ -1659,7 +1640,6 @@ footer :focus-visible { outline-color: var(--color-papel); }
   .obra-cuerpo > *,
   .obra { transform: none; }
   .obra:hover .ventana-vista img { transform: none; }
-  .obra-numero { transition: none; }
   /* sin autoplay, la barra de la activa queda llena */
   .indice-barra i { animation: none; }
 
