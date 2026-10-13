@@ -6,7 +6,14 @@
 
 export const site = {
   name: "Visual Solution",
-  title: "Visual Solution",
+  /* Lo que Google muestra como título de la portada. Con el nombre solo,
+     el sitio aparece únicamente a quien ya busca "Visual Solution"; con
+     lo que hace, también a quien busca el servicio. Menos de 60
+     caracteres para que no lo corten. */
+  title: "Visual Solution — Desarrollo web, tiendas online y video",
+  /* El código de verificación de Google Search Console (la etiqueta HTML:
+     sólo lo que va en content="…"). Vacío, no se agrega nada. */
+  googleVerification: "MH1NQj3p6UpKMhZt3sfpeR_cGPpKbVuC18MT6r32syk",
   description:
     "Visual Solution es un estudio de desarrollo web y producción de contenido. Sitios, tiendas online, video e identidad visual para marcas que quieren vender mejor.",
   shortDescription: "Estudio de desarrollo web y producción de contenido.",
@@ -58,7 +65,40 @@ export const legal = {
   holder: "Visual Solution",
   rights: "Todos los derechos reservados",
   credit: "Diseño y desarrollo propio",
+
+  /* TODO: COMPLETAR CON LOS DATOS REALES DEL TITULAR.
+     La Ley 24.240 de Defensa del Consumidor (art. 4) y la Ley 25.326 de
+     Protección de Datos Personales (art. 6) piden identificar a quien
+     presta el servicio y es responsable de los datos: nombre y apellido
+     o razón social, CUIT y domicilio. No se inventan: mientras estén
+     vacíos, las páginas legales no los muestran, pero el sitio no queda
+     en regla hasta completarlos. */
+  titular: "" as string, // nombre y apellido, o razón social, de quien factura
+  cuit: "" as string, // formato 20-12345678-9
+  domicilio: "" as string, // domicilio legal o comercial, con localidad y provincia
+
+  /* La fecha de la última revisión de las páginas legales. Se cambia a
+     mano cada vez que se modifica su contenido: es la que ve la persona
+     para saber si algo cambió desde la última vez que las leyó. */
+  actualizado: "25 de septiembre de 2026",
+
+  /* Disposición 890/2025 de la Subsecretaría de Defensa del Consumidor y
+     Lealtad Comercial: todo proveedor con sitio web tiene que enlazar el
+     formulario de la Ventanilla Federal Única de Reclamos con esta
+     leyenda. Va en el pie de todas las páginas. */
+  consumidor: {
+    leyenda: "Defensa de las y los Consumidores. Para reclamos ingrese aquí",
+    url: "https://www.argentina.gob.ar/produccion/defensadelconsumidor/formulario",
+  },
 } as const;
+
+/* Las páginas legales. El texto largo vive en cada página
+   (app/privacidad y app/terminos); acá sólo las rutas, para que el pie,
+   el formulario y el sitemap apunten al mismo lugar. */
+export const paginasLegales = [
+  { href: "/terminos", label: "Términos y condiciones" },
+  { href: "/privacidad", label: "Política de privacidad" },
+] as const;
 
 export const nav = [
   { href: "#servicios", label: "Servicios" },
@@ -205,6 +245,21 @@ export type Work = {
   chapters?: Chapter[];
   /* Imágenes sueltas al pie del caso, en una tira que se desliza. */
   gallery?: string[];
+  /* Un video corto del producto en uso: vertical, sin sonido y en loop.
+     Los pasos cuentan en texto lo mismo que muestra el video, para que
+     se entienda sin reproducirlo y lo pueda leer un lector de pantalla. */
+  demo?: {
+    title: string;
+    intro?: string;
+    steps: { title: string; body: string }[];
+    result?: { title: string; tags: string[] };
+    /* Las fuentes en orden de preferencia: el navegador toma la primera
+       que sabe reproducir. */
+    videos: { src: string; type: string }[];
+    poster: string;
+    /* Qué se ve en el video, en una frase. */
+    label: string;
+  };
 };
 
 /* Un chat de WhatsApp con el estudio, con el mensaje ya escrito si se
@@ -351,9 +406,9 @@ export const works: Work[] = [
     previewPosition: "50% 52%",
     previewEntera: { fondo: "#E5E6E8" },
     alt: "Pieza de App Visual: «Todo tu negocio en una sola app», con el ícono VA entre dos estrellas",
-    /* Todo lo de acá sale del post de Instagram y de la pieza, en las
-       palabras del estudio. No se afirma nada más: el stack no está
-       publicado, así que no va. */
+    /* Todo lo de acá sale del post de Instagram, de la pieza y del video
+       de instalación, en las palabras del estudio. No se afirma nada
+       más: el stack no está publicado, así que no va. */
     short: "Stock, caja y ventas. Sin internet y sin cuota.",
     summary: "Todo tu negocio en una sola app.",
     facts: [
@@ -363,6 +418,27 @@ export const works: Work[] = [
       { label: "Costo", value: "Sin cuota" },
       { label: "Estado", value: "Disponible" },
     ],
+    /* El video es la animación de la instalación que hizo el estudio
+       (1080×1920, 8 s). Los pasos repiten sus textos tal cual. Va en
+       AV1 (182 KB) y, para quien no lo decodifica, en H.264 (431 KB). */
+    demo: {
+      title: "Cómo se instala",
+      intro: "La instalamos nosotros en tu computadora, en dos pasos.",
+      steps: [
+        { title: "Conectamos el pendrive", body: "Enchufamos a tu computadora el pendrive con App Visual." },
+        { title: "Instalamos", body: "Se copian los archivos y quedan listos el stock, la caja y las ventas." },
+      ],
+      result: {
+        title: "Listo para usar",
+        tags: ["Sin internet", "Los datos quedan en tu computadora", "Sin cuota"],
+      },
+      videos: [
+        { src: "/trabajos/app-visual-instalacion-av1.mp4", type: 'video/mp4; codecs="av01.0.08M.08"' },
+        { src: "/trabajos/app-visual-instalacion.mp4", type: 'video/mp4; codecs="avc1.640032"' },
+      ],
+      poster: "/trabajos/app-visual-instalacion.webp",
+      label: "Animación de la instalación de App Visual: se conecta el pendrive, se instala y queda lista para usar.",
+    },
   },
 ];
 

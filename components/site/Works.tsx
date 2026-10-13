@@ -9,6 +9,8 @@ import { scrollToId } from "@/components/motion/MotionProvider";
 import { useMotionEnv, withTransition } from "@/lib/motion";
 import { etiquetaEnlace, works, type Work } from "@/lib/content";
 import { MetalFaz } from "@/components/brand/MetalRig";
+import { Eyebrow } from "@/components/site/Eyebrow";
+import { Flecha } from "@/components/ui/Flecha";
 
 /* ============================================================
    EL CATÁLOGO
@@ -121,6 +123,7 @@ function Tarjeta({
       className={`obra ${work.pending ? "es-pendiente" : ""}`}
       onPointerMove={mover}
       onPointerLeave={soltar}
+      data-luz
     >
       <Ventana work={work} morphing={morphing} />
 
@@ -144,10 +147,12 @@ function Tarjeta({
                 <MetalFaz />
                 <i className="diamond" aria-hidden="true" />
                 {etiquetaEnlace(work.url!)}
+                <Flecha externa />
                 <span className="sr-only"> (se abre en una pestaña nueva)</span>
               </a>
               <button className="obra-ficha" type="button" onClick={() => onOpen(work)}>
                 Ver ficha
+                <Flecha />
               </button>
             </>
           ) : (
@@ -155,6 +160,7 @@ function Tarjeta({
               <MetalFaz />
               <i className="diamond" aria-hidden="true" />
               {etiquetaFicha}
+              <Flecha />
             </button>
           )}
         </div>
@@ -312,17 +318,28 @@ export function Works() {
   }, [close]);
 
   return (
-    <section className="bg-fondo py-20 md:py-28" id="trabajos">
+    <section className="seccion" id="trabajos" aria-labelledby="trabajos-titulo">
       <div className="mx-auto w-full max-w-[1200px] px-4 md:px-10">
-        <div className="mb-10 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+        {/* Una sola palabra a escala de cartel: es la sección que vende, y
+            el titular más grande de la página después del hero. */}
+        <div className="cabecera">
           <Reveal>
-            <SplitHeading text="Trabajos" className="display display-md" />
-            <p className="mt-6 max-w-[40ch] text-base leading-relaxed text-azul/85">
-              Proyectos reales, funcionando. Deslizá y entrá a verlos.
-            </p>
+            <Eyebrow n="02">Proyectos</Eyebrow>
+            <div className="titulo-con-cuenta">
+              <SplitHeading id="trabajos-titulo" text="Trabajos" className="display display-xl" />
+              {/* La cuenta, en superíndice como en un índice editorial. Es
+                  decorado: el carrusel de abajo ya la dice. */}
+              <span className="titulo-cuenta" aria-hidden="true">
+                {dosCifras(total)}
+              </span>
+            </div>
           </Reveal>
-          <Reveal as="a" delay={1} className="link shrink-0" href="#contacto">
-            Contanos tu proyecto
+          <Reveal delay={1} className="cabecera-texto">
+            <p>Proyectos reales, funcionando. Deslizá y entrá a verlos.</p>
+            <a className="link link-flecha mt-5" href="#contacto">
+              Contanos tu proyecto
+              <Flecha />
+            </a>
           </Reveal>
         </div>
       </div>
@@ -403,15 +420,11 @@ export function Works() {
             </div>
 
             <div className="carrusel-flechas">
-              <button type="button" className="flecha" aria-label="Proyecto anterior" onClick={() => ir(activa - 1)}>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M15 5l-7 7 7 7" />
-                </svg>
+              <button type="button" className="carrusel-boton es-atras" aria-label="Proyecto anterior" onClick={() => ir(activa - 1)}>
+                <Flecha />
               </button>
-              <button type="button" className="flecha" aria-label="Proyecto siguiente" onClick={() => ir(activa + 1)}>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M9 5l7 7-7 7" />
-                </svg>
+              <button type="button" className="carrusel-boton" aria-label="Proyecto siguiente" onClick={() => ir(activa + 1)}>
+                <Flecha />
               </button>
             </div>
           </div>

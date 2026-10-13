@@ -1,16 +1,22 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import Link from "next/link";
+import { Check, Copy, Mail, MessagesSquare } from "lucide-react";
+import { siInstagram, siWhatsapp } from "simple-icons";
 import { Reveal, SplitHeading } from "@/components/motion/Reveal";
+import { Eyebrow } from "@/components/site/Eyebrow";
+import { Flecha } from "@/components/ui/Flecha";
 import { useMotionEnv } from "@/lib/motion";
 import { onAskAbout, onAskForServices } from "@/lib/consult";
 import { serviceOptions, site, whatsappUrl } from "@/lib/content";
 import { MetalFaz } from "@/components/brand/MetalRig";
 
-type Fields = { nombre: string; email: string; servicio: string; mensaje: string };
+type Fields = { nombre: string; email: string; servicio: string; mensaje: string; acepta: boolean };
+type CampoTexto = Exclude<keyof Fields, "acepta">;
 type Errors = Partial<Record<keyof Fields, string>>;
 
-const empty: Fields = { nombre: "", email: "", servicio: "", mensaje: "" };
+const empty: Fields = { nombre: "", email: "", servicio: "", mensaje: "", acepta: false };
 
 function validate(v: Fields): Errors {
   const e: Errors = {};
@@ -19,6 +25,9 @@ function validate(v: Fields): Errors {
     e.email = "Revisá el correo, parece incompleto.";
   if (!v.servicio) e.servicio = "Elegí una opción.";
   if (v.mensaje.trim().length < 12) e.mensaje = "Contanos un poco más, con una línea alcanza.";
+  /* Ley 25.326, art. 5: el consentimiento tiene que ser expreso. La
+     casilla es eso: sin marcarla no se arma el mensaje. */
+  if (!v.acepta) e.acepta = "Para enviar, marcá que leíste y aceptás la política de privacidad.";
   return e;
 }
 
@@ -34,6 +43,19 @@ export function Contact() {
   const [failed, setFailed] = useState("");
   const { reduce } = useMotionEnv();
   const mensajeRef = useRef<HTMLTextAreaElement>(null);
+  const [copiado, setCopiado] = useState(false);
+
+  /* Copiar el correo: quien escribe desde otra cuenta o desde el
+     teléfono no quiere que se abra el cliente de mail. */
+  const copiarCorreo = async () => {
+    try {
+      await navigator.clipboard.writeText(site.email);
+      setCopiado(true);
+      window.setTimeout(() => setCopiado(false), 1800);
+    } catch {
+      /* sin permiso de portapapeles queda el enlace de siempre */
+    }
+  };
 
   /* Si alguien pidió consultar por un proyecto del catálogo, el mensaje
      llega precargado y el foco va al final del texto para que siga
@@ -81,7 +103,7 @@ export function Contact() {
     []
   );
 
-  const set = (k: keyof Fields) => (e: { target: { value: string } }) => {
+  const set = (k: CampoTexto) => (e: { target: { value: string } }) => {
     setValues((v) => ({ ...v, [k]: e.target.value }));
     if (errors[k]) setErrors((x) => ({ ...x, [k]: undefined }));
   };
@@ -159,52 +181,94 @@ export function Contact() {
   }
 
   return (
-    <section className="bg-fondo py-20 md:py-28" id="contacto">
-      <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 items-start gap-10 px-4 md:px-10 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
+    <section className="seccion" id="contacto" aria-labelledby="contacto-titulo">
+      <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 items-start gap-12 px-4 md:px-10 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
         <Reveal>
+          <Eyebrow n="05">Contacto</Eyebrow>
           <SplitHeading
+            id="contacto-titulo"
             text="Hablemos de tu proyecto."
+            accent="tu proyecto."
             className="display display-md"
           />
-          <p className="mt-4 max-w-[62ch] text-base leading-relaxed text-azul/85">
+          <p className="mt-8 max-w-[46ch] text-[17px] leading-relaxed text-azul/85">
             Te respondemos con alcance, plazo y precio.
           </p>
 
-          <dl className="mt-10 grid gap-6">
-            <div>
-              <dt className="label mb-2 block text-azul/80">WhatsApp</dt>
-              <dd className="m-0">
-                <a className="link" href={whatsappUrl()} target="_blank" rel="noopener noreferrer">
+          {/* Cada canal es una fila entera que se toca: el ícono dice qué
+              es, la flecha adónde lleva. Antes eran enlaces sueltos de una
+              línea, chicos para el dedo. */}
+          <ul className="contacto-filas">
+            <li className="contacto-fila">
+              <span className="contacto-icono" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d={siWhatsapp.path} />
+                </svg>
+              </span>
+              <span className="contacto-dato">
+                <span className="label contacto-rotulo">WhatsApp</span>
+                <a className="contacto-enlace" href={whatsappUrl()} target="_blank" rel="noopener noreferrer">
                   {site.whatsappVisible}
+                  <span className="sr-only"> (se abre en una pestaña nueva)</span>
                 </a>
-              </dd>
-            </div>
-            <div>
-              <dt className="label mb-2 block text-azul/80">Correo</dt>
-              <dd className="m-0">
-                <a className="link" href={`mailto:${site.email}`}>
+              </span>
+              <Flecha externa className="contacto-flecha" />
+            </li>
+            <li className="contacto-fila">
+              <span className="contacto-icono" aria-hidden="true">
+                <Mail size={18} strokeWidth={1.8} />
+              </span>
+              <span className="contacto-dato">
+                <span className="label contacto-rotulo">Correo</span>
+                <a className="contacto-enlace" href={`mailto:${site.email}`}>
                   {site.email}
                 </a>
-              </dd>
-            </div>
-            <div>
-              <dt className="label mb-2 block text-azul/80">Instagram</dt>
-              <dd className="m-0">
-                <a className="link" href={site.instagram.url} target="_blank" rel="noopener">
+              </span>
+              <button
+                className={`contacto-copiar ${copiado ? "es-hecho" : ""}`}
+                type="button"
+                onClick={copiarCorreo}
+                aria-label={copiado ? "Correo copiado" : "Copiar el correo"}
+              >
+                {copiado ? <Check size={15} strokeWidth={2.2} /> : <Copy size={15} strokeWidth={1.9} />}
+                <span className="contacto-copiar-texto" aria-hidden="true">
+                  {copiado ? "Copiado" : "Copiar"}
+                </span>
+              </button>
+              <span className="sr-only" aria-live="polite">
+                {copiado ? "Correo copiado" : ""}
+              </span>
+            </li>
+            <li className="contacto-fila">
+              <span className="contacto-icono" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d={siInstagram.path} />
+                </svg>
+              </span>
+              <span className="contacto-dato">
+                <span className="label contacto-rotulo">Instagram</span>
+                <a className="contacto-enlace" href={site.instagram.url} target="_blank" rel="noopener">
                   {site.instagram.handle}
+                  <span className="sr-only"> (se abre en una pestaña nueva)</span>
                 </a>
-              </dd>
-            </div>
-            <div>
-              <dt className="label mb-2 block text-azul/80">Respuesta</dt>
-              <dd className="m-0 text-base text-azul/80">Contestamos todos los mensajes.</dd>
-            </div>
-          </dl>
+              </span>
+              <Flecha externa className="contacto-flecha" />
+            </li>
+            <li className="contacto-fila es-nota">
+              <span className="contacto-icono" aria-hidden="true">
+                <MessagesSquare size={18} strokeWidth={1.8} />
+              </span>
+              <span className="contacto-dato">
+                <span className="label contacto-rotulo">Respuesta</span>
+                <span className="contacto-valor">Contestamos todos los mensajes.</span>
+              </span>
+            </li>
+          </ul>
         </Reveal>
 
         <Reveal delay={1}>
           {sent ? (
-            <div className="rounded-cards bg-papel p-8" role="status">
+            <div className="superficie rounded-cards bg-papel p-6 sm:p-8" role="status">
               <h3 className="display display-sm">Mensaje listo para enviar</h3>
               <p className="mt-2 max-w-[44ch] text-base leading-relaxed text-azul/85">{sent}</p>
               {waUrl && (
@@ -229,7 +293,7 @@ export function Contact() {
               </button>
             </div>
           ) : (
-            <form className="grid gap-4 rounded-cards bg-papel p-6" onSubmit={onSubmit} noValidate>
+            <form className="superficie es-alta grid gap-4 rounded-cards bg-papel p-5 sm:p-6 lg:p-8" onSubmit={onSubmit} noValidate>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className={`grid gap-2 ${errors.nombre ? "has-error" : ""}`}>
                   <div className="fl">
@@ -319,6 +383,55 @@ export function Contact() {
                 {errors.mensaje && <p className="text-xs text-error">{errors.mensaje}</p>}
               </div>
 
+              {/* Resolución AAIP 14/2018 y art. 6 de la Ley 25.326: antes de
+                  recolectar se dice quién es responsable, para qué se usan los
+                  datos, quién los recibe, qué es obligatorio y cómo ejercer los
+                  derechos. Va acá, a la vista, y no sólo en la política. */}
+              <p id="aviso-datos" className="aviso-datos">
+                <span className="text-azul">Tus datos.</span> {site.name} los usa sólo para responder esta
+                consulta y armar la propuesta.{" "}
+                {site.whatsapp
+                  ? "El sitio no los guarda: se abre WhatsApp (un servicio de Meta) con tu mensaje escrito y nos llega recién cuando lo enviás."
+                  : site.formEndpoint
+                    ? "Se envían a nuestro sistema de contacto sólo para responderte."
+                    : "El sitio no los guarda: se abre tu programa de correo con el mensaje escrito y nos llega recién cuando lo enviás."}{" "}
+                Todos los campos son necesarios para poder responderte. Podés pedir acceso, corrección o
+                eliminación escribiendo a {site.email}. Más detalles en la{" "}
+                <Link href="/privacidad" target="_blank">
+                  política de privacidad
+                  <span className="sr-only"> (se abre en una pestaña nueva)</span>
+                </Link>
+                .
+              </p>
+
+              <div className={`grid gap-2 ${errors.acepta ? "has-error" : ""}`}>
+                <label className="casilla">
+                  <input
+                    type="checkbox"
+                    name="acepta"
+                    checked={values.acepta}
+                    onChange={(e) => {
+                      const acepta = e.target.checked;
+                      setValues((v) => ({ ...v, acepta }));
+                      if (errors.acepta) setErrors((x) => ({ ...x, acepta: undefined }));
+                    }}
+                    aria-invalid={!!errors.acepta}
+                    aria-describedby="aviso-datos"
+                    required
+                  />
+                  <span className="casilla-caja" aria-hidden="true">
+                    <svg viewBox="0 0 16 16" fill="none">
+                      <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                  <span>
+                    Leí la política de privacidad y acepto que {site.name} use estos datos para responder mi
+                    consulta.
+                  </span>
+                </label>
+                {errors.acepta && <p className="text-xs text-error">{errors.acepta}</p>}
+              </div>
+
               {sending && (
                 <div className="h-0.5 overflow-hidden rounded-sm bg-azul/15" aria-hidden="true">
                   <i
@@ -329,10 +442,13 @@ export function Contact() {
               )}
 
               <div className="mt-2 flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-center">
-                <p className="label text-azul/80">
+                <p className="label max-w-[36ch] leading-snug text-azul/80">
                   {site.whatsapp ? "Se abre WhatsApp con tu consulta. Acá no guardamos nada." : "Usamos estos datos solo para responderte."}
                 </p>
-                <button className={`btn btn-metal ${ok ? "ok" : ""}`} type="submit" disabled={sending}>
+                {/* shrink-0: con la leyenda larga al lado, la fila lo achicaba
+                    y el metal, que recorta lo que sobra, le comía la primera
+                    letra ("nviar por WhatsApp"). */}
+                <button className={`btn btn-metal shrink-0 ${ok ? "ok" : ""}`} type="submit" disabled={sending}>
                   <MetalFaz />
                   <span className="send-label">{sending ? "Enviando" : site.whatsapp ? "Enviar por WhatsApp" : "Enviar mensaje"}</span>
                   <span className="send-ok" aria-hidden="true">

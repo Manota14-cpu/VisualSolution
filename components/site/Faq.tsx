@@ -1,21 +1,47 @@
 "use client";
 
 import { useState } from "react";
+import { siWhatsapp } from "simple-icons";
 import { Reveal, SplitHeading } from "@/components/motion/Reveal";
-import { faqs } from "@/lib/content";
+import { Eyebrow } from "@/components/site/Eyebrow";
+import { MetalFaz } from "@/components/brand/MetalRig";
+import { Flecha } from "@/components/ui/Flecha";
+import { faqs, whatsappUrl } from "@/lib/content";
 
 export function Faq() {
   // una sola respuesta abierta a la vez
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section className="bg-fondo py-20 md:py-28" id="preguntas">
-      <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-10 px-4 md:px-10 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
-        <Reveal className="self-start">
+    <section className="seccion" id="preguntas" aria-labelledby="preguntas-titulo">
+      <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-12 px-4 md:px-10 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
+        <Reveal className="self-start lg:sticky lg:top-32">
+          <Eyebrow n="04">Preguntas</Eyebrow>
           <SplitHeading
+            id="preguntas-titulo"
             text="Lo que siempre nos preguntan"
+            accent="nos preguntan"
             className="display display-md"
           />
+          {/* Quien no encuentra su pregunta tiene la respuesta a un toque,
+              en el mismo canal que el resto del sitio. */}
+          <div className="faq-otra">
+            <p>¿Tenés otra pregunta?</p>
+            <a
+              className="btn btn-metal es-suave btn-sm"
+              href={whatsappUrl("Hola Visual Solution, tengo una pregunta.")}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <MetalFaz />
+              <svg className="size-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                <path d={siWhatsapp.path} />
+              </svg>
+              Preguntanos por WhatsApp
+              <Flecha externa />
+              <span className="sr-only"> (se abre en una pestaña nueva)</span>
+            </a>
+          </div>
         </Reveal>
 
         <Reveal>

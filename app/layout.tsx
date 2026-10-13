@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
+/* La capa de experiencia va después: gana en los empates. */
+import "./experiencia.css";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { MetalRig } from "@/components/brand/MetalRig";
 import { BackToTop, Grain, Preloader, ScrollProgress } from "@/components/motion/Chrome";
@@ -45,6 +47,7 @@ export const metadata: Metadata = {
      nombrarla acá, Next la engancha sola. */
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
+  verification: site.googleVerification ? { google: site.googleVerification } : undefined,
   /* El ícono sale de la pieza del estudio: el VS azul sobre papel
      cuadriculado. Los tamaños chicos van recortados más cerca de la marca
      para que a 32px no sea casi todo fondo; el de 180 es la pieza entera. */
@@ -74,6 +77,11 @@ const datosDelEstudio = {
   sameAs: [site.instagram.url, site.tiktok, site.youtube],
   copyrightHolder: { "@type": "Organization", name: legal.holder, url: siteUrl },
   copyrightYear: legal.year,
+  /* Los datos del titular sólo salen cuando están cargados en
+     lib/content: un buscador no puede recibir un CUIT vacío. */
+  ...(legal.titular ? { legalName: legal.titular } : {}),
+  ...(legal.cuit ? { taxID: legal.cuit } : {}),
+  ...(legal.domicilio ? { address: legal.domicilio } : {}),
   areaServed: "AR",
   knowsLanguage: "es",
   hasOfferCatalog: {
@@ -100,6 +108,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
              nada de lo que escribe un visitante acá adentro. */
           dangerouslySetInnerHTML={{ __html: JSON.stringify(datosDelEstudio) }}
         />
+        {/* El lienzo vivo: luces de bruma que derivan y la trama fija. Va
+            detrás de todo y no se anuncia. */}
+        <div className="ambiente" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </div>
         <Preloader />
         <ScrollProgress />
         <Grain />

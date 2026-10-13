@@ -83,24 +83,42 @@ export function Reveal({ as: Tag = "div", className = "", delay = 0, children, .
 export function SplitHeading({
   as: Tag = "h2",
   text,
+  accent,
   className = "",
+  id,
 }: {
   as?: ElementType;
   text: string;
+  /* Un tramo del mismo texto que se imprime en la segunda fuerza de la
+     tinta. Es el remate de la frase: el ojo entra por el principio y se
+     queda con el final. Tiene que ser un fragmento literal de text. */
+  accent?: string;
   className?: string;
+  id?: string;
 }) {
   const ref = useReveal<HTMLElement>();
   const words = text.trim().split(/\s+/);
+  const marca = accent ? accent.trim().split(/\s+/) : [];
+  let desde = -1;
+  for (let i = 0; marca.length && i <= words.length - marca.length; i++) {
+    if (marca.every((m, j) => words[i + j] === m)) {
+      desde = i;
+      break;
+    }
+  }
   return (
-    <Tag ref={ref} className={`rv ${className}`}>
-      {words.map((word, i) => (
-        <span key={`${word}-${i}`}>
-          <span className="w">
-            <i style={{ ["--d" as string]: `${i * 45}ms` } as React.CSSProperties}>{word}</i>
+    <Tag ref={ref} id={id} className={`rv ${className}`}>
+      {words.map((word, i) => {
+        const acento = desde >= 0 && i >= desde && i < desde + marca.length;
+        return (
+          <span key={`${word}-${i}`}>
+            <span className={acento ? "w acento" : "w"}>
+              <i style={{ ["--d" as string]: `${i * 55}ms` } as React.CSSProperties}>{word}</i>
+            </span>
+            {i < words.length - 1 ? " " : null}
           </span>
-          {i < words.length - 1 ? " " : null}
-        </span>
-      ))}
+        );
+      })}
     </Tag>
   );
 }

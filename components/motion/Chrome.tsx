@@ -7,7 +7,7 @@
 
 import { useEffect, useState } from "react";
 import { MARK_PATH, MARK_VIEWBOX, Mark } from "@/components/brand/Mark";
-import { onScroll, useMotionEnv } from "@/lib/motion";
+import { onScroll, terminarIntro, useMotionEnv } from "@/lib/motion";
 import { lockScroll, scrollToTop } from "@/components/motion/MotionProvider";
 
 /* La intro imprime la marca: las dos tintas entran fuera de registro y
@@ -27,7 +27,10 @@ export function Preloader() {
     } catch {
       seen = false;
     }
-    if (reduce || seen) return;
+    if (reduce || seen) {
+      terminarIntro();
+      return;
+    }
     try {
       sessionStorage.setItem("vs-boot", "1");
     } catch {
@@ -35,15 +38,20 @@ export function Preloader() {
     }
     setShow(true);
     lockScroll(true);
+    /* El hero empieza a imprimirse mientras la intro se desvanece: las
+       dos entradas quedan encadenadas, sin un cuadro vacío en el medio. */
+    const i = window.setTimeout(terminarIntro, 780);
     const a = window.setTimeout(() => {
       setDone(true);
       lockScroll(false);
     }, 900);
     const b = window.setTimeout(() => setShow(false), 1500);
     return () => {
+      window.clearTimeout(i);
       window.clearTimeout(a);
       window.clearTimeout(b);
       lockScroll(false);
+      terminarIntro();
     };
   }, [ready, reduce]);
 
