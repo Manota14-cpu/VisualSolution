@@ -515,11 +515,11 @@ html.lite .hero-titulo { filter: none; }
 
 /* ==========================================================
    EL EQUIPO
-   Una ficha de papel por persona, del mismo largo una al lado de
-   la otra. La luz azul sigue al cursor por adentro (--lx/--ly, los
-   escribe MetalRig en todo lo que lleva data-luz); sin puntero, sube
-   desde abajo. Sin foto, las iniciales van sobre la bruma con la
-   trama de la marca.
+   La credencial: papel con una plancha en azul pleno metida 10px
+   adentro, como los marcos del hero y del cierre, y los radios
+   anidados (40px afuera, 30px adentro). La luz azul sigue al cursor
+   por la ficha y una lámpara de bruma por la plancha: las dos leen
+   --lx/--ly, que escribe MetalRig en todo lo que lleva data-luz.
    ========================================================== */
 .perfiles {
   display: grid;
@@ -530,12 +530,10 @@ html.lite .hero-titulo { filter: none; }
 }
 
 .perfil {
-  position: relative;
   display: flex;
   flex-direction: column;
-  gap: clamp(20px, 2.4vw, 28px);
   height: 100%;
-  padding: clamp(26px, 3.4vw, 40px);
+  padding: 10px;
   border-radius: var(--radius-cards);
   border: 1px solid var(--borde-fino);
   background-color: var(--color-papel);
@@ -543,50 +541,206 @@ html.lite .hero-titulo { filter: none; }
   box-shadow: var(--sombra-1);
   transition: box-shadow .6s var(--ease-out), transform .6s var(--ease-out), --luz .45s ease;
 }
-.perfil:focus-within { --luz: .08; }
+.perfil:focus-within { --luz: .06; }
 @media (hover: hover) {
-  .perfil:hover { --luz: .12; box-shadow: var(--sombra-2); transform: translateY(-4px); }
+  .perfil:hover { --luz: .1; box-shadow: var(--sombra-2); transform: translateY(-4px); }
 }
 
-.perfil-cab { display: flex; align-items: center; gap: clamp(16px, 2vw, 22px); }
-
-.perfil-foto {
-  position: relative;
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: clamp(76px, 8vw, 96px);
-  aspect-ratio: 1;
+/* ---------------- la plancha ---------------- */
+.perfil-plancha {
+  aspect-ratio: 16 / 11;
+  min-height: 236px;
   overflow: hidden;
-  border-radius: var(--radius-pills);
-  background-color: var(--color-bruma);
-  background-image: radial-gradient(circle at center, rgb(255 255 255 / .5) 1.1px, transparent 1.2px);
-  background-size: 8px 8px;
-  box-shadow: 0 0 0 4px var(--color-papel), 0 0 0 5px var(--borde-fino);
+  border-radius: 30px;
+}
+/* El pie oscuro sostiene el nombre sobre cualquier foto y trae la
+   trama de la marca, que se desvanece hacia arriba. */
+.perfil-plancha::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at center, rgb(174 205 237 / .32) 1.2px, transparent 1.3px) 0 0 / 9px 9px,
+    linear-gradient(to top, rgb(0 54 165 / .94), rgb(0 54 165 / .72) 34%, rgb(0 54 165 / .2));
+  -webkit-mask-image: linear-gradient(to top, #000 22%, transparent 60%);
+          mask-image: linear-gradient(to top, #000 22%, transparent 60%);
+}
+/* La lámpara: se enciende con el cursor encima y lo sigue. */
+.perfil-plancha::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(380px circle at var(--lx, 78%) var(--ly, 0%), rgb(174 205 237 / .32), rgb(174 205 237 / 0) 62%);
+  opacity: 0;
+  transition: opacity .5s ease;
+}
+@media (hover: hover) {
+  .perfil:hover .perfil-plancha::after { opacity: 1; }
+}
+
+/* El retrato, impreso en una sola tinta: en gris y en modo trama sobre
+   el azul, las sombras quedan en azul y las luces en papel. Con el
+   cursor encima, la tinta se levanta y aparece la foto en color. */
+.perfil-retrato {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  isolation: isolate;
+  background-color: var(--color-azul);
+  transition: background-color .8s ease;
+}
+.perfil-retrato img {
+  object-fit: cover;
+  object-position: 50% 24%;
+  filter: grayscale(1) contrast(1.08);
+  mix-blend-mode: screen;
+  transition: filter .8s ease, scale 1.2s var(--ease-out);
+}
+@media (hover: hover) {
+  .perfil:hover .perfil-retrato { background-color: rgb(0 54 165 / 0); }
+  .perfil:hover .perfil-retrato img { filter: grayscale(0) contrast(1); scale: 1.04; }
+}
+
+/* Sin foto, las iniciales en la trama de la 404, enormes y cortadas
+   por el borde de la plancha. */
+.perfil-monograma {
+  position: absolute;
+  z-index: -1;
+  top: -.17em;
+  right: -.05em;
   font-family: var(--font-display);
-  font-size: clamp(26px, 2.8vw, 34px);
   font-weight: 500;
-  letter-spacing: -0.04em;
-  color: var(--color-azul);
+  font-size: clamp(170px, 21vw, 280px);
+  line-height: 1;
+  letter-spacing: -0.08em;
+  color: transparent;
+  background-image:
+    radial-gradient(circle at center, var(--color-papel) 2.1px, transparent 2.3px),
+    linear-gradient(rgb(255 255 255 / .16), rgb(255 255 255 / .16));
+  background-size: 8px 8px, 100% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  user-select: none;
 }
-.perfil-foto-img { width: 100%; height: 100%; object-fit: cover; }
 
-.perfil-nombre { font-size: clamp(26px, 2.6vw, 34px); line-height: 1.02; }
-.perfil-rol { margin-top: 6px; font-size: 15px; line-height: 1.35; color: var(--color-azul-medio); }
+.perfil-n {
+  position: absolute;
+  z-index: 1;
+  top: 16px;
+  left: 16px;
+  padding: 6px 11px;
+  border-radius: var(--radius-pills);
+  background: rgb(0 54 165 / .38);
+  -webkit-backdrop-filter: blur(8px);
+          backdrop-filter: blur(8px);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.2;
+  letter-spacing: .12em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-papel);
+}
+.perfil-n span { color: rgb(255 255 255 / .62); }
 
-.perfil-bio { max-width: 46ch; font-size: 16px; line-height: 1.6; color: rgb(0 54 165 / .85); }
+.perfil-titular {
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 0 0;
+  padding: 0 clamp(20px, 2.6vw, 28px) clamp(20px, 2.4vw, 26px);
+}
+.perfil-nombre {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(30px, 3.3vw, 44px);
+  line-height: .96;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+  color: var(--color-papel);
+}
+.perfil-rol { margin-top: 8px; font-size: 15px; line-height: 1.35; color: var(--color-bruma); }
 
-.perfil-grupos {
+/* ---------------- el papel ---------------- */
+.perfil-cuerpo {
+  container-type: inline-size;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: clamp(20px, 2.4vw, 26px);
+  padding: clamp(20px, 2.4vw, 26px) clamp(20px, 2.6vw, 28px) clamp(18px, 2.2vw, 24px);
+}
+.perfil-bio { max-width: 48ch; font-size: 16px; line-height: 1.6; color: rgb(0 54 165 / .85); }
+
+/* Lo que sabe hacer, como una ficha técnica: el grupo a la izquierda,
+   las etiquetas a la derecha, un punteado entre renglones. En una
+   ficha angosta el grupo pasa arriba. */
+.perfil-ficha { border-top: 1.5px dotted rgb(0 54 165 / .28); }
+.perfil-fila {
   display: grid;
-  gap: 18px;
-  padding-top: clamp(20px, 2.4vw, 28px);
-  border-top: 1.5px dotted rgb(0 54 165 / .3);
+  gap: 10px;
+  padding-block: 14px;
+  border-bottom: 1.5px dotted rgb(0 54 165 / .28);
 }
-.perfil-grupo { margin-bottom: 10px; color: rgb(0 54 165 / .75); letter-spacing: .12em; }
+.perfil-fila dt { color: rgb(0 54 165 / .75); letter-spacing: .12em; }
+@container (min-width: 400px) {
+  .perfil-fila { grid-template-columns: 140px minmax(0, 1fr); gap: 16px; align-items: start; }
+  .perfil-fila dt { padding-top: 7px; }
+}
+.perfil .badge { padding: 5px 12px; font-size: 13px; }
 
-/* Los enlaces quedan al pie, alineados entre las dos fichas aunque una
+/* Las redes van al pie, alineadas entre las dos fichas aunque una
    tenga menos habilidades que la otra. */
-.perfil-enlaces { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: auto; }
+.perfil-enlaces { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+.perfil-enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--radius-pills);
+  border: 1px solid rgb(0 54 165 / .2);
+  background: var(--color-papel);
+  font-size: 14px;
+  color: var(--color-azul);
+  transition: border-color .25s ease, color .25s ease, background-color .25s ease;
+}
+.perfil-enlace:hover { border-color: var(--color-azul-medio); color: var(--color-azul-medio); background: var(--color-fondo); }
+
+/* La entrada: la plancha se imprime de arriba abajo, como las capturas
+   de Trabajos; el retrato se asienta; las etiquetas llegan en orden de
+   lectura. Las iniciales derivan apenas mientras la ficha cruza la
+   pantalla. */
+@media (prefers-reduced-motion: no-preference) {
+  .rv .perfil-plancha { clip-path: inset(0 0 100% 0 round 30px); }
+  .rv.in .perfil-plancha {
+    clip-path: inset(0 round 30px);
+    transition: clip-path 1.2s var(--ease-out) .18s;
+  }
+  .rv .perfil-retrato { transform: scale(1.1); }
+  .rv.in .perfil-retrato {
+    transform: none;
+    transition: transform 1.6s var(--ease-out) .2s, background-color .8s ease;
+  }
+  .rv .perfil .badge { opacity: 0; translate: 0 8px; }
+  .rv.in .perfil .badge {
+    opacity: 1;
+    translate: none;
+    transition: opacity .5s ease, translate .7s var(--ease-out);
+    transition-delay: calc(.55s + var(--k, 0) * 45ms);
+  }
+  @supports (animation-timeline: view()) {
+    .perfil-monograma {
+      animation: monograma-deriva linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+@keyframes monograma-deriva {
+  from { translate: 0 -7%; }
+  to   { translate: 0 7%; }
+}
 
 /* ==========================================================
    EL CIERRE
@@ -1131,4 +1285,5 @@ html.lite .hero-titulo { filter: none; }
   .pliego:not(.is-open):hover::after,
   .perfil:hover,
   .paso::before { transform: none; }
+  .perfil:hover .perfil-retrato img { scale: none; }
 }

@@ -6,16 +6,20 @@ import { numeroDeSeccion, perfilesCargados, type Perfil } from "@/lib/content";
 
 /* ============================================================
    EL EQUIPO
-   Una tarjeta por persona: quién es, a qué se dedica y qué sabe
-   hacer, con las habilidades agrupadas. Los datos viven en
-   lib/content.ts (perfiles). Sin ningún perfil cargado la sección
-   no se dibuja, y tampoco su enlace en la barra.
+   Una credencial por persona. Arriba, una plancha en azul pleno
+   con el retrato impreso en la tinta de la marca —las sombras en
+   azul, las luces en papel—, así dos fotos sacadas en lugares
+   distintos se leen como una serie. Sin foto, las iniciales van
+   enormes en la trama. Abajo, en papel, la bio y lo que sabe hacer
+   como una ficha técnica: el grupo a la izquierda, las etiquetas a
+   la derecha.
 
-   Es un componente de servidor: sólo Reveal, que anima la entrada,
-   se hidrata en el cliente.
+   Los datos viven en lib/content.ts (perfiles). Sin ningún perfil
+   cargado la sección no se dibuja, y tampoco su enlace en la barra.
+   Es un componente de servidor: sólo Reveal se hidrata.
    ============================================================ */
 
-/* Las dos primeras iniciales del nombre, para la ficha sin foto. */
+/* Las dos primeras iniciales del nombre, para la plancha sin foto. */
 const iniciales = (nombre: string) =>
   nombre
     .trim()
@@ -25,69 +29,83 @@ const iniciales = (nombre: string) =>
     .join("")
     .toUpperCase();
 
-function Ficha({ perfil, indice }: { perfil: Perfil; indice: number }) {
+const dosCifras = (n: number) => String(n).padStart(2, "0");
+
+function Ficha({ perfil, indice, total }: { perfil: Perfil; indice: number; total: number }) {
   const tituloId = `${perfil.id}-nombre`;
+  /* Las etiquetas entran en orden de lectura, de un grupo al
+     siguiente: la cuenta sigue corriendo entre grupos. */
+  let k = 0;
 
   /* .rv y la tarjeta van en elementos separados: .rv.in fija su propia
      transición y pisaría la de la luz y la sombra de la tarjeta. */
   return (
     <Reveal delay={indice} className="h-full">
       <article className="perfil" data-luz aria-labelledby={tituloId}>
-        <header className="perfil-cab">
-          <div className="perfil-foto">
-            {perfil.foto ? (
+        <div className="perfil-plancha inundado">
+          {perfil.foto ? (
+            <div className="perfil-retrato">
               <Image
                 src={perfil.foto}
-                alt={`Foto de ${perfil.nombre}`}
-                width={192}
-                height={192}
-                sizes="96px"
-                className="perfil-foto-img"
+                alt={`Retrato de ${perfil.nombre}`}
+                fill
+                sizes="(min-width: 768px) 560px, 100vw"
               />
-            ) : (
-              <span aria-hidden="true">{iniciales(perfil.nombre)}</span>
-            )}
-          </div>
-          <div>
-            <h3 id={tituloId} className="display display-sm perfil-nombre">
+            </div>
+          ) : (
+            <span className="perfil-monograma" aria-hidden="true">
+              {iniciales(perfil.nombre)}
+            </span>
+          )}
+
+          <span className="perfil-n" aria-hidden="true">
+            {dosCifras(indice + 1)} <span>/ {dosCifras(total)}</span>
+          </span>
+
+          <div className="perfil-titular">
+            <h3 id={tituloId} className="perfil-nombre">
               {perfil.nombre}
             </h3>
             {perfil.rol && <p className="perfil-rol">{perfil.rol}</p>}
           </div>
-        </header>
+        </div>
 
-        {perfil.bio && <p className="perfil-bio">{perfil.bio}</p>}
+        <div className="perfil-cuerpo">
+          {perfil.bio && <p className="perfil-bio">{perfil.bio}</p>}
 
-        {perfil.habilidades.length > 0 && (
-          <div className="perfil-grupos">
-            {perfil.habilidades.map((g) => (
-              <div key={g.grupo}>
-                <h4 className="label perfil-grupo">{g.grupo}</h4>
-                <ul className="flex flex-wrap gap-2">
-                  {g.items.map((item) => (
-                    <li key={item} className="badge">
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        )}
+          {perfil.habilidades.length > 0 && (
+            <dl className="perfil-ficha">
+              {perfil.habilidades.map((g) => (
+                <div key={g.grupo} className="perfil-fila">
+                  <dt className="label">{g.grupo}</dt>
+                  <dd>
+                    <ul className="flex flex-wrap gap-2">
+                      {g.items.map((item) => (
+                        <li key={item} className="badge" style={{ ["--k" as string]: k++ } as React.CSSProperties}>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
 
-        {perfil.enlaces && perfil.enlaces.length > 0 && (
-          <ul className="perfil-enlaces">
-            {perfil.enlaces.map((e) => (
-              <li key={e.url}>
-                <a className="link link-flecha" href={e.url} target="_blank" rel="noopener noreferrer">
-                  {e.label}
-                  <Flecha externa />
-                  <span className="sr-only"> (se abre en una pestaña nueva)</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
+          {perfil.enlaces && perfil.enlaces.length > 0 && (
+            <ul className="perfil-enlaces">
+              {perfil.enlaces.map((e) => (
+                <li key={e.url}>
+                  <a className="perfil-enlace" href={e.url} target="_blank" rel="noopener noreferrer">
+                    {e.label}
+                    <Flecha externa />
+                    <span className="sr-only"> (se abre en una pestaña nueva)</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </article>
     </Reveal>
   );
@@ -114,7 +132,7 @@ export function Team() {
 
         <div className="perfiles">
           {perfilesCargados.map((p, i) => (
-            <Ficha key={p.id} perfil={p} indice={i} />
+            <Ficha key={p.id} perfil={p} indice={i} total={perfilesCargados.length} />
           ))}
         </div>
       </div>

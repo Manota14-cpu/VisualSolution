@@ -131,8 +131,11 @@ export type Perfil = {
   rol: string;
   /* Dos o tres líneas. */
   bio: string;
-  /* La foto, en /public/equipo: cuadrada, con 600×600 alcanza. Sin foto
-     se dibujan las iniciales sobre el color de la marca. */
+  /* La foto, en /public/equipo, de 1200 px de ancho o más. Se recorta
+     apaisada y centrada un poco arriba, así que conviene que la cara
+     quede en el tercio de arriba. Se imprime en el azul de la marca y
+     aparece en color al pasar el cursor. Sin foto se dibujan las
+     iniciales en la trama. */
   foto?: string;
   /* Lo que sabe hacer, en grupos con su título (Desarrollo, Video…).
      Cada ítem se muestra como una etiqueta. */
