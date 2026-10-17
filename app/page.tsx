@@ -3,6 +3,7 @@ import { Hero, Marquee } from "@/components/site/Hero";
 import { Services } from "@/components/site/Services";
 import { Works } from "@/components/site/Works";
 import { Stack } from "@/components/site/Stack";
+import { Team } from "@/components/site/Team";
 import { Process } from "@/components/site/Process";
 import { Faq } from "@/components/site/Faq";
 import { Contact } from "@/components/site/Contact";
@@ -20,6 +21,7 @@ export default function Page() {
         <Services />
         <Works />
         <Stack />
+        <Team />
         <Process />
         <Faq />
         <Contact />

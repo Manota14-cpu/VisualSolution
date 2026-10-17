@@ -79,6 +79,12 @@ Está todo junto en `lib/content.ts`, marcado con `TODO`.
    borrador razonable. Ajustalos a como trabajás de verdad (los términos ya
    aclaran que son orientativos y que vale la propuesta escrita).
 
+4. **Los perfiles del equipo** (`perfiles`). La sección "Equipo" muestra una
+   ficha por persona —nombre, rol, bio, habilidades agrupadas, enlaces y foto
+   opcional en `public/equipo/`— y no existe, ni en la página ni en la barra,
+   hasta que un perfil tiene el nombre completo. Un perfil sin nombre no se
+   muestra. El ejemplo de cómo se completa está arriba de `perfiles`.
+
 ## El formulario
 
 Manda la consulta por WhatsApp: arma el mensaje con lo escrito y abre un chat

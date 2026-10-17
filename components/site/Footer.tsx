@@ -52,7 +52,8 @@ export function Closer() {
 }
 
 const columns = [
-  { title: "Estudio", links: nav.slice(0, 4) },
+  /* Todo lo de la barra menos Contacto, que tiene su propia columna. */
+  { title: "Estudio", links: nav.filter((n) => n.href !== "#contacto") },
   {
     title: "Contacto",
     links: [

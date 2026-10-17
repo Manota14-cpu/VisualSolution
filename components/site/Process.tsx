@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { Reveal, SplitHeading } from "@/components/motion/Reveal";
 import { Eyebrow } from "@/components/site/Eyebrow";
 import { onScroll, useMotionEnv } from "@/lib/motion";
-import { steps } from "@/lib/content";
+import { numeroDeSeccion, steps } from "@/lib/content";
 
 export function Process() {
   const wrap = useRef<HTMLDivElement>(null);
@@ -84,7 +84,7 @@ export function Process() {
     <section className="seccion" id="proceso" aria-labelledby="proceso-titulo">
       <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-12 px-4 md:px-10 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
         <Reveal className="self-start lg:sticky lg:top-32">
-          <Eyebrow n="03">Proceso</Eyebrow>
+          <Eyebrow n={numeroDeSeccion("#proceso")}>Proceso</Eyebrow>
           <SplitHeading
             id="proceso-titulo"
             text="Cómo trabajamos"

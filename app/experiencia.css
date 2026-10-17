@@ -514,6 +514,81 @@ html.lite .hero-titulo { filter: none; }
 @media (hover: hover) { .stack-logos li:hover svg { transform: translateY(-2px) scale(1.08); } }
 
 /* ==========================================================
+   EL EQUIPO
+   Una ficha de papel por persona, del mismo largo una al lado de
+   la otra. La luz azul sigue al cursor por adentro (--lx/--ly, los
+   escribe MetalRig en todo lo que lleva data-luz); sin puntero, sube
+   desde abajo. Sin foto, las iniciales van sobre la bruma con la
+   trama de la marca.
+   ========================================================== */
+.perfiles {
+  display: grid;
+  gap: clamp(16px, 2.4vw, 28px);
+}
+@media (min-width: 768px) {
+  .perfiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.perfil {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 2.4vw, 28px);
+  height: 100%;
+  padding: clamp(26px, 3.4vw, 40px);
+  border-radius: var(--radius-cards);
+  border: 1px solid var(--borde-fino);
+  background-color: var(--color-papel);
+  background-image: radial-gradient(520px circle at var(--lx, 50%) var(--ly, 125%), rgb(21 91 205 / var(--luz)), transparent 62%);
+  box-shadow: var(--sombra-1);
+  transition: box-shadow .6s var(--ease-out), transform .6s var(--ease-out), --luz .45s ease;
+}
+.perfil:focus-within { --luz: .08; }
+@media (hover: hover) {
+  .perfil:hover { --luz: .12; box-shadow: var(--sombra-2); transform: translateY(-4px); }
+}
+
+.perfil-cab { display: flex; align-items: center; gap: clamp(16px, 2vw, 22px); }
+
+.perfil-foto {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: clamp(76px, 8vw, 96px);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius-pills);
+  background-color: var(--color-bruma);
+  background-image: radial-gradient(circle at center, rgb(255 255 255 / .5) 1.1px, transparent 1.2px);
+  background-size: 8px 8px;
+  box-shadow: 0 0 0 4px var(--color-papel), 0 0 0 5px var(--borde-fino);
+  font-family: var(--font-display);
+  font-size: clamp(26px, 2.8vw, 34px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  color: var(--color-azul);
+}
+.perfil-foto-img { width: 100%; height: 100%; object-fit: cover; }
+
+.perfil-nombre { font-size: clamp(26px, 2.6vw, 34px); line-height: 1.02; }
+.perfil-rol { margin-top: 6px; font-size: 15px; line-height: 1.35; color: var(--color-azul-medio); }
+
+.perfil-bio { max-width: 46ch; font-size: 16px; line-height: 1.6; color: rgb(0 54 165 / .85); }
+
+.perfil-grupos {
+  display: grid;
+  gap: 18px;
+  padding-top: clamp(20px, 2.4vw, 28px);
+  border-top: 1.5px dotted rgb(0 54 165 / .3);
+}
+.perfil-grupo { margin-bottom: 10px; color: rgb(0 54 165 / .75); letter-spacing: .12em; }
+
+/* Los enlaces quedan al pie, alineados entre las dos fichas aunque una
+   tenga menos habilidades que la otra. */
+.perfil-enlaces { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: auto; }
+
+/* ==========================================================
    EL CIERRE
    La luz del cursor aclara la trama (::after, con --lx/--ly), y el
    monograma, enorme y en filete, se asienta mientras la sección
@@ -1054,5 +1129,6 @@ html.lite .hero-titulo { filter: none; }
   .contacto-fila:hover .contacto-flecha,
   :is(a, button):hover > .flecha,
   .pliego:not(.is-open):hover::after,
+  .perfil:hover,
   .paso::before { transform: none; }
 }

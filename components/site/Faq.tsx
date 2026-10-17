@@ -6,7 +6,7 @@ import { Reveal, SplitHeading } from "@/components/motion/Reveal";
 import { Eyebrow } from "@/components/site/Eyebrow";
 import { MetalFaz } from "@/components/brand/MetalRig";
 import { Flecha } from "@/components/ui/Flecha";
-import { faqs, whatsappUrl } from "@/lib/content";
+import { faqs, numeroDeSeccion, whatsappUrl } from "@/lib/content";
 
 export function Faq() {
   // una sola respuesta abierta a la vez
@@ -16,7 +16,7 @@ export function Faq() {
     <section className="seccion" id="preguntas" aria-labelledby="preguntas-titulo">
       <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-12 px-4 md:px-10 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
         <Reveal className="self-start lg:sticky lg:top-32">
-          <Eyebrow n="04">Preguntas</Eyebrow>
+          <Eyebrow n={numeroDeSeccion("#preguntas")}>Preguntas</Eyebrow>
           <SplitHeading
             id="preguntas-titulo"
             text="Lo que siempre nos preguntan"

@@ -9,7 +9,7 @@ import { Eyebrow } from "@/components/site/Eyebrow";
 import { Flecha } from "@/components/ui/Flecha";
 import { useMotionEnv } from "@/lib/motion";
 import { onAskAbout, onAskForServices } from "@/lib/consult";
-import { serviceOptions, site, whatsappUrl } from "@/lib/content";
+import { numeroDeSeccion, serviceOptions, site, whatsappUrl } from "@/lib/content";
 import { MetalFaz } from "@/components/brand/MetalRig";
 
 type Fields = { nombre: string; email: string; servicio: string; mensaje: string; acepta: boolean };
@@ -184,7 +184,7 @@ export function Contact() {
     <section className="seccion" id="contacto" aria-labelledby="contacto-titulo">
       <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 items-start gap-12 px-4 md:px-10 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
         <Reveal>
-          <Eyebrow n="05">Contacto</Eyebrow>
+          <Eyebrow n={numeroDeSeccion("#contacto")}>Contacto</Eyebrow>
           <SplitHeading
             id="contacto-titulo"
             text="Hablemos de tu proyecto."

@@ -100,13 +100,67 @@ export const paginasLegales = [
   { href: "/privacidad", label: "Política de privacidad" },
 ] as const;
 
-export const nav = [
+/* ============================================================
+   EL EQUIPO
+   Los perfiles de las personas del estudio: quién es cada una y qué
+   sabe hacer. La sección "Equipo" se arma sola con lo que se cargue
+   acá abajo.
+
+   Un perfil con el nombre vacío no se muestra, y sin ningún perfil
+   cargado la sección y su enlace en la barra no existen: se
+   completa lo real, no se rellena con datos inventados.
+
+   Para cargar un perfil, se completan los campos de uno de los dos
+   de abajo. Por ejemplo:
+
+     nombre: "Nombre Apellido",
+     rol: "Desarrollo web",
+     bio: "Dos o tres líneas sobre qué hace y cómo trabaja.",
+     foto: "/equipo/nombre.webp",
+     habilidades: [
+       { grupo: "Desarrollo", items: ["Next.js", "React"] },
+       { grupo: "Diseño", items: ["Figma"] },
+     ],
+     enlaces: [{ label: "Instagram", url: "https://www.instagram.com/…" }],
+   ============================================================ */
+export type Perfil = {
+  id: string;
+  /* Nombre y apellido. Vacío, el perfil no se muestra. */
+  nombre: string;
+  /* A qué se dedica, en pocas palabras. Va bajo el nombre. */
+  rol: string;
+  /* Dos o tres líneas. */
+  bio: string;
+  /* La foto, en /public/equipo: cuadrada, con 600×600 alcanza. Sin foto
+     se dibujan las iniciales sobre el color de la marca. */
+  foto?: string;
+  /* Lo que sabe hacer, en grupos con su título (Desarrollo, Video…).
+     Cada ítem se muestra como una etiqueta. */
+  habilidades: { grupo: string; items: string[] }[];
+  /* Redes o portfolio personal. Se abren en una pestaña nueva. */
+  enlaces?: { label: string; url: string }[];
+};
+
+export const perfiles: Perfil[] = [
+  { id: "perfil-1", nombre: "", rol: "", bio: "", habilidades: [] },
+  { id: "perfil-2", nombre: "", rol: "", bio: "", habilidades: [] },
+];
+
+export const perfilesCargados = perfiles.filter((p) => p.nombre.trim() !== "");
+
+export const nav: { href: string; label: string }[] = [
   { href: "#servicios", label: "Servicios" },
   { href: "#trabajos", label: "Trabajos" },
+  ...(perfilesCargados.length ? [{ href: "#equipo", label: "Equipo" }] : []),
   { href: "#proceso", label: "Proceso" },
   { href: "#preguntas", label: "Preguntas" },
   { href: "#contacto", label: "Contacto" },
-] as const;
+];
+
+/* El número del rótulo de cada sección sale de su lugar en la barra, así
+   la numeración sigue siendo correcta con o sin la sección de equipo. */
+export const numeroDeSeccion = (href: string) =>
+  String(nav.findIndex((n) => n.href === href) + 1).padStart(2, "0");
 
 export const hero = {
   headline: "Donde la idea toca la máquina.",

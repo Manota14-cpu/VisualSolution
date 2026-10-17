@@ -7,7 +7,7 @@ import { Reveal, SplitHeading } from "@/components/motion/Reveal";
 import { CaseLayer } from "@/components/site/CaseLayer";
 import { scrollToId } from "@/components/motion/MotionProvider";
 import { useMotionEnv, withTransition } from "@/lib/motion";
-import { etiquetaEnlace, works, type Work } from "@/lib/content";
+import { etiquetaEnlace, numeroDeSeccion, works, type Work } from "@/lib/content";
 import { MetalFaz } from "@/components/brand/MetalRig";
 import { Eyebrow } from "@/components/site/Eyebrow";
 import { Flecha } from "@/components/ui/Flecha";
@@ -340,7 +340,7 @@ export function Works() {
             el titular más grande de la página después del hero. */}
         <div className="cabecera">
           <Reveal>
-            <Eyebrow n="02">Proyectos</Eyebrow>
+            <Eyebrow n={numeroDeSeccion("#trabajos")}>Proyectos</Eyebrow>
             <div className="titulo-con-cuenta">
               <SplitHeading id="trabajos-titulo" text="Trabajos" className="display display-xl" />
               {/* La cuenta, en superíndice como en un índice editorial. Es

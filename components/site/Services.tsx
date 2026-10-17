@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Reveal, SplitHeading, useReveal } from "@/components/motion/Reveal";
 import { Eyebrow } from "@/components/site/Eyebrow";
-import { services, type Service } from "@/lib/content";
+import { numeroDeSeccion, services, type Service } from "@/lib/content";
 
 /* ============================================================
    LOS SERVICIOS
@@ -121,7 +121,7 @@ export function Services() {
             vacío al lado de cada titular. */}
         <Reveal className="cabecera">
           <div>
-            <Eyebrow n="01">Servicios</Eyebrow>
+            <Eyebrow n={numeroDeSeccion("#servicios")}>Servicios</Eyebrow>
             <SplitHeading
               id="servicios-titulo"
               text="Todo lo que tu marca necesita."
