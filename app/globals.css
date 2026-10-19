@@ -845,6 +845,258 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .case-back:hover { background: var(--color-azul); color: var(--color-papel); }
 .case-back svg { transition: transform .25s cubic-bezier(.16,1,.3,1); }
 .case-back:hover svg { transform: translateX(-2px); }
+
+/* ---------------- la cabecera ----------------
+   La misma que las secciones de la página: rótulo y titular a la
+   izquierda, el párrafo, las herramientas y la acción a la derecha,
+   apoyados en la base del titular. */
+.caso-cabecera {
+  display: grid;
+  gap: 24px;
+  padding-block: clamp(36px, 5vw, 64px) clamp(28px, 3.6vw, 44px);
+}
+@media (min-width: 1024px) {
+  .caso-cabecera {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    align-items: end;
+    column-gap: clamp(40px, 6vw, 88px);
+  }
+}
+.caso-cabecera-lado { display: grid; justify-items: start; gap: 18px; }
+.caso-resumen { max-width: 48ch; font-size: clamp(16px, 1.2vw, 18px); line-height: 1.6; color: rgb(0 54 165 / .85); }
+
+/* ---------------- la portada ----------------
+   Plancha en azul pleno (.inundado) con el trabajo apoyado encima. La
+   ventana se sale por el borde de abajo, como un equipo que asoma; la
+   lámpara de bruma sigue al cursor (data-luz). */
+.caso-portada {
+  overflow: hidden;
+  aspect-ratio: 2 / 1;
+  border-radius: var(--radius-cards);
+  box-shadow: var(--sombra-2);
+}
+.caso-portada::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(560px circle at var(--lx, 72%) var(--ly, 8%), rgb(174 205 237 / .3), rgb(174 205 237 / 0) 62%);
+}
+.caso-ventana {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 9%;
+  width: 84%;
+  translate: -50% 0;
+  overflow: hidden;
+  border-radius: 18px 18px 0 0;
+  background: var(--color-papel);
+  box-shadow: 0 34px 80px -30px rgb(0 24 90 / .6);
+}
+.caso-ventana-barra {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 38px;
+  padding: 0 16px;
+  border-bottom: 1px solid rgb(0 54 165 / .08);
+}
+.caso-ventana-barra > span { flex: none; width: 9px; height: 9px; border-radius: var(--radius-pills); background: rgb(0 54 165 / .18); }
+.caso-ventana-barra p {
+  min-width: 0;
+  margin-left: 12px;
+  padding: 4px 14px;
+  overflow: hidden;
+  border-radius: var(--radius-pills);
+  background: rgb(0 54 165 / .06);
+  font-size: 12px;
+  line-height: 1.3;
+  color: rgb(0 54 165 / .8);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.caso-ventana-vista { position: relative; aspect-ratio: 16 / 10; background: var(--color-fondo); }
+/* Una pieza gráfica no es una pantalla: va entera, como un afiche. */
+.caso-pieza {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 8%;
+  height: 84%;
+  aspect-ratio: 1;
+  translate: -50% 0;
+  rotate: -2.5deg;
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow: 0 30px 70px -28px rgb(0 24 90 / .6);
+}
+@media (max-width: 767px) {
+  .caso-portada { aspect-ratio: 5 / 4; border-radius: 28px; }
+  .caso-ventana { top: 10%; width: 90%; border-radius: 12px 12px 0 0; }
+  .caso-ventana-barra { height: 30px; padding: 0 12px; gap: 5px; }
+  .caso-ventana-barra > span { width: 7px; height: 7px; }
+  .caso-ventana-barra p { margin-left: 8px; padding: 3px 10px; font-size: 11px; }
+}
+/* El trabajo sube apenas mientras la portada cruza la pantalla. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .caso-ventana,
+    .caso-pieza {
+      animation: caso-asoma linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 60%;
+    }
+  }
+}
+@keyframes caso-asoma {
+  from { translate: -50% 9%; }
+  to   { translate: -50% 0; }
+}
+
+/* ---------------- los datos ----------------
+   Una ficha de papel. Las columnas se reparten solas; el punteado
+   entre datos se corre un pelo a la izquierda y el de la primera
+   columna queda afuera, recortado. */
+.caso-datos { margin-top: clamp(16px, 2.2vw, 28px); }
+.caso-datos dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid var(--borde-fino);
+  background: var(--color-papel);
+  box-shadow: var(--sombra-1);
+}
+.caso-datos dl > div {
+  margin: -1.5px 0 0 -1.5px;
+  padding: clamp(18px, 2vw, 24px) clamp(18px, 2.2vw, 28px);
+  border-top: 1.5px dotted rgb(0 54 165 / .22);
+  border-left: 1.5px dotted rgb(0 54 165 / .22);
+}
+.caso-datos dt { color: rgb(0 54 165 / .75); }
+.caso-datos dd { margin-top: 8px; font-size: 16px; line-height: 1.4; color: var(--color-azul); }
+
+/* ---------------- los capítulos ----------------
+   El número impreso en la trama, como la cifra de la 404 pero en tinta
+   sobre papel. El texto arranca a la altura del título. */
+.capitulos { margin-top: clamp(28px, 4vw, 48px); }
+.capitulo {
+  --n-alto: clamp(64px, 8vw, 112px);
+  display: grid;
+  gap: 18px 64px;
+  padding-block: clamp(36px, 5vw, 64px);
+  border-top: 1.5px dotted rgb(0 54 165 / .22);
+}
+.capitulo:first-child { border-top: 0; }
+.capitulo-n {
+  display: block;
+  margin-bottom: 14px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--n-alto);
+  line-height: .8;
+  letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums;
+  color: transparent;
+  background-image:
+    radial-gradient(circle at center, var(--color-azul-medio) 2px, transparent 2.2px),
+    linear-gradient(rgb(21 91 205 / .2), rgb(21 91 205 / .2));
+  background-size: 7px 7px, 100% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+}
+.capitulo-texto { max-width: 58ch; font-size: clamp(17px, 1.35vw, 19px); line-height: 1.7; color: rgb(0 54 165 / .88); }
+.capitulo-imagen {
+  position: relative;
+  grid-column: 1 / -1;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-cards);
+}
+@media (min-width: 768px) {
+  .capitulo { grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr); }
+  .capitulo-cab { position: sticky; top: 96px; align-self: start; }
+  .capitulo-texto { padding-top: calc(var(--n-alto) * .8 + 14px); }
+}
+
+/* ---------------- el cierre ---------------- */
+.caso-cierre {
+  overflow: hidden;
+  margin-top: clamp(24px, 4vw, 48px);
+  padding: clamp(64px, 9vw, 112px) clamp(20px, 4vw, 48px);
+  border-radius: var(--radius-cards);
+  text-align: center;
+}
+
+/* ---------------- el siguiente ----------------
+   La captura va impresa en la tinta, como un panel cerrado del
+   acordeón; con el cursor encima se destiñe a color. */
+.caso-siguiente { margin-top: clamp(14px, 2vw, 22px); }
+.siguiente {
+  position: relative;
+  display: grid;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-cards);
+  border: 1px solid var(--borde-fino);
+  background: var(--color-papel);
+  box-shadow: var(--sombra-1);
+  text-align: left;
+  color: var(--color-azul);
+  cursor: pointer;
+  transition: box-shadow .6s var(--ease-out), transform .6s var(--ease-out);
+}
+@media (min-width: 768px) {
+  .siguiente { grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); min-height: 230px; }
+}
+.siguiente-texto { display: grid; align-content: center; gap: 10px; padding: clamp(24px, 3vw, 40px); }
+.siguiente-texto .label { color: rgb(0 54 165 / .75); }
+.siguiente-titulo {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(32px, 4vw, 56px);
+  line-height: .95;
+  letter-spacing: -0.05em;
+  transition: color .3s ease;
+}
+.siguiente-tipo { font-size: 15px; color: rgb(0 54 165 / .75); }
+.siguiente-imagen { position: relative; min-height: 190px; overflow: hidden; isolation: isolate; background: var(--color-azul); }
+.siguiente-imagen img { filter: grayscale(1) contrast(1.05); transition: filter .7s ease, scale 1s var(--ease-out); }
+.siguiente-imagen::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background:
+    radial-gradient(circle at center, rgb(174 205 237 / .34) 1.2px, transparent 1.3px) 0 0 / 9px 9px,
+    rgb(0 54 165 / .5);
+  transition: opacity .6s ease;
+}
+.siguiente-flecha {
+  position: absolute;
+  z-index: 2;
+  right: 20px;
+  bottom: 20px;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-pills);
+  background: var(--color-papel);
+  color: var(--color-azul);
+  box-shadow: var(--sombra-1);
+}
+.siguiente-flecha .flecha { width: 18px; height: 18px; }
+.siguiente:focus-visible { outline: 2px solid var(--color-azul-medio); outline-offset: 4px; }
+.siguiente:focus-visible .siguiente-flecha .flecha { transform: translateX(3px); }
+@media (hover: hover) {
+  .siguiente:hover { box-shadow: var(--sombra-2); transform: translateY(-4px); }
+  .siguiente:hover .siguiente-titulo { color: var(--color-azul-medio); }
+  .siguiente:hover .siguiente-imagen img { filter: none; scale: 1.04; }
+  .siguiente:hover .siguiente-imagen::after { opacity: 0; }
+  .siguiente:hover .siguiente-flecha .flecha { transform: translateX(3px); }
+}
 /* ==========================================================
    LOS PLIEGOS
    Cinco bandas a todo el ancho en lugar de cinco tarjetas del
@@ -1628,6 +1880,8 @@ footer :focus-visible { outline-color: var(--color-papel); }
   .hoja.es-despues { --giro: 0deg; }
   .hoja-imagen { --deriva: 0; }
   .hoja-detalle > * { translate: none; }
+  .siguiente:hover,
+  .siguiente:hover .siguiente-imagen img { transform: none; scale: none; }
 
   /* El metal se queda quieto pero sigue siendo metal: los anillos
      frenan en una posición cualquiera y el canto conserva sus

@@ -229,6 +229,26 @@ export function Works() {
     return () => window.removeEventListener("popstate", onPop);
   }, [closeNow]);
 
+  /* Pasar al siguiente sin cerrar la capa. La URL se reemplaza y no se
+     apila: atrás sigue cerrando la ficha. El panel de ese trabajo queda
+     abierto en el acordeón y lleva el nombre de transición, así al
+     cerrar la imagen vuelve a su lugar. */
+  const siguiente = useCallback(
+    (work: Work) => {
+      setActiva(works.findIndex((w) => w.id === work.id));
+      withTransition(
+        () =>
+          flushSync(() => {
+            setMorphId(work.id);
+            setOpen(work);
+          }),
+        reduce
+      );
+      history.replaceState({ caso: work.id }, "", `/trabajos/${work.id}`);
+    },
+    [reduce]
+  );
+
   const consultar = useCallback(() => {
     close();
     window.setTimeout(() => scrollToId("contacto"), 220);
@@ -281,7 +301,11 @@ export function Works() {
                 activa={i === activa}
                 lado={i < activa ? "antes" : i > activa ? "despues" : null}
                 deriva={Math.max(-1.5, Math.min(1.5, activa - i))}
-                morphing={morphId === w.id}
+                /* El nombre de transición no puede estar dos veces en la
+                   página: el panel lo lleva sólo con la ficha cerrada, y
+                   la portada de la ficha sólo con la ficha abierta. Si
+                   coinciden, el navegador cancela la transición. */
+                morphing={morphId === w.id && !open}
                 onActivar={() => setActiva(i)}
                 onTecla={tecla(i)}
                 onOpen={show}
@@ -297,6 +321,7 @@ export function Works() {
           morphName={morphId === open.id ? morphNameFor(open.id) : undefined}
           onClose={close}
           onConsult={consultar}
+          onNext={siguiente}
         />
       )}
     </section>

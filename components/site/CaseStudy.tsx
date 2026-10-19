@@ -9,47 +9,83 @@
    ============================================================ */
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
+import { siWhatsapp } from "simple-icons";
 import { askAbout } from "@/lib/consult";
 import { clamp01, useMotionEnv } from "@/lib/motion";
-import { etiquetaEnlace, type Work } from "@/lib/content";
+import { etiquetaEnlace, whatsappUrl, works, type Work } from "@/lib/content";
 import { MetalFaz } from "@/components/brand/MetalRig";
+import { Mark } from "@/components/brand/Mark";
+import { Reveal, SplitHeading } from "@/components/motion/Reveal";
+import { Eyebrow } from "@/components/site/Eyebrow";
+import { Flecha } from "@/components/ui/Flecha";
 
-/* La imagen de portada es la que viaja desde la grilla. El nombre de
-   transición tiene que ser único en el documento, por eso lo recibe
-   desde afuera y sólo lo lleva la ficha que se está abriendo. */
+const dosCifras = (n: number) => String(n).padStart(2, "0");
+
+/* La portada: una plancha en azul pleno con la trama, como las
+   portadas del catálogo, y el trabajo apoyado encima. Un sitio va
+   adentro de una ventana de navegador con su dirección —dice, sin
+   explicarlo, que es un sitio que funciona—; una pieza gráfica va
+   entera, como un afiche sobre la plancha.
+
+   Es la que viaja desde el acordeón: el nombre de transición tiene que
+   ser único en el documento, por eso lo recibe desde afuera y sólo lo
+   lleva la ficha que se está abriendo. Por lo mismo no lleva revelado
+   de entrada: la captura de la transición la vería transparente. */
 export function CaseCover({ work, morphName }: { work: Work; morphName?: string }) {
+  let contenido: React.ReactNode;
+  if (!work.preview) {
+    /* Sin captura, la plancha y el nombre: nunca una imagen rota. */
+    contenido = (
+      <div className="ventana-plancha">
+        <span>{work.title}</span>
+      </div>
+    );
+  } else if (work.previewEntera) {
+    contenido = (
+      <div className="caso-pieza" style={{ background: work.previewEntera.fondo }}>
+        <Image src={work.preview} alt={work.alt} fill priority sizes="(max-width: 768px) 80vw, 460px" className="object-contain" />
+      </div>
+    );
+  } else {
+    contenido = (
+      <div className="caso-ventana">
+        <div className="caso-ventana-barra" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+          {work.url && <p>{work.url.replace(/^https?:[/][/]/, "").replace(/[/]$/, "")}</p>}
+        </div>
+        <div className="caso-ventana-vista">
+          <Image
+            src={work.preview}
+            alt={work.alt}
+            fill
+            priority
+            sizes="(max-width: 768px) 92vw, 920px"
+            className="object-cover object-top"
+            style={work.previewPosition ? { objectPosition: work.previewPosition } : undefined}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
-      className="shot relative aspect-[16/9] w-full overflow-hidden rounded-cards md:aspect-[21/9]"
-      style={
-        {
-          ...(morphName ? { viewTransitionName: morphName } : {}),
-          ...(work.previewEntera ? { background: work.previewEntera.fondo } : {}),
-        } as React.CSSProperties
-      }
+      className="caso-portada inundado"
+      data-luz
+      style={morphName ? ({ viewTransitionName: morphName } as React.CSSProperties) : undefined}
     >
-      {work.preview ? (
-        <Image
-          src={work.preview}
-          alt={work.alt}
-          fill
-          priority
-          sizes="(max-width: 1200px) 100vw, 1200px"
-          className={work.previewEntera ? "object-contain" : "object-cover object-top"}
-          style={!work.previewEntera && work.previewPosition ? { objectPosition: work.previewPosition } : undefined}
-        />
-      ) : (
-        /* Sin captura, la portada se llena con la plancha del sistema y
-           el nombre: nunca una imagen rota. */
-        <div className="ventana-plancha">
-          <span>{work.title}</span>
-        </div>
-      )}
+      {contenido}
     </div>
   );
 }
 
+/* Los datos duros, en una ficha de papel. Las columnas se reparten
+   solas: con cuatro o con cinco datos entran en un renglón, sin uno
+   colgando abajo. */
 function Facts({ work }: { work: Work }) {
   // Sin datos propios se arman con lo que ya tiene la ficha.
   const facts =
@@ -60,49 +96,39 @@ function Facts({ work }: { work: Work }) {
     ];
 
   return (
-    <dl className="grid grid-cols-2 gap-x-8 gap-y-6 border-y border-dotted border-azul/30 py-8 md:grid-cols-4">
-      {facts.map((f) => (
-        <div key={f.label}>
-          <dt className="label text-azul/80">{f.label}</dt>
-          <dd className="mt-2 text-base text-azul">{f.value}</dd>
-        </div>
-      ))}
-    </dl>
+    <Reveal className="caso-datos">
+      <dl>
+        {facts.map((f) => (
+          <div key={f.label}>
+            <dt className="label">{f.label}</dt>
+            <dd>{f.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </Reveal>
   );
 }
 
-/* Capítulo: el texto se lee mientras la imagen queda fija al costado.
-   En pantallas chicas se apilan, que es como se lee de verdad. */
+/* Capítulo: el número impreso en la trama y el título a un lado,
+   quietos mientras se lee; el texto al otro, a cuerpo de lectura. En
+   pantallas chicas se apilan, que es como se lee de verdad. */
 function Chapter({ chapter, index }: { chapter: NonNullable<Work["chapters"]>[number]; index: number }) {
   return (
-    <section className="grid grid-cols-1 gap-8 py-14 md:grid-cols-[1fr_1.1fr] md:gap-16 md:py-20">
-      <div className="md:sticky md:top-24 md:self-start">
-        <h2 className="display display-sm">
-          {chapter.title}
-        </h2>
-        <p className="mt-5 max-w-[58ch] text-base leading-relaxed text-azul/85">{chapter.body}</p>
+    <Reveal as="section" className="capitulo">
+      <div className="capitulo-cab">
+        <span className="capitulo-n" aria-hidden="true">
+          {dosCifras(index + 1)}
+        </span>
+        <h2 className="display display-sm">{chapter.title}</h2>
       </div>
+      <p className="capitulo-texto">{chapter.body}</p>
 
-      {chapter.image ? (
-        <div className="shot relative aspect-[4/3] overflow-hidden rounded-cards">
-          <Image
-            src={chapter.image}
-            alt=""
-            fill
-            sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover"
-          />
-        </div>
-      ) : (
-        /* Sin imagen el capítulo respira solo: una regla y el número,
-           en vez de un hueco o una tarjeta vacía. */
-        <div className="hidden items-start justify-end md:flex">
-          <span className="label text-azul/80">
-            {String(index + 1).padStart(2, "0")}
-          </span>
+      {chapter.image && (
+        <div className="capitulo-imagen shot">
+          <Image src={chapter.image} alt="" fill sizes="(max-width: 768px) 100vw, 1020px" className="object-cover" />
         </div>
       )}
-    </section>
+    </Reveal>
   );
 }
 
@@ -294,92 +320,199 @@ export function CaseProgress({ scroller }: { scroller?: React.RefObject<HTMLElem
   );
 }
 
+/* El remate: la misma plancha que cierra la página principal. Adentro
+   del sitio, la acción lleva al formulario con el proyecto ya escrito;
+   en la página suelta (un enlace compartido, un buscador) no hay
+   formulario, así que va directo a WhatsApp con el mensaje armado. */
+function Cierre({ work, conHistoria, onConsult }: { work: Work; conHistoria: boolean; onConsult?: () => void }) {
+  const mensaje = `Hola Visual Solution, vi ${work.title} en su sitio y quiero algo así para mi negocio.`;
+  const whatsapp = (
+    <>
+      <MetalFaz />
+      <svg className="size-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+        <path d={siWhatsapp.path} />
+      </svg>
+      {onConsult ? "Escribinos por WhatsApp" : "Consultar por WhatsApp"}
+      <Flecha externa />
+      <span className="sr-only"> (se abre en una pestaña nueva)</span>
+    </>
+  );
+
+  return (
+    <section className="caso-cierre cierre inundado" data-luz aria-labelledby="caso-cierre-titulo">
+      <Mark className="cierre-marca" />
+      <div className="relative">
+        <SplitHeading
+          id="caso-cierre-titulo"
+          text="¿Querés algo así para tu negocio?"
+          accent="para tu negocio?"
+          className="mx-auto max-w-[15ch] display display-md"
+        />
+        <Reveal as="p" delay={1} className="mx-auto mt-6 max-w-[48ch] text-[17px] leading-relaxed text-papel/85">
+          {conHistoria
+            ? "Contanos la idea. La primera propuesta no se cobra."
+            : "Si querés ver el detalle de este trabajo o algo parecido para tu negocio, escribinos y te lo mostramos."}
+        </Reveal>
+        <Reveal delay={2} className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          {onConsult ? (
+            <>
+              <button
+                className="btn btn-metal"
+                type="button"
+                onClick={() => {
+                  askAbout(work.title);
+                  onConsult();
+                }}
+              >
+                <MetalFaz />
+                <i className="diamond" aria-hidden="true" />
+                Consultar por este proyecto
+              </button>
+              <a className="btn btn-metal es-suave" href={whatsappUrl(mensaje)} target="_blank" rel="noopener noreferrer">
+                {whatsapp}
+              </a>
+            </>
+          ) : (
+            <>
+              <a className="btn btn-metal" href={whatsappUrl(mensaje)} target="_blank" rel="noopener noreferrer">
+                {whatsapp}
+              </a>
+              <Link className="btn btn-metal es-suave" href="/#contacto">
+                <MetalFaz />
+                <i className="diamond" aria-hidden="true" />
+                Usar el formulario
+              </Link>
+            </>
+          )}
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* La salida hacia adelante: el próximo trabajo del catálogo, con su
+   captura impresa en la tinta como los paneles cerrados del acordeón.
+   Adentro del sitio cambia la ficha sin cerrar la capa; en la página
+   suelta es un enlace a la otra página. */
+function Siguiente({ work, onNext }: { work: Work; onNext?: (w: Work) => void }) {
+  const i = works.findIndex((w) => w.id === work.id);
+  const sig = works[(i + 1) % works.length];
+  if (!sig || sig.id === work.id) return null;
+
+  const dentro = (
+    <>
+      <span className="siguiente-texto">
+        <span className="label">
+          Siguiente proyecto · {dosCifras(works.indexOf(sig) + 1)} / {dosCifras(works.length)}
+        </span>
+        <span className="siguiente-titulo">{sig.title}</span>
+        <span className="siguiente-tipo">{sig.kind}</span>
+      </span>
+      <span className="siguiente-imagen" aria-hidden="true">
+        {sig.preview && (
+          <Image
+            src={sig.preview}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, 420px"
+            className="object-cover"
+            style={sig.previewPosition ? { objectPosition: sig.previewPosition } : undefined}
+          />
+        )}
+      </span>
+      <span className="siguiente-flecha" aria-hidden="true">
+        <Flecha />
+      </span>
+    </>
+  );
+
+  return (
+    <Reveal as="nav" className="caso-siguiente" aria-label="Siguiente proyecto">
+      {onNext ? (
+        <button type="button" className="siguiente" onClick={() => onNext(sig)}>
+          {dentro}
+        </button>
+      ) : (
+        <Link className="siguiente" href={`/trabajos/${sig.id}`}>
+          {dentro}
+        </Link>
+      )}
+    </Reveal>
+  );
+}
+
 export function CaseStudy({
   work,
   morphName,
   onConsult,
+  onNext,
 }: {
   work: Work;
   morphName?: string;
   onConsult?: () => void;
+  onNext?: (w: Work) => void;
 }) {
   const hasStory = !!work.chapters?.length;
+  const numero = dosCifras(works.findIndex((w) => w.id === work.id) + 1);
 
   return (
-    <article className="mx-auto w-full max-w-[1100px] px-4 pb-24 md:px-10">
-      <header className="pt-6 md:pt-10">
-        <CaseCover work={work} morphName={morphName} />
+    <article className="mx-auto w-full max-w-[1100px] px-4 pb-16 md:px-10 md:pb-24">
+      {/* La misma cabecera que las secciones de la página: rótulo y
+          titular a la izquierda, el párrafo y las acciones a la derecha. */}
+      <header className="caso-cabecera">
+        <Reveal>
+          <Eyebrow n={numero}>
+            {work.kind} · {work.year}
+          </Eyebrow>
+          <SplitHeading as="h1" text={work.title} className="display display-lg" />
+        </Reveal>
 
-        {/* El año no se repite acá: ya está en la fila de datos, y como
-            insignia suelta quedaba colgando sin alinearse con nada. */}
-        <div className="mt-8">
-          <h1 className="display display-lg">
-            {work.title}
-          </h1>
-          {work.summary && (
-            <p className="mt-4 max-w-[58ch] text-lg leading-relaxed text-azul/85">{work.summary}</p>
-          )}
+        <Reveal delay={1} className="caso-cabecera-lado">
+          {work.summary && <p className="caso-resumen">{work.summary}</p>}
+          {work.tech?.length ? (
+            <ul className="obra-tech" aria-label="Herramientas">
+              {work.tech.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ul>
+          ) : null}
 
           {/* Quien llega acá desde un buscador o un enlace compartido no
               tiene otra forma de llegar al proyecto: el sitio en vivo es
               la mejor prueba de que existe y funciona. */}
           {work.url && (
-            <a
-              className="btn btn-metal mt-7"
-              href={work.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a className="btn btn-metal" href={work.url} target="_blank" rel="noopener noreferrer">
               <MetalFaz />
               <i className="diamond" aria-hidden="true" />
               {etiquetaEnlace(work.url)}
+              <Flecha externa />
               <span className="sr-only"> (se abre en una pestaña nueva)</span>
             </a>
           )}
-        </div>
+        </Reveal>
       </header>
 
-      <div className="mt-10">
-        <Facts work={work} />
-      </div>
+      <CaseCover work={work} morphName={morphName} />
+
+      <Facts work={work} />
 
       {work.demo && <Demo demo={work.demo} />}
 
-      {hasStory ? (
-        <div className="divide-y divide-dotted divide-azul/30">
+      {/* Sin capítulos la ficha no pide disculpas: muestra lo que hay y
+          el cierre ofrece la conversación. */}
+      {hasStory && (
+        <div className="capitulos">
           {work.chapters!.map((c, i) => (
             <Chapter key={c.title} chapter={c} index={i} />
           ))}
         </div>
-      ) : (
-        /* Ficha compacta: no pide disculpas por no tener historia,
-           muestra lo que hay y ofrece la conversación. */
-        <p className="max-w-[58ch] py-14 text-base leading-relaxed text-azul/85 md:py-20">
-          Si querés ver el detalle de este trabajo o algo parecido para tu negocio, escribinos y te lo
-          mostramos.
-        </p>
       )}
 
       {work.gallery?.length ? <Gallery images={work.gallery} title={work.title} /> : null}
 
-      <footer className="border-t border-dotted border-azul/30 pt-12 text-center">
-        <p className="mx-auto max-w-[34ch] display display-sm">
-          ¿Querés algo así para tu negocio?
-        </p>
-        <button
-          className="btn btn-metal mt-7"
-          type="button"
-          onClick={() => {
-            askAbout(work.title);
-            onConsult?.();
-          }}
-        >
-          <MetalFaz />
-          <i className="diamond" aria-hidden="true" />
-          Consultar por este proyecto
-        </button>
-      </footer>
+      <Cierre work={work} conHistoria={hasStory} onConsult={onConsult} />
 
+      <Siguiente work={work} onNext={onNext} />
     </article>
   );
 }

@@ -21,21 +21,28 @@ export function CaseLayer({
   morphName,
   onClose,
   onConsult,
+  onNext,
 }: {
   work: Work;
   morphName?: string;
   onClose: () => void;
   onConsult: () => void;
+  onNext: (w: Work) => void;
 }) {
   const scroller = useRef<HTMLDivElement>(null);
   const closeBtn = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     lockScroll(true);
-    scroller.current?.scrollTo(0, 0);
     closeBtn.current?.focus();
     return () => lockScroll(false);
   }, []);
+
+  /* Cada ficha empieza arriba: también cuando se pasa a la siguiente
+     sin cerrar la capa. */
+  useEffect(() => {
+    scroller.current?.scrollTo(0, 0);
+  }, [work.id]);
 
   /* Foco atrapado y salida por Escape. El caso es una capa modal: si
      el tabulador se escapa a la grilla de atrás, se pierde el hilo. */
@@ -88,7 +95,7 @@ export function CaseLayer({
         <CaseProgress scroller={scroller} />
       </div>
 
-      <CaseStudy work={work} morphName={morphName} onConsult={onConsult} />
+      <CaseStudy work={work} morphName={morphName} onConsult={onConsult} onNext={onNext} />
     </div>
   );
 }
