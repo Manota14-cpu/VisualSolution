@@ -145,8 +145,46 @@ export type Perfil = {
 };
 
 export const perfiles: Perfil[] = [
-  { id: "perfil-1", nombre: "", rol: "", bio: "", habilidades: [] },
-  { id: "perfil-2", nombre: "", rol: "", bio: "", habilidades: [] },
+  {
+    id: "mateo-rojas",
+    nombre: "Mateo Rojas",
+    rol: "Fundador · Desarrollo web con IA y edición de video",
+    bio: "Estudiante de programación que usa la inteligencia artificial como herramienta de trabajo. Desarrollo sitios web con IA, edito video en After Effects y me encargo de crear y organizar el contenido de Instagram.",
+    habilidades: [
+      { grupo: "Inteligencia artificial", items: ["Herramientas de IA", "Programación asistida por IA"] },
+      { grupo: "Desarrollo web", items: ["Sitios web con IA"] },
+      { grupo: "Video", items: ["After Effects", "Edición", "Animación"] },
+      { grupo: "Redes sociales", items: ["Contenido para Instagram", "Planificación de publicaciones"] },
+    ],
+    enlaces: [{ label: "Instagram", url: "https://www.instagram.com/_mateoorojass/" }],
+  },
+  {
+    id: "joaquin-manota",
+    nombre: "Joaquin Manota",
+    rol: "Fundador · Desarrollador y diseñador web",
+    bio: "Me especializo en crear páginas web y en el diseño y la edición de imágenes y video. Me apasiona la tecnología, aprender cosas nuevas y crear soluciones digitales para negocios.",
+    /* Los lenguajes y las herramientas salen de lo que este mismo
+       repositorio confirma: el sitio está hecho en TypeScript con React,
+       Next.js y Tailwind CSS, se versiona en GitHub y se publica en
+       Vercel; la versión anterior era HTML, CSS y JavaScript. */
+    habilidades: [
+      {
+        grupo: "Desarrollo web",
+        items: ["HTML", "CSS", "JavaScript", "TypeScript", "React", "Next.js", "Tailwind CSS"],
+      },
+      { grupo: "Herramientas", items: ["Git y GitHub", "Vercel"] },
+      { grupo: "Diseño y edición", items: ["Diseño web", "Edición de imágenes", "Edición de video"] },
+      {
+        grupo: "Forma de trabajo",
+        items: ["Resolución de problemas", "Atención al cliente", "Trabajo en equipo", "Aprendizaje continuo"],
+      },
+    ],
+    /* Sin los parámetros de rastreo de los enlaces copiados. */
+    enlaces: [
+      { label: "Instagram", url: "https://www.instagram.com/joaco.manota/" },
+      { label: "LinkedIn", url: "https://www.linkedin.com/in/joaquin-manota-4326603a6/" },
+    ],
+  },
 ];
 
 export const perfilesCargados = perfiles.filter((p) => p.nombre.trim() !== "");
