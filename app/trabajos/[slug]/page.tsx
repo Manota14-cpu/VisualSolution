@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CaseStudy } from "@/components/site/CaseStudy";
+import { CaseNav, CaseStudy } from "@/components/site/CaseStudy";
 import { Mark } from "@/components/brand/Mark";
 import { works, site } from "@/lib/content";
 
@@ -62,10 +62,11 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
           </Link>
           <Link className="inline-flex items-center gap-2" href="/" aria-label={`${site.name}, inicio`}>
             <Mark className="block h-auto w-[22px]" />
-            <span className="text-sm font-medium text-azul">
+            <span className="hidden text-sm font-medium text-azul sm:inline">
               Visual <span className="text-azul/80">Solution</span>
             </span>
           </Link>
+          <CaseNav work={work} />
         </div>
       </div>
 

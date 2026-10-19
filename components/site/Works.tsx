@@ -229,11 +229,11 @@ export function Works() {
     return () => window.removeEventListener("popstate", onPop);
   }, [closeNow]);
 
-  /* Pasar al siguiente sin cerrar la capa. La URL se reemplaza y no se
-     apila: atrás sigue cerrando la ficha. El panel de ese trabajo queda
-     abierto en el acordeón y lleva el nombre de transición, así al
-     cerrar la imagen vuelve a su lugar. */
-  const siguiente = useCallback(
+  /* Pasar a otro trabajo sin cerrar la capa. La URL se reemplaza y no
+     se apila: atrás sigue cerrando la ficha. El panel de ese trabajo
+     queda abierto en el acordeón y lleva el nombre de transición, así
+     al cerrar la imagen vuelve a su lugar. */
+  const irA = useCallback(
     (work: Work) => {
       setActiva(works.findIndex((w) => w.id === work.id));
       withTransition(
@@ -321,7 +321,9 @@ export function Works() {
           morphName={morphId === open.id ? morphNameFor(open.id) : undefined}
           onClose={close}
           onConsult={consultar}
-          onNext={siguiente}
+          onGo={irA}
+          anterior={works[(works.indexOf(open) - 1 + total) % total]}
+          siguiente={works[(works.indexOf(open) + 1) % total]}
         />
       )}
     </section>

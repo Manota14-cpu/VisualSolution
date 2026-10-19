@@ -845,6 +845,37 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .case-back:hover { background: var(--color-azul); color: var(--color-papel); }
 .case-back svg { transition: transform .25s cubic-bezier(.16,1,.3,1); }
 .case-back:hover svg { transform: translateX(-2px); }
+@media (max-width: 639px) { .case-bar-titulo { display: none; } }
+
+/* Anterior, cuenta y siguiente, en la barra de la ficha. */
+.caso-nav { display: flex; align-items: center; gap: 8px; }
+.caso-nav-cuenta {
+  margin-right: 6px;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  letter-spacing: .1em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-azul);
+}
+.caso-nav-cuenta span { color: rgb(0 54 165 / .62); }
+.caso-flecha {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pills);
+  border: 1px solid var(--borde-fino);
+  background: var(--color-papel);
+  box-shadow: var(--sombra-1);
+  color: var(--color-azul);
+  cursor: pointer;
+  transition: background-color .25s ease, color .25s ease, transform .3s var(--ease-out);
+}
+.caso-flecha .flecha { width: 15px; height: 15px; }
+.caso-flecha.es-atras .flecha { transform: scaleX(-1); }
+.caso-flecha.es-atras:is(:hover, :focus-visible) > .flecha { transform: scaleX(-1) translateX(3px); }
+.caso-flecha:hover { background: var(--color-azul); color: var(--color-papel); }
+.caso-flecha:active { transform: scale(.94); }
 
 /* ---------------- la cabecera ----------------
    La misma que las secciones de la página: rótulo y titular a la
@@ -938,16 +969,29 @@ p, li, dd, figcaption { text-wrap: pretty; }
   .caso-ventana-barra > span { width: 7px; height: 7px; }
   .caso-ventana-barra p { margin-left: 8px; padding: 3px 10px; font-size: 11px; }
 }
-/* El trabajo sube apenas mientras la portada cruza la pantalla. */
+/* El trabajo se inclina hacia el cursor (--rx/--ry, los escribe
+   CaseCover), entra con una aparición corta y sube apenas mientras la
+   portada cruza la pantalla. Cada cosa en su propiedad —transform,
+   scale y translate— para que no se pisen. */
+.caso-ventana,
+.caso-pieza {
+  transform: perspective(1600px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform .6s var(--ease-out);
+}
 @media (prefers-reduced-motion: no-preference) {
+  .caso-ventana,
+  .caso-pieza { animation: caso-entra 1s var(--ease-out) .12s both; }
   @supports (animation-timeline: view()) {
     .caso-ventana,
     .caso-pieza {
-      animation: caso-asoma linear both;
-      animation-timeline: view();
-      animation-range: cover 0% cover 60%;
+      animation: caso-entra 1s var(--ease-out) .12s both, caso-asoma linear both;
+      animation-timeline: auto, view();
+      animation-range: normal, cover 0% cover 60%;
     }
   }
+}
+@keyframes caso-entra {
+  from { opacity: 0; scale: .94; }
 }
 @keyframes caso-asoma {
   from { translate: -50% 9%; }
@@ -978,20 +1022,98 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .caso-datos dd { margin-top: 8px; font-size: 16px; line-height: 1.4; color: var(--color-azul); }
 
 /* ---------------- los capítulos ----------------
-   El número impreso en la trama, como la cifra de la 404 pero en tinta
-   sobre papel. El texto arranca a la altura del título. */
+   A la izquierda el índice, quieto: el riel crece hasta el capítulo
+   que estás leyendo (--actual, lo escribe CaseStudy). A la derecha, el
+   número impreso en la trama, como la cifra de la 404 pero en tinta
+   sobre papel. */
 .capitulos { margin-top: clamp(28px, 4vw, 48px); }
+.capitulos-indice { display: none; }
+@media (min-width: 900px) {
+  .capitulos {
+    display: grid;
+    grid-template-columns: minmax(0, .72fr) minmax(0, 1.6fr);
+    column-gap: clamp(40px, 6vw, 96px);
+  }
+  .capitulos-indice {
+    display: block;
+    position: sticky;
+    top: 110px;
+    align-self: start;
+    padding-block: clamp(36px, 5vw, 64px);
+  }
+}
+.capitulos-indice .label { margin-bottom: 16px; color: rgb(0 54 165 / .75); }
+.capitulos-indice ol { position: relative; display: grid; gap: 2px; padding-left: 20px; }
+.capitulos-indice ol::before,
+.capitulos-indice ol::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 1.5px;
+}
+.capitulos-indice ol::before { bottom: 10px; background: rgb(0 54 165 / .14); }
+.capitulos-indice ol::after {
+  height: calc((100% - 20px) * (var(--actual, 0) + 1) / var(--total, 1));
+  background: var(--color-azul-medio);
+  transition: height .6s var(--ease-out);
+}
+/* Los que no leés todavía quedan en voz baja, pero pasan AA (4.8:1). */
+.capitulos-indice button {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 0;
+  text-align: left;
+  font-size: 16px;
+  line-height: 1.3;
+  color: rgb(0 54 165 / .72);
+  background: none;
+  cursor: pointer;
+  transition: color .3s ease, translate .45s var(--ease-out);
+}
+.capitulos-indice-n {
+  flex: none;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  letter-spacing: .1em;
+  font-variant-numeric: tabular-nums;
+}
+.capitulos-indice button.is-leido { color: rgb(0 54 165 / .82); }
+.capitulos-indice button.is-actual { color: var(--color-azul); translate: 4px 0; }
+/* el punto sobre el riel marca dónde estás parado */
+.capitulos-indice button { position: relative; }
+.capitulos-indice button::before {
+  content: "";
+  position: absolute;
+  /* centrado en el riel, contando los 4px que se corre el actual */
+  left: -27.75px;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  margin-top: -4.5px;
+  border-radius: var(--radius-pills);
+  background: var(--color-azul-medio);
+  box-shadow: 0 0 0 4px var(--color-fondo);
+  scale: 0;
+  transition: scale .45s var(--ease-out);
+}
+.capitulos-indice button.is-actual::before { scale: 1; }
+.capitulos-indice button.is-actual .capitulos-indice-n { color: var(--color-azul-medio); }
+.capitulos-indice button:hover { color: var(--color-azul-medio); }
+
 .capitulo {
-  --n-alto: clamp(64px, 8vw, 112px);
-  display: grid;
-  gap: 18px 64px;
+  --n-alto: clamp(64px, 7vw, 96px);
   padding-block: clamp(36px, 5vw, 64px);
   border-top: 1.5px dotted rgb(0 54 165 / .22);
+  /* al saltar desde el índice, el título no queda abajo de la barra */
+  scroll-margin-top: 84px;
 }
 .capitulo:first-child { border-top: 0; }
 .capitulo-n {
   display: block;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   font-family: var(--font-display);
   font-weight: 500;
   font-size: var(--n-alto);
@@ -1006,18 +1128,14 @@ p, li, dd, figcaption { text-wrap: pretty; }
   -webkit-background-clip: text;
           background-clip: text;
 }
-.capitulo-texto { max-width: 58ch; font-size: clamp(17px, 1.35vw, 19px); line-height: 1.7; color: rgb(0 54 165 / .88); }
+.capitulo h2 { margin-bottom: 14px; }
+.capitulo-texto { max-width: 60ch; font-size: clamp(17px, 1.35vw, 19px); line-height: 1.7; color: rgb(0 54 165 / .88); }
 .capitulo-imagen {
   position: relative;
-  grid-column: 1 / -1;
-  aspect-ratio: 16 / 9;
+  margin-top: 28px;
+  aspect-ratio: 16 / 10;
   overflow: hidden;
   border-radius: var(--radius-cards);
-}
-@media (min-width: 768px) {
-  .capitulo { grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr); }
-  .capitulo-cab { position: sticky; top: 96px; align-self: start; }
-  .capitulo-texto { padding-top: calc(var(--n-alto) * .8 + 14px); }
 }
 
 /* ---------------- el cierre ---------------- */
@@ -1882,6 +2000,8 @@ footer :focus-visible { outline-color: var(--color-papel); }
   .hoja-detalle > * { translate: none; }
   .siguiente:hover,
   .siguiente:hover .siguiente-imagen img { transform: none; scale: none; }
+  .capitulos-indice button.is-actual { translate: none; }
+  .capitulos-indice button::before { left: -23.75px; }
 
   /* El metal se queda quieto pero sigue siendo metal: los anillos
      frenan en una posición cualquiera y el canto conserva sus

@@ -12,7 +12,7 @@
    ============================================================ */
 
 import { useEffect, useRef } from "react";
-import { CaseProgress, CaseStudy } from "@/components/site/CaseStudy";
+import { CaseNav, CaseProgress, CaseStudy } from "@/components/site/CaseStudy";
 import { lockScroll } from "@/components/motion/MotionProvider";
 import type { Work } from "@/lib/content";
 
@@ -21,13 +21,17 @@ export function CaseLayer({
   morphName,
   onClose,
   onConsult,
-  onNext,
+  onGo,
+  anterior,
+  siguiente,
 }: {
   work: Work;
   morphName?: string;
   onClose: () => void;
   onConsult: () => void;
-  onNext: (w: Work) => void;
+  onGo: (w: Work) => void;
+  anterior: Work;
+  siguiente: Work;
 }) {
   const scroller = useRef<HTMLDivElement>(null);
   const closeBtn = useRef<HTMLButtonElement>(null);
@@ -44,12 +48,20 @@ export function CaseLayer({
     scroller.current?.scrollTo(0, 0);
   }, [work.id]);
 
-  /* Foco atrapado y salida por Escape. El caso es una capa modal: si
-     el tabulador se escapa a la grilla de atrás, se pierde el hilo. */
+  /* Foco atrapado, salida por Escape y las flechas para pasar de
+     proyecto. El caso es una capa modal: si el tabulador se escapa a la
+     grilla de atrás, se pierde el hilo. */
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
+        return;
+      }
+      if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && !e.altKey && !e.ctrlKey && !e.metaKey) {
+        const t = e.target as HTMLElement | null;
+        if (t?.closest("input, textarea, select, video, [contenteditable]")) return;
+        e.preventDefault();
+        onGo(e.key === "ArrowLeft" ? anterior : siguiente);
         return;
       }
       if (e.key !== "Tab") return;
@@ -71,7 +83,7 @@ export function CaseLayer({
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [onClose, onGo, anterior, siguiente]);
 
   return (
     <div
@@ -90,12 +102,13 @@ export function CaseLayer({
             </svg>
             Catálogo
           </button>
-          <p className="truncate label text-azul/80">{work.title}</p>
+          <p className="case-bar-titulo truncate label text-azul/80">{work.title}</p>
+          <CaseNav work={work} onGo={onGo} />
         </div>
         <CaseProgress scroller={scroller} />
       </div>
 
-      <CaseStudy work={work} morphName={morphName} onConsult={onConsult} onNext={onNext} />
+      <CaseStudy work={work} morphName={morphName} onConsult={onConsult} onGo={onGo} />
     </div>
   );
 }

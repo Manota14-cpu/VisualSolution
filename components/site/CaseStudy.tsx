@@ -10,7 +10,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { siWhatsapp } from "simple-icons";
 import { askAbout } from "@/lib/consult";
 import { clamp01, useMotionEnv } from "@/lib/motion";
@@ -20,6 +20,7 @@ import { Mark } from "@/components/brand/Mark";
 import { Reveal, SplitHeading } from "@/components/motion/Reveal";
 import { Eyebrow } from "@/components/site/Eyebrow";
 import { Flecha } from "@/components/ui/Flecha";
+import { scrollToId } from "@/components/motion/MotionProvider";
 
 const dosCifras = (n: number) => String(n).padStart(2, "0");
 
@@ -34,6 +35,26 @@ const dosCifras = (n: number) => String(n).padStart(2, "0");
    lleva la ficha que se está abriendo. Por lo mismo no lleva revelado
    de entrada: la captura de la transición la vería transparente. */
 export function CaseCover({ work, morphName }: { work: Work; morphName?: string }) {
+  const { reduce, fine } = useMotionEnv();
+
+  /* El trabajo se inclina apenas hacia el cursor: se siente como un
+     objeto apoyado en la plancha. Sólo con mouse y con movimiento. */
+  const inclinar = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (reduce || !fine || e.pointerType !== "mouse") return;
+      const r = e.currentTarget.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      e.currentTarget.style.setProperty("--ry", `${(x * 7).toFixed(2)}deg`);
+      e.currentTarget.style.setProperty("--rx", `${(-y * 5).toFixed(2)}deg`);
+    },
+    [reduce, fine]
+  );
+  const soltar = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.style.removeProperty("--rx");
+    e.currentTarget.style.removeProperty("--ry");
+  }, []);
+
   let contenido: React.ReactNode;
   if (!work.preview) {
     /* Sin captura, la plancha y el nombre: nunca una imagen rota. */
@@ -77,6 +98,8 @@ export function CaseCover({ work, morphName }: { work: Work; morphName?: string 
       className="caso-portada inundado"
       data-luz
       style={morphName ? ({ viewTransitionName: morphName } as React.CSSProperties) : undefined}
+      onPointerMove={inclinar}
+      onPointerLeave={soltar}
     >
       {contenido}
     </div>
@@ -109,26 +132,85 @@ function Facts({ work }: { work: Work }) {
   );
 }
 
-/* Capítulo: el número impreso en la trama y el título a un lado,
-   quietos mientras se lee; el texto al otro, a cuerpo de lectura. En
-   pantallas chicas se apilan, que es como se lee de verdad. */
-function Chapter({ chapter, index }: { chapter: NonNullable<Work["chapters"]>[number]; index: number }) {
-  return (
-    <Reveal as="section" className="capitulo">
-      <div className="capitulo-cab">
-        <span className="capitulo-n" aria-hidden="true">
-          {dosCifras(index + 1)}
-        </span>
-        <h2 className="display display-sm">{chapter.title}</h2>
-      </div>
-      <p className="capitulo-texto">{chapter.body}</p>
+/* Los capítulos. A la izquierda, un índice quieto que marca en cuál
+   estás y lleva a cualquiera; a la derecha, cada capítulo con su
+   número impreso en la trama. En pantallas chicas el índice no está:
+   los capítulos se apilan y se leen de corrido.
 
-      {chapter.image && (
-        <div className="capitulo-imagen shot">
-          <Image src={chapter.image} alt="" fill sizes="(max-width: 768px) 100vw, 1020px" className="object-cover" />
-        </div>
-      )}
-    </Reveal>
+   El índice usa botones y no enlaces con #: adentro de la capa, un
+   cambio de fragmento dispara popstate y cerraría la ficha. */
+function Capitulos({ work }: { work: Work }) {
+  const chapters = work.chapters!;
+  const [actual, setActual] = useState(0);
+  const lista = useRef<HTMLDivElement>(null);
+  const { reduce } = useMotionEnv();
+  const idDe = (i: number) => `capitulo-${work.id}-${i + 1}`;
+
+  /* El capítulo actual es el que cruza una franja angosta un poco por
+     encima del medio de la pantalla. */
+  useEffect(() => {
+    const el = lista.current;
+    if (!el || !("IntersectionObserver" in window)) return;
+    const secciones = Array.from(el.querySelectorAll<HTMLElement>(".capitulo"));
+    const io = new IntersectionObserver(
+      (entradas) => {
+        for (const e of entradas) if (e.isIntersecting) setActual(secciones.indexOf(e.target as HTMLElement));
+      },
+      { rootMargin: "-38% 0px -58% 0px", threshold: 0 }
+    );
+    secciones.forEach((s) => io.observe(s));
+    return () => io.disconnect();
+  }, [work.id]);
+
+  const ir = (i: number) => {
+    const destino = document.getElementById(idDe(i));
+    if (!destino) return;
+    /* En la capa se desplaza la capa; en la página, el documento, que
+       lleva el scroll con inercia. */
+    if (destino.closest(".case-layer")) destino.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    else scrollToId(destino.id);
+  };
+
+  return (
+    <div className="capitulos" style={{ ["--actual" as string]: actual } as React.CSSProperties}>
+      <nav className="capitulos-indice" aria-label="Capítulos">
+        <p className="label">El proyecto</p>
+        <ol style={{ ["--total" as string]: chapters.length } as React.CSSProperties}>
+          {chapters.map((c, i) => (
+            <li key={c.title}>
+              <button
+                type="button"
+                className={i === actual ? "is-actual" : i < actual ? "is-leido" : ""}
+                aria-current={i === actual ? "true" : undefined}
+                onClick={() => ir(i)}
+              >
+                <span className="capitulos-indice-n">{dosCifras(i + 1)}</span>
+                {c.title}
+              </button>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      <div ref={lista}>
+        {chapters.map((c, i) => (
+          <Reveal as="section" key={c.title} id={idDe(i)} className="capitulo" aria-labelledby={`${idDe(i)}-t`}>
+            <span className="capitulo-n" aria-hidden="true">
+              {dosCifras(i + 1)}
+            </span>
+            <h2 id={`${idDe(i)}-t`} className="display display-sm">
+              {c.title}
+            </h2>
+            <p className="capitulo-texto">{c.body}</p>
+            {c.image && (
+              <div className="capitulo-imagen shot">
+                <Image src={c.image} alt="" fill sizes="(max-width: 900px) 100vw, 640px" className="object-cover" />
+              </div>
+            )}
+          </Reveal>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -394,9 +476,16 @@ function Cierre({ work, conHistoria, onConsult }: { work: Work; conHistoria: boo
    captura impresa en la tinta como los paneles cerrados del acordeón.
    Adentro del sitio cambia la ficha sin cerrar la capa; en la página
    suelta es un enlace a la otra página. */
-function Siguiente({ work, onNext }: { work: Work; onNext?: (w: Work) => void }) {
+/* El anterior y el siguiente del catálogo, dando la vuelta en los
+   extremos. */
+const vecinos = (work: Work) => {
   const i = works.findIndex((w) => w.id === work.id);
-  const sig = works[(i + 1) % works.length];
+  const n = works.length;
+  return { i, anterior: works[(i - 1 + n) % n], siguiente: works[(i + 1) % n] };
+};
+
+function Siguiente({ work, onGo }: { work: Work; onGo?: (w: Work) => void }) {
+  const sig = vecinos(work).siguiente;
   if (!sig || sig.id === work.id) return null;
 
   const dentro = (
@@ -428,8 +517,8 @@ function Siguiente({ work, onNext }: { work: Work; onNext?: (w: Work) => void })
 
   return (
     <Reveal as="nav" className="caso-siguiente" aria-label="Siguiente proyecto">
-      {onNext ? (
-        <button type="button" className="siguiente" onClick={() => onNext(sig)}>
+      {onGo ? (
+        <button type="button" className="siguiente" onClick={() => onGo(sig)}>
           {dentro}
         </button>
       ) : (
@@ -441,16 +530,48 @@ function Siguiente({ work, onNext }: { work: Work; onNext?: (w: Work) => void })
   );
 }
 
+/* Anterior, cuenta y siguiente, para la barra de arriba. Adentro del
+   sitio cambian la ficha sin cerrarla; en la página suelta son
+   enlaces a las otras páginas. */
+export function CaseNav({ work, onGo }: { work: Work; onGo?: (w: Work) => void }) {
+  const { i, anterior, siguiente } = vecinos(work);
+  if (works.length < 2) return null;
+
+  const flecha = (destino: Work, atras: boolean) => {
+    const etiqueta = `${atras ? "Proyecto anterior" : "Proyecto siguiente"}: ${destino.title}`;
+    const clase = `caso-flecha ${atras ? "es-atras" : ""}`;
+    return onGo ? (
+      <button type="button" className={clase} aria-label={etiqueta} title={destino.title} onClick={() => onGo(destino)}>
+        <Flecha />
+      </button>
+    ) : (
+      <Link className={clase} href={`/trabajos/${destino.id}`} aria-label={etiqueta} title={destino.title}>
+        <Flecha />
+      </Link>
+    );
+  };
+
+  return (
+    <nav className="caso-nav" aria-label="Otros proyectos">
+      <span className="caso-nav-cuenta" aria-hidden="true">
+        {dosCifras(i + 1)} <span>/ {dosCifras(works.length)}</span>
+      </span>
+      {flecha(anterior, true)}
+      {flecha(siguiente, false)}
+    </nav>
+  );
+}
+
 export function CaseStudy({
   work,
   morphName,
   onConsult,
-  onNext,
+  onGo,
 }: {
   work: Work;
   morphName?: string;
   onConsult?: () => void;
-  onNext?: (w: Work) => void;
+  onGo?: (w: Work) => void;
 }) {
   const hasStory = !!work.chapters?.length;
   const numero = dosCifras(works.findIndex((w) => w.id === work.id) + 1);
@@ -500,19 +621,13 @@ export function CaseStudy({
 
       {/* Sin capítulos la ficha no pide disculpas: muestra lo que hay y
           el cierre ofrece la conversación. */}
-      {hasStory && (
-        <div className="capitulos">
-          {work.chapters!.map((c, i) => (
-            <Chapter key={c.title} chapter={c} index={i} />
-          ))}
-        </div>
-      )}
+      {hasStory && <Capitulos key={work.id} work={work} />}
 
       {work.gallery?.length ? <Gallery images={work.gallery} title={work.title} /> : null}
 
       <Cierre work={work} conHistoria={hasStory} onConsult={onConsult} />
 
-      <Siguiente work={work} onNext={onNext} />
+      <Siguiente work={work} onGo={onGo} />
     </article>
   );
 }
