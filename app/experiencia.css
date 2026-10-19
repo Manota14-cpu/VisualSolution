@@ -403,30 +403,6 @@ html.lite .hero-titulo { filter: none; }
 }
 
 /* ==========================================================
-   LAS TARJETAS DEL CATÁLOGO
-   El canto se enciende donde está el cursor: un aro de un píxel
-   que sólo existe cerca del puntero. La luz de adentro ya la pinta
-   .obra con --lx/--ly (globals.css).
-   ========================================================== */
-.obra::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  border-radius: inherit;
-  padding: 1px;
-  pointer-events: none;
-  background: radial-gradient(340px circle at var(--lx, 50%) var(--ly, 0%), rgb(21 91 205 / .7), rgb(21 91 205 / 0) 60%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  opacity: 0;
-  transition: opacity .45s ease;
-}
-@media (hover: hover) { .obra:hover::after { opacity: 1; } }
-
-/* ==========================================================
    SERVICIOS
    El número ordena la lista como un índice. Al pasar el cursor, una
    hoja de papel sube desde la base del pliego —la tinta todavía no
@@ -462,38 +438,6 @@ html.lite .hero-titulo { filter: none; }
 }
 @media (hover: hover) {
   .pliego:not(.is-open):hover::after { transform: none; opacity: 1; }
-}
-
-/* ==========================================================
-   LAS CAPTURAS
-   Cada captura deriva unos puntos dentro de su ventana mientras
-   cruza la pantalla: la ventana queda fija y el sitio se mueve
-   detrás, como mirar por un vidrio. Ligado al scroll, sin JS.
-   ========================================================== */
-@media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    .ventana-vista img {
-      scale: 1.08;
-      animation: vista-deriva linear both;
-      animation-timeline: view();
-      animation-range: cover 0% cover 100%;
-    }
-  }
-}
-@keyframes vista-deriva {
-  from { translate: 0 -3.5%; }
-  to   { translate: 0 3.5%; }
-}
-
-/* La captura se imprime: cuando la tarjeta entra, la imagen baja de
-   arriba hacia abajo como una pasada de la prensa. Es lo mismo que dice
-   la marca —las cosas se imprimen, no se deslizan— en voz baja. */
-@media (prefers-reduced-motion: no-preference) {
-  .rv .ventana-vista { clip-path: inset(0 0 100% 0); }
-  .rv.in .ventana-vista {
-    clip-path: inset(0 0 0 0);
-    transition: clip-path 1.2s var(--ease-out) .18s;
-  }
 }
 
 /* "Trabajos" con su cuenta arriba a la derecha. */

@@ -14,149 +14,124 @@ import { Flecha } from "@/components/ui/Flecha";
 
 /* ============================================================
    EL CATÁLOGO
-   Un carrusel: un proyecto grande por vez, con los vecinos asomando a
-   los costados para invitar a deslizar. Avanza solo cada pocos
-   segundos —la barra de cada proyecto muestra cuánto falta— y se
-   frena apenas alguien lo toca, pasa el cursor o lo deja de ver.
+   Un acordeón: los trabajos en fila, como los lomos de una carpeta.
+   El abierto se lleva la mitad del ancho, en color, con su nombre y
+   sus acciones; los cerrados quedan angostos e impresos en la tinta
+   de la marca (gris, velo azul y la trama), con el nombre de costado.
+   Con mouse se abre el que tiene el cursor encima; con el dedo o el
+   teclado, el que se toca o se elige. En el teléfono la fila pasa a
+   columna.
 
-   La pista es un scroll horizontal nativo con imanes: en el teléfono
-   se desliza con el dedo sin ninguna librería, y el autoplay sólo le
-   pide al navegador que vaya a la diapositiva que toca.
+   Los cerrados se inclinan apenas hacia el abierto y su imagen se
+   corre hacia él: la fila tiene profundidad y el ojo va solo al que
+   importa. Todo es CSS: el componente sólo dice cuál está abierto.
 
-   Cada tarjeta muestra el proyecto adentro de una ventana de
-   navegador: dice, sin explicarlo, que es un sitio que funciona. La
-   acción principal abre el sitio en vivo; la ficha sigue como segunda
-   puerta.
+   La acción principal abre el sitio en vivo; la ficha sigue como
+   segunda puerta.
    ============================================================ */
 
-/* Cuánto dura cada proyecto en pantalla. Tiene que ir a la par de la
-   animación de la barra en globals.css (--carrusel-paso). */
-const PASO_MS = 6000;
+/* Qué parte del ancho se lleva el abierto (sin contar los huecos). */
+const ABIERTO = 0.52;
 
 const morphNameFor = (id: string) => `caso-${id}`;
 
-/* La ventana: el marco de navegador con la captura adentro. */
-function Ventana({ work, morphing }: { work: Work; morphing: boolean }) {
-  const morph = morphing
-    ? ({ viewTransitionName: morphNameFor(work.id) } as React.CSSProperties)
-    : undefined;
-
-  /* Con portada, la ventana es la portada entera: ya trae su propio
-     marco de navegador, el número y el nombre, así que no lleva barra. */
-  if (work.portada) {
-    return (
-      <div className="ventana es-portada" aria-hidden="true">
-        <div className="ventana-vista" style={morph}>
-          {/* Calidad alta a propósito: las portadas tienen texto y capturas
-              chicas, y con la compresión de siempre se veían borrosas. */}
-          <Image
-            src={work.portada}
-            alt=""
-            fill
-            quality={90}
-            sizes="(max-width: 900px) 90vw, 680px"
-            className="object-cover"
-          />
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="ventana" aria-hidden="true">
-      <div className="ventana-barra">
-        <span />
-        <span />
-        <span />
-        {work.url && <p className="ventana-url">{work.url.replace(/^https?:[/][/]/, "")}</p>}
-      </div>
-
-      <div className="ventana-vista" style={morph}>
-        {work.preview ? (
-          <Image
-            src={work.preview}
-            alt=""
-            fill
-            sizes="(max-width: 900px) 100vw, 60vw"
-            className="object-cover object-top"
-            style={work.previewPosition ? { objectPosition: work.previewPosition } : undefined}
-          />
-        ) : (
-          /* Sin captura, la ventana no queda vacía ni rota: se llena
-             con la plancha y el nombre, que es material del sistema. */
-          <div className="ventana-plancha">
-            <span>{work.title}</span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 const dosCifras = (n: number) => String(n).padStart(2, "0");
 
-function Tarjeta({
+function Hoja({
   work,
+  indice,
+  activa,
+  lado,
+  deriva,
   morphing,
-  inclinar,
+  onActivar,
+  onTecla,
   onOpen,
 }: {
   work: Work;
+  indice: number;
+  activa: boolean;
+  /* De qué lado del abierto queda: hacia ahí se inclina. */
+  lado: "antes" | "despues" | null;
+  /* Cuántos lugares lo separan del abierto, con signo y tope en 1.5:
+     cuánto se corre la imagen. */
+  deriva: number;
   morphing: boolean;
-  inclinar: boolean;
+  onActivar: () => void;
+  onTecla: (e: React.KeyboardEvent<HTMLButtonElement>) => void;
   onOpen: (w: Work) => void;
 }) {
-  const ref = useRef<HTMLElement>(null);
+  const id = `trabajo-${work.id}`;
   const externo = !!work.url;
   /* Sin sitio en vivo la acción lleva a la ficha, y la etiqueta dice lo
      que es cada cosa: una app se conoce, un sitio se mira. */
   const etiquetaFicha = work.category === "software" ? "Conocer la app" : "Ver ficha del proyecto";
-
-  /* La tarjeta activa se inclina apenas hacia el cursor y un brillo la
-     sigue: se siente como un objeto que se puede agarrar. Sólo con
-     mouse y con movimiento permitido. */
-  const mover = useCallback(
-    (e: React.PointerEvent<HTMLElement>) => {
-      const el = ref.current;
-      if (!el || !inclinar || e.pointerType !== "mouse") return;
-      const r = el.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width;
-      const y = (e.clientY - r.top) / r.height;
-      el.style.setProperty("--ry", `${((x - 0.5) * 5).toFixed(2)}deg`);
-      el.style.setProperty("--rx", `${((0.5 - y) * 4).toFixed(2)}deg`);
-      el.style.setProperty("--gx", `${(x * 100).toFixed(1)}%`);
-      el.style.setProperty("--gy", `${(y * 100).toFixed(1)}%`);
-    },
-    [inclinar]
-  );
-  const soltar = useCallback(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.removeProperty("--rx");
-    el.style.removeProperty("--ry");
-  }, []);
+  const n = dosCifras(indice + 1);
 
   return (
-    <article
-      ref={ref}
-      className={`obra ${work.pending ? "es-pendiente" : ""}`}
-      onPointerMove={mover}
-      onPointerLeave={soltar}
-      data-luz
+    <li
+      className={`hoja ${activa ? "is-activa" : ""} ${lado ? `es-${lado}` : ""}`}
+      style={{ ["--i" as string]: indice, ["--deriva" as string]: deriva } as React.CSSProperties}
+      onPointerEnter={(e) => e.pointerType === "mouse" && onActivar()}
     >
-      <Ventana work={work} morphing={morphing} />
+      {/* El marco es el que viaja a la ficha cuando se abre: tiene la
+          medida exacta del panel, sin lo que la imagen asoma de más. */}
+      <div
+        className="hoja-marco"
+        aria-hidden="true"
+        style={morphing ? ({ viewTransitionName: morphNameFor(work.id) } as React.CSSProperties) : undefined}
+      >
+        <div className="hoja-imagen">
+          {work.preview ? (
+            <Image
+              src={work.preview}
+              alt=""
+              fill
+              sizes="(max-width: 899px) 100vw, 720px"
+              className="object-cover"
+              style={work.previewPosition ? { objectPosition: work.previewPosition } : undefined}
+            />
+          ) : (
+            /* Sin captura, el panel no queda vacío ni roto: se llena con
+               la plancha y el nombre, que es material del sistema. */
+            <div className="ventana-plancha">
+              <span>{work.title}</span>
+            </div>
+          )}
+        </div>
+      </div>
 
-      <div className="obra-cuerpo">
-        {work.pending && (
-          <div className="obra-meta">
-            <span className="badge obra-espera">En preparación</span>
-          </div>
-        )}
+      {/* El lomo: número y nombre de costado, sólo con el panel cerrado. */}
+      <span className="hoja-lomo" aria-hidden="true">
+        <span className="hoja-n">{n}</span>
+        <span className="hoja-lomo-titulo">{work.title}</span>
+      </span>
 
-        <h3 className="obra-titulo">{work.title}</h3>
-        {work.short && <p className="obra-texto">{work.short}</p>}
+      {/* Todo el panel es el botón que lo abre. Abierto sigue ahí, por
+          debajo de las acciones, para que el teclado no pierda el lugar. */}
+      <button
+        type="button"
+        className="hoja-gatillo"
+        aria-expanded={activa}
+        aria-controls={id}
+        aria-label={`${work.title}, ${work.kind}`}
+        onClick={onActivar}
+        onKeyDown={onTecla}
+      />
 
-        <div className="obra-acciones">
+      {/* inert saca del tabulador y del árbol de accesibilidad lo que no
+          se ve: las acciones de un panel cerrado no se pueden tocar. */}
+      <div className="hoja-detalle" id={id} inert={!activa}>
+        <p className="hoja-meta">
+          <span className="hoja-n">{n}</span>
+          <i aria-hidden="true" />
+          {work.kind}
+          {work.pending && <span className="badge">En preparación</span>}
+        </p>
+        <h3 className="hoja-titulo">{work.title}</h3>
+        {work.short && <p className="hoja-texto">{work.short}</p>}
+
+        <div className="hoja-acciones">
           {externo ? (
             <>
               <a className="btn btn-metal btn-sm" href={work.url} target="_blank" rel="noopener noreferrer">
@@ -166,7 +141,7 @@ function Tarjeta({
                 <Flecha externa />
                 <span className="sr-only"> (se abre en una pestaña nueva)</span>
               </a>
-              <button className="obra-ficha" type="button" onClick={() => onOpen(work)}>
+              <button className="hoja-ficha" type="button" onClick={() => onOpen(work)}>
                 Ver ficha
                 <Flecha />
               </button>
@@ -181,7 +156,7 @@ function Tarjeta({
           )}
         </div>
       </div>
-    </article>
+    </li>
   );
 }
 
@@ -191,104 +166,30 @@ export function Works() {
      la pieza ANTES de que empiece la captura, y seguir puesto hasta que
      la vuelta termine. */
   const [morphId, setMorphId] = useState<string | null>(null);
-  const { reduce, fine, ready } = useMotionEnv();
+  const { reduce } = useMotionEnv();
   const pushedUrl = useRef(false);
 
-  /* ---- el carrusel ---- */
+  /* ---- el acordeón ---- */
   const [activa, setActiva] = useState(0);
-  /* Cada vuelta del mismo índice tiene que reiniciar la barra: la key de
-     la barra lleva este contador. */
-  const [vuelta, setVuelta] = useState(0);
-  const [encima, setEncima] = useState(false);
-  const [foco, setFoco] = useState(false);
-  const [tocando, setTocando] = useState(false);
-  const [aLaVista, setALaVista] = useState(false);
-  const carrusel = useRef<HTMLDivElement>(null);
-  const pista = useRef<HTMLUListElement>(null);
+  const lista = useRef<HTMLUListElement>(null);
   const total = works.length;
+  /* Cuánto crece el abierto para quedarse con ABIERTO del ancho: los
+     cerrados crecen 1 cada uno. */
+  const crece = (ABIERTO * (total - 1)) / (1 - ABIERTO);
 
-  /* Se frena cuando alguien lo está mirando de cerca, cuando no está en
-     pantalla, con la ficha abierta o con movimiento reducido. */
-  const pausado = !ready || reduce || encima || foco || tocando || !aLaVista || !!open;
-
-  const centrar = useCallback(
-    (i: number, suave = true) => {
-      const t = pista.current;
-      const d = t?.children[i] as HTMLElement | undefined;
-      if (!t || !d) return;
-      t.scrollTo({
-        left: d.offsetLeft - (t.clientWidth - d.offsetWidth) / 2,
-        behavior: suave && !reduce ? "smooth" : "auto",
-      });
-    },
-    [reduce]
-  );
-
-  const ir = useCallback(
-    (i: number) => {
-      const n = (i + total) % total;
+  /* Las flechas recorren los paneles como pestañas: mueven el foco al
+     vecino y lo abren. */
+  const tecla = useCallback(
+    (i: number) => (e: React.KeyboardEvent<HTMLButtonElement>) => {
+      const paso = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
+      if (!paso) return;
+      e.preventDefault();
+      const n = (i + paso + total) % total;
       setActiva(n);
-      setVuelta((v) => v + 1);
-      centrar(n);
+      lista.current?.querySelectorAll<HTMLButtonElement>(".hoja-gatillo")[n]?.focus();
     },
-    [centrar, total]
+    [total]
   );
-
-  /* Cuando el que desliza es el dedo, la diapositiva activa sale de
-     dónde quedó la pista: la más cercana al centro. Se calcula al
-     terminar el desplazamiento, no durante, para que el autoplay y el
-     dedo no se pisen. */
-  useEffect(() => {
-    const t = pista.current;
-    if (!t) return;
-    let espera = 0;
-    const leer = () => {
-      const centro = t.scrollLeft + t.clientWidth / 2;
-      let mejor = 0;
-      let dist = Infinity;
-      Array.from(t.children).forEach((c, i) => {
-        const el = c as HTMLElement;
-        const d = Math.abs(el.offsetLeft + el.offsetWidth / 2 - centro);
-        if (d < dist) {
-          dist = d;
-          mejor = i;
-        }
-      });
-      setActiva((a) => {
-        if (a !== mejor) setVuelta((v) => v + 1);
-        return mejor;
-      });
-    };
-    const onScroll = () => {
-      window.clearTimeout(espera);
-      espera = window.setTimeout(leer, 120);
-    };
-    t.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      t.removeEventListener("scroll", onScroll);
-      window.clearTimeout(espera);
-    };
-  }, []);
-
-  /* Al cambiar el ancho, la activa vuelve al centro sin animación. */
-  useEffect(() => {
-    const t = pista.current;
-    if (!t) return;
-    const ro = new ResizeObserver(() => centrar(activa, false));
-    ro.observe(t);
-    return () => ro.disconnect();
-  }, [activa, centrar]);
-
-  useEffect(() => {
-    const el = carrusel.current;
-    if (!el || !("IntersectionObserver" in window)) {
-      setALaVista(true);
-      return;
-    }
-    const io = new IntersectionObserver(([e]) => setALaVista(e.isIntersecting), { threshold: 0.35 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
 
   /* Cerrar de verdad. Lo llama sólo el popstate, para que haya un
      único camino: si cerráramos acá Y además volviéramos atrás, el
@@ -344,108 +245,51 @@ export function Works() {
             <div className="titulo-con-cuenta">
               <SplitHeading id="trabajos-titulo" text="Trabajos" className="display display-xl" />
               {/* La cuenta, en superíndice como en un índice editorial. Es
-                  decorado: el carrusel de abajo ya la dice. */}
+                  decorado: los números de los paneles ya la dicen. */}
               <span className="titulo-cuenta" aria-hidden="true">
                 {dosCifras(total)}
               </span>
             </div>
           </Reveal>
           <Reveal delay={1} className="cabecera-texto">
-            <p>Proyectos reales, funcionando. Deslizá y entrá a verlos.</p>
+            <p>Proyectos reales, funcionando. Elegí uno y entrá a verlo.</p>
             <a className="link link-flecha mt-5" href="#contacto">
               Contanos tu proyecto
               <Flecha />
             </a>
           </Reveal>
         </div>
-      </div>
 
-      {/* El revelado va afuera: su clase "in" la pone el observador a mano
-          y React se la llevaría puesta al re-renderizar is-pausado. */}
-      <Reveal>
-        <div
-          className={`carrusel ${pausado ? "is-pausado" : ""}`}
-          ref={carrusel}
-          role="region"
-          aria-roledescription="carrusel"
-          aria-label="Trabajos"
-          onPointerEnter={(e) => e.pointerType === "mouse" && setEncima(true)}
-          onPointerLeave={(e) => e.pointerType === "mouse" && setEncima(false)}
-          onFocus={() => setFoco(true)}
-          onBlur={(e) => {
-            if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFoco(false);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "ArrowRight") ir(activa + 1);
-            if (e.key === "ArrowLeft") ir(activa - 1);
-          }}
-        >
+        <Reveal>
           <ul
-            className="carrusel-pista"
-            ref={pista}
-            onTouchStart={() => setTocando(true)}
-            onTouchEnd={() => setTocando(false)}
-            onTouchCancel={() => setTocando(false)}
+            ref={lista}
+            className="acordeon"
+            aria-label="Trabajos"
+            style={
+              {
+                ["--n" as string]: total,
+                ["--abierto" as string]: ABIERTO,
+                ["--crece" as string]: crece.toFixed(3),
+              } as React.CSSProperties
+            }
           >
             {works.map((w, i) => (
-              <li
+              <Hoja
                 key={w.id}
-                className={`diapo ${i === activa ? "is-activa" : ""}`}
-                aria-roledescription="diapositiva"
-                aria-label={`${i + 1} de ${total}: ${w.title}`}
-                /* Tocar un vecino lo trae al centro en vez de abrirlo. */
-                onClickCapture={(e) => {
-                  if (i === activa) return;
-                  e.preventDefault();
-                  e.stopPropagation();
-                  ir(i);
-                }}
-                onFocus={() => i !== activa && ir(i)}
-              >
-                <Tarjeta work={w} morphing={morphId === w.id} inclinar={fine && !reduce && i === activa} onOpen={show} />
-              </li>
+                work={w}
+                indice={i}
+                activa={i === activa}
+                lado={i < activa ? "antes" : i > activa ? "despues" : null}
+                deriva={Math.max(-1.5, Math.min(1.5, activa - i))}
+                morphing={morphId === w.id}
+                onActivar={() => setActiva(i)}
+                onTecla={tecla(i)}
+                onOpen={show}
+              />
             ))}
           </ul>
-
-          <div className="carrusel-controles mx-auto w-full max-w-[1200px] px-4 md:px-10">
-            <p className="carrusel-cuenta" aria-hidden="true">
-              <span key={activa}>{dosCifras(activa + 1)}</span> / {dosCifras(total)}
-            </p>
-
-            <div className="carrusel-indices">
-              {works.map((w, i) => (
-                <button
-                  key={w.id}
-                  type="button"
-                  className={`indice ${i === activa ? "is-activo" : ""} ${i < activa ? "is-visto" : ""}`}
-                  aria-current={i === activa ? "true" : undefined}
-                  onClick={() => ir(i)}
-                >
-                  <span className="indice-nombre">{w.title}</span>
-                  <span className="indice-barra" aria-hidden="true">
-                    {i === activa && (
-                      <i
-                        key={vuelta}
-                        style={{ ["--carrusel-paso" as string]: `${PASO_MS}ms` } as React.CSSProperties}
-                        onAnimationEnd={() => ir(activa + 1)}
-                      />
-                    )}
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            <div className="carrusel-flechas">
-              <button type="button" className="carrusel-boton es-atras" aria-label="Proyecto anterior" onClick={() => ir(activa - 1)}>
-                <Flecha />
-              </button>
-              <button type="button" className="carrusel-boton" aria-label="Proyecto siguiente" onClick={() => ir(activa + 1)}>
-                <Flecha />
-              </button>
-            </div>
-          </div>
-        </div>
-      </Reveal>
+        </Reveal>
+      </div>
 
       {open && (
         <CaseLayer
