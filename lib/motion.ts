@@ -9,6 +9,7 @@
    ============================================================ */
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 export const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
@@ -117,6 +118,36 @@ export function terminarIntro() {
   introLista = true;
   document.documentElement.classList.add("intro-lista");
   introSubs.forEach((fn) => fn());
+}
+
+/* ---- Lo que pasa al pie de la pantalla ----
+   true mientras alguno de los elementos del selector cruza la franja
+   de abajo de la pantalla, que es donde viven los botones fijos. Se
+   vuelve a buscar en cada página: el layout no se desmonta al navegar
+   y los elementos son otros. */
+export function useAlPie(selector: string) {
+  const ruta = usePathname();
+  const [alPie, setAlPie] = useState(false);
+  useEffect(() => {
+    setAlPie(false);
+    if (!("IntersectionObserver" in window)) return;
+    const els = Array.from(document.querySelectorAll(selector));
+    if (!els.length) return;
+    const vistos = new Set<Element>();
+    const io = new IntersectionObserver(
+      (entradas) => {
+        for (const e of entradas) {
+          if (e.isIntersecting) vistos.add(e.target);
+          else vistos.delete(e.target);
+        }
+        setAlPie(vistos.size > 0);
+      },
+      { rootMargin: "-84% 0px 0px 0px", threshold: 0 }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [selector, ruta]);
+  return alPie;
 }
 
 export function useIntroLista() {

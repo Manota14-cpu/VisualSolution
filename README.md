@@ -71,15 +71,11 @@ Está todo junto en `lib/content.ts`, marcado con `TODO`.
    y es responsable de los datos. Mientras estén vacíos las páginas legales no
    los muestran, pero el sitio no queda en regla hasta completarlos.
 
-2. **Las fotos de servicios.** Dos pliegos usan picsum. Poné archivos tuyos en
-   `public/` y referencialos como `/mi-foto.jpg`. Cuando sean todas propias,
-   se puede borrar el bloque `remotePatterns` de `next.config.mjs`.
-
-3. **Las respuestas de Preguntas.** Los plazos y la forma de pago son un
+2. **Las respuestas de Preguntas.** Los plazos y la forma de pago son un
    borrador razonable. Ajustalos a como trabajás de verdad (los términos ya
    aclaran que son orientativos y que vale la propuesta escrita).
 
-4. **Los perfiles del equipo** (`perfiles`). La sección "Equipo" muestra una
+3. **Los perfiles del equipo** (`perfiles`). La sección "Equipo" muestra una
    ficha por persona —nombre, rol, bio, habilidades agrupadas, enlaces y foto
    opcional en `public/equipo/`— y no existe, ni en la página ni en la barra,
    hasta que un perfil tiene el nombre completo. Un perfil sin nombre no se

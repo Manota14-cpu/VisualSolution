@@ -740,9 +740,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 
 /* El número del paso deja de ser un monograma en un círculo y pasa a
-   ser un numeral a escala de afiche. Apagado es casi invisible; el que
-   la línea alcanza salta a azul, y la línea termina siempre sobre
-   uno: nunca en el aire entre dos. */
+   ser un numeral a escala de afiche. Apagado queda en voz baja (3:1,
+   el mínimo para texto grande); el que la línea alcanza salta a azul,
+   y la línea termina siempre sobre uno: nunca en el aire entre dos. */
 .step-token {
   display: block;
   width: auto; height: auto;
@@ -759,7 +759,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
      títulos de los pasos quedaban a distinta distancia del número. */
   min-width: 1.28em;
   font-variant-numeric: tabular-nums;
-  color: rgb(0 54 165 / .18);
+  color: rgb(0 54 165 / .58);
   transition: color .4s ease;
 }
 .step-token.on { color: var(--color-azul); animation: golpe .55s cubic-bezier(.16,1,.3,1); }
@@ -1870,8 +1870,8 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 
 #btt {
-  /* un escalón arriba del de WhatsApp: 20 de margen + 56 + 12 de aire */
-  position: fixed; right: 20px; bottom: 88px; z-index: 45;
+  /* el mismo lugar que el de WhatsApp: nunca se ven los dos */
+  position: fixed; right: 20px; bottom: 20px; z-index: 45;
   display: grid; place-items: center;
   width: 56px; height: 56px; border-radius: var(--radius-pills);
   /* el aro de papel lo separa del pie, que también es azul: sin él, el
@@ -1904,8 +1904,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .wsp-flotante:hover { background: var(--color-azul-medio); }
 .wsp-flotante svg { width: 22px; height: 22px; fill: currentColor; flex: none; }
 @media (max-width: 639px) {
-  .wsp-flotante { width: 56px; padding: 0; justify-content: center; }
+  /* en el teléfono, más chico y más pegado al borde: tapa menos */
+  .wsp-flotante { right: 14px; bottom: 14px; width: 50px; height: 50px; padding: 0; justify-content: center; }
   .wsp-texto { display: none; }
+  #btt { right: 14px; bottom: 14px; width: 50px; height: 50px; }
 }
 
 /* Lenis */

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { siWhatsapp } from "simple-icons";
-import { onScroll } from "@/lib/motion";
+import { onScroll, useAlPie } from "@/lib/motion";
 import { whatsappUrl } from "@/lib/content";
 
 /* ============================================================
@@ -10,7 +10,10 @@ import { whatsappUrl } from "@/lib/content";
    Un chat con el estudio desde cualquier punto de la página, con
    el saludo ya escrito. Aparece recién al dejar atrás el hero —ahí
    ya están los botones de la consulta y taparlos sería competirles—
-   y queda debajo del de volver arriba.
+   y se va donde la página ya ofrece WhatsApp: en Contacto (además
+   pisaba el formulario), en el cierre, en el pie y, en la ficha de un
+   trabajo, en el siguiente proyecto que va al final. Ahí su lugar lo
+   toma el de volver arriba: nunca hay dos botones fijos a la vez.
 
    Va en la tinta del sitio y no en el verde de WhatsApp: el glifo
    alcanza para reconocerlo, y un verde saturado sería el único
@@ -18,9 +21,11 @@ import { whatsappUrl } from "@/lib/content";
    ============================================================ */
 
 export function WhatsAppFlotante() {
-  const [on, setOn] = useState(false);
+  const [pasoElHero, setPasoElHero] = useState(false);
+  const tapado = useAlPie("#contacto, .cierre, .caso-siguiente, footer");
+  const on = pasoElHero && !tapado;
 
-  useEffect(() => onScroll((v) => setOn(v > window.innerHeight * 0.9)), []);
+  useEffect(() => onScroll((v) => setPasoElHero(v > window.innerHeight * 0.9)), []);
 
   return (
     <a

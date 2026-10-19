@@ -618,10 +618,20 @@ html.lite .hero-titulo { filter: none; }
 
 /* Lo que sabe hacer, como una ficha técnica: el grupo a la izquierda,
    las etiquetas a la derecha, un punteado entre renglones. En una
-   ficha angosta el grupo pasa arriba. */
-.perfil-ficha { border-top: 1.5px dotted rgb(0 54 165 / .28); }
+   ficha angosta el grupo pasa arriba.
+   Las dos fichas miden lo mismo y una tiene más etiquetas que la otra:
+   la tabla se estira y reparte el sobrante entre sus renglones, en vez
+   de dejar un hueco antes de las redes. */
+.perfil-ficha {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  border-top: 1.5px dotted rgb(0 54 165 / .28);
+}
 .perfil-fila {
   display: grid;
+  flex: 1 0 auto;
+  align-content: center;
   gap: 10px;
   padding-block: 14px;
   border-bottom: 1.5px dotted rgb(0 54 165 / .28);
@@ -759,6 +769,11 @@ html.lite .hero-titulo { filter: none; }
    El paso que la línea acaba de alcanzar se levanta en una hoja de
    papel; los que faltan quedan a media voz. Sólo con JavaScript
    (.vivo): sin él, todo se lee parejo.
+   A media voz, pero legibles: antes se apagaban con opacidad y
+   quedaban en 2.5:1. Ahora baja la tinta de cada cosa por separado,
+   medida contra el lienzo y contra la luz de bruma del ambiente (el
+   peor caso): el texto pasa AA (4.8:1) y el título, que es texto
+   grande, 3.5:1.
    ========================================================== */
 .paso { position: relative; isolation: isolate; }
 .paso::before {
@@ -781,8 +796,9 @@ html.lite .hero-titulo { filter: none; }
 .paso:last-of-type::before { bottom: -18px; }
 @media (min-width: 1280px) { .paso::before { right: -20px; } }
 .steps.vivo .paso.es-actual::before { opacity: 1; transform: none; }
-.steps.vivo .paso > div { transition: opacity .5s ease; }
-.steps.vivo .paso:not(.es-alcanzado) > div { opacity: .55; }
+.steps.vivo .paso :is(h3, p) { transition: color .5s ease; }
+.steps.vivo .paso:not(.es-alcanzado) h3 { color: rgb(0 54 165 / .64); }
+.steps.vivo .paso:not(.es-alcanzado) p { color: rgb(0 54 165 / .78); }
 
 /* ==========================================================
    PREGUNTAS

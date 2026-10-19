@@ -96,6 +96,7 @@ function Pliego({
                     fill
                     sizes="(max-width: 900px) 100vw, 60vw"
                     className="object-cover"
+                    style={service.image.position ? { objectPosition: service.image.position } : undefined}
                   />
                 </div>
               )}

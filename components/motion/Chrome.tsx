@@ -7,7 +7,7 @@
 
 import { useEffect, useState } from "react";
 import { MARK_PATH, MARK_VIEWBOX, Mark } from "@/components/brand/Mark";
-import { onScroll, terminarIntro, useMotionEnv } from "@/lib/motion";
+import { terminarIntro, useAlPie, useMotionEnv } from "@/lib/motion";
 import { lockScroll, scrollToTop } from "@/components/motion/MotionProvider";
 
 /* La intro imprime la marca: las dos tintas entran fuera de registro y
@@ -85,11 +85,12 @@ export function Grain() {
   return null;
 }
 
+/* Sólo al final, en el lugar del de WhatsApp: a mitad de página la
+   barra de arriba ya lleva al inicio, y dos botones fijos apilados
+   tapaban contenido. */
 export function BackToTop() {
-  const [on, setOn] = useState(false);
+  const on = useAlPie(".cierre, .caso-siguiente, footer");
   const [spin, setSpin] = useState(false);
-
-  useEffect(() => onScroll((v) => setOn(v > window.innerHeight * 0.9)), []);
 
   return (
     <button

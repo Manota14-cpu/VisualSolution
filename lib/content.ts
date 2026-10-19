@@ -248,8 +248,9 @@ export type Service = {
   title: string;
   body: string;
   token?: string;
-  /* TODO: reemplazar por fotos propias en /public */
-  image?: { src: string; alt: string };
+  /* Material propio, en /public. La franja es muy apaisada: position
+     (object-position) dice dónde se centra el recorte. */
+  image?: { src: string; alt: string; position?: string };
   tags?: string[];
   span: string;
   featured?: boolean;
@@ -260,7 +261,8 @@ export const services: Service[] = [
     id: "web",
     title: "Desarrollo web a medida",
     body: "Sitios y landings rápidos, a medida y fáciles de editar.",
-    image: { src: "https://picsum.photos/seed/visualsolution-code-editor/1000/560", alt: "" },
+    /* La captura de un trabajo real del catálogo, no una foto de banco. */
+    image: { src: "/trabajos/neweb.webp", alt: "Captura de NEWEB, un sitio del catálogo de trabajos" },
     tags: ["Next.js", "React", "WordPress", "Integraciones"],
     span: "xl:col-span-6",
   },
@@ -277,7 +279,12 @@ export const services: Service[] = [
     id: "audiovisual",
     title: "Producción audiovisual",
     body: "Videos para redes, producto y marca. De la idea a la edición.",
-    image: { src: "https://picsum.photos/seed/visualsolution-camera-rig/800/450", alt: "" },
+    /* Un cuadro del video de la portada del sitio. */
+    image: {
+      src: "/video/manotacielo-poster.jpg",
+      alt: "Cuadro del video de la portada: una persona con su computadora en una terraza sobre las nubes",
+      position: "50% 58%",
+    },
     span: "xl:col-span-5",
   },
   {
