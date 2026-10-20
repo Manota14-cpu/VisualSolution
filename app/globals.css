@@ -8,6 +8,14 @@
   initial-value: 0;
 }
 
+/* El radio de la lupa de "Tu web, en vivo": registrado para que crezca
+   y se achique con transición en vez de saltar. */
+@property --lente {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
 /* El ángulo del degradado cónico que hace el canto de los botones de
    metal. Mismo motivo que --luz: sin declararlo, un @keyframes que lo
    lleve de 0deg a 360deg saltaría de golpe en vez de interpolar. */
@@ -1674,6 +1682,390 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 
 
+  /* ==========================================================
+     TU WEB, EN VIVO
+     Afuera de la ventana manda el sistema del sitio. Adentro, la web
+     de muestra tiene su propia paleta y su propia letra (tw-editorial,
+     tw-audaz, tw-calido): muestra que una web puede tener otra voz.
+     Todas sus medidas salen del ancho de la ventana (cqi), no de la
+     pantalla: al achicarla a celular, se reacomoda sola.
+     ========================================================== */
+  .tuweb .eyebrow-n { animation: latido 1.8s ease-in-out infinite; }
+
+  .tw { display: grid; gap: clamp(20px, 3vw, 40px); }
+  @media (min-width: 1024px) {
+    .tw { grid-template-columns: 330px minmax(0, 1fr); align-items: start; }
+    .tw-lado { position: sticky; top: 104px; display: grid; gap: 18px; }
+  }
+  /* En una columna el orden es otro: primero se elige, después se mira
+     y recién al final se pide. El lado se disuelve y sus dos partes
+     se acomodan alrededor de la ventana. */
+  @media (max-width: 1023px) {
+    .tw-lado { display: contents; }
+    .tw-controles { order: 1; }
+    .tw-escena { order: 2; }
+    .tw-pie { order: 3; }
+  }
+
+  .tw-controles {
+    display: grid;
+    gap: 20px;
+    padding: clamp(20px, 2.4vw, 28px);
+    border-radius: 28px;
+    border: 1px solid var(--borde-fino);
+    background: var(--color-papel);
+    box-shadow: var(--sombra-1);
+  }
+  .tw-campo { display: grid; gap: 10px; min-width: 0; border: 0; padding: 0; margin: 0; }
+  .tw-campo > .label, .tw-campo > legend { color: rgb(0 54 165 / .75); }
+  .tw-campo legend { padding: 0; margin-bottom: 10px; }
+  .tw-controles .field-input { padding: 14px 22px; }
+  .tw-detalle { font-size: 13px; color: rgb(0 54 165 / .75); }
+
+  .tw-opciones { display: flex; flex-wrap: wrap; gap: 8px; border: 0; padding: 0; margin: 0; min-width: 0; }
+  .tw-opcion { position: relative; display: inline-flex; }
+  .tw-opcion input { position: absolute; inset: 0; z-index: 1; margin: 0; opacity: 0; cursor: pointer; }
+  .tw-opcion > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 14px;
+    border-radius: var(--radius-pills);
+    border: 1px solid rgb(0 54 165 / .2);
+    background: var(--color-papel);
+    font-size: 14px;
+    line-height: 1;
+    color: var(--color-azul);
+    transition: background-color .25s ease, color .25s ease, border-color .25s ease;
+  }
+  .tw-opcion svg { width: 16px; height: 16px; flex: none; }
+  .tw-opcion:hover > span { border-color: var(--color-azul-medio); }
+  .tw-opcion input:checked + span { background: var(--color-azul); border-color: var(--color-azul); color: var(--color-papel); }
+  .tw-opcion input:focus-visible + span { outline: 2px solid var(--color-azul-medio); outline-offset: 2px; }
+  .tw-muestra { display: inline-flex; padding-left: 4px; }
+  .tw-muestra b { width: 12px; height: 12px; margin-left: -4px; border-radius: var(--radius-pills); box-shadow: 0 0 0 1.5px var(--color-papel); }
+
+  .tw-pie { display: grid; justify-items: start; gap: 12px; }
+  .tw-nota { max-width: 40ch; font-size: 13px; line-height: 1.5; color: rgb(0 54 165 / .75); }
+
+  /* ---------------- la ventana ---------------- */
+  .tw-escena { display: grid; justify-items: center; gap: 16px; min-width: 0; }
+  .tw-marco {
+    width: 100%;
+    max-width: 1000px;
+    overflow: hidden;
+    border-radius: 22px;
+    border: 1px solid var(--borde-fino);
+    background: var(--color-papel);
+    box-shadow: var(--sombra-2);
+    transition: max-width .8s var(--ease-out), border-radius .8s var(--ease-out), padding .8s var(--ease-out), background-color .5s ease;
+  }
+  .tw-barra { display: flex; align-items: center; gap: 7px; height: 40px; padding: 0 16px; border-bottom: 1px solid rgb(0 54 165 / .08); }
+  .tw-barra > span { flex: none; width: 9px; height: 9px; border-radius: var(--radius-pills); background: rgb(0 54 165 / .18); }
+  .tw-barra p {
+    min-width: 0;
+    margin-left: 12px;
+    padding: 4px 14px;
+    overflow: hidden;
+    border-radius: var(--radius-pills);
+    background: rgb(0 54 165 / .06);
+    font-size: 12px;
+    line-height: 1.3;
+    color: rgb(0 54 165 / .8);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .tw-pantalla {
+    container: tw / inline-size;
+    position: relative;
+    height: clamp(500px, 50vw, 600px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  /* El celular: la ventana se achica hasta el ancho de un teléfono y
+     se vuelve un equipo en la tinta de la marca, con la dirección en
+     la isla de arriba. */
+  .tw-marco.es-celu { max-width: 380px; padding: 10px; border-radius: 46px; border-color: transparent; background: #0B1E4F; }
+  .es-celu .tw-barra { justify-content: center; height: 30px; padding: 0; border: 0; }
+  .es-celu .tw-barra > span { display: none; }
+  .es-celu .tw-barra p { margin: 0; background: rgb(255 255 255 / .12); color: rgb(255 255 255 / .85); font-size: 11px; }
+  .es-celu .tw-pantalla { height: 620px; border-radius: 36px; }
+
+  .tw-vista { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 16px; }
+  .tw-plano-btn {
+    min-height: 40px;
+    padding: 0 16px;
+    border-radius: var(--radius-pills);
+    border: 1px dashed var(--color-azul-medio);
+    background: transparent;
+    font-size: 14px;
+    color: var(--color-azul);
+    cursor: pointer;
+    transition: background-color .25s ease, color .25s ease;
+  }
+  .tw-plano-btn[aria-pressed="true"] { background: var(--color-azul); color: var(--color-papel); border-style: solid; }
+  .tw-pista { display: none; font-size: 13px; color: rgb(0 54 165 / .72); }
+  html.fine .tw-pista { display: block; }
+  /* En un teléfono la ventana ya tiene el ancho de un teléfono. */
+  @media (max-width: 699px) { .tw-dispositivo { display: none; } }
+
+  /* ---------------- la lupa ----------------
+     Dos capas idénticas: el diseño abajo y el plano arriba, recortado
+     a un círculo que sigue al cursor (--mx/--my, --lente). */
+  .tw-lienzo { position: relative; transition: --lente .45s var(--ease-out); }
+  .tw-lienzo[data-lente] { --lente: 118px; }
+  .tw-lienzo.plano-entero { --lente: 2600px; transition-duration: 1.1s; }
+  .tw-capa-plano, .tw-plano {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    clip-path: circle(var(--lente) at var(--mx, 50%) var(--my, 50%));
+  }
+  .plano-entero .tw-plano { clip-path: circle(var(--lente) at 50% 0%); }
+  .tw-lupa {
+    position: absolute;
+    left: var(--mx, 50%);
+    top: var(--my, 50%);
+    width: calc(var(--lente) * 2);
+    height: calc(var(--lente) * 2);
+    translate: -50% -50%;
+    border-radius: var(--radius-pills);
+    border: 2px solid var(--color-azul-medio);
+    box-shadow: 0 0 0 5px rgb(255 255 255 / .55), 0 24px 60px -24px rgb(0 54 165 / .6);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .3s ease;
+  }
+  .tw-lienzo[data-lente]:not(.plano-entero) .tw-lupa { opacity: 1; }
+  .tw-lupa span {
+    position: absolute;
+    left: 50%;
+    bottom: -12px;
+    translate: -50% 0;
+    padding: 3px 9px;
+    border-radius: var(--radius-pills);
+    background: var(--color-azul);
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--color-papel);
+  }
+
+  /* ---------------- la web de muestra ---------------- */
+  .tw-sitio {
+    --rb: var(--r);
+    position: relative;
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    transition: background-color .5s ease, color .5s ease;
+  }
+  .tw-editorial {
+    --bg: #F3EEE4; --ink: #1E1B16; --muted: #5E574B; --acento: #A3472A; --acento-texto: #A3472A; --sobre-acento: #FFF8EE;
+    --superficie: #FBF8F2; --linea: rgb(30 27 22 / .14); --r: 2px; --rb: 2px;
+    --t1: #A3472A; --t2: #1E1B16; --t3: #E2D6C1; --t4: #FBF8F2;
+    --display: var(--font-instrument), Georgia, serif; --peso: 400; --caja: none; --tracking: -0.01em;
+  }
+  .tw-audaz {
+    --bg: #0F1012; --ink: #F4F4F0; --muted: #A3A3AB; --acento: #D4FF3F; --acento-texto: #D4FF3F; --sobre-acento: #0F1012;
+    --superficie: #1A1B1F; --linea: rgb(244 244 240 / .14); --r: 0px; --rb: 0px;
+    --t1: #D4FF3F; --t2: #F4F4F0; --t3: #2A2B31; --t4: #0F1012;
+    --display: var(--font-space), system-ui, sans-serif; --peso: 700; --caja: uppercase; --tracking: -0.035em;
+  }
+  .tw-calido {
+    --bg: #FFF3EA; --ink: #3A2921; --muted: #7A5E52; --acento: #C2512F; --acento-texto: #B4462A; --sobre-acento: #FFFFFF;
+    --superficie: #FFFFFF; --linea: rgb(58 41 33 / .12); --r: 24px; --rb: 999px;
+    --t1: #C2512F; --t2: #FFC9A8; --t3: #3A2921; --t4: #FFFFFF;
+    --display: var(--font-dm-sans), system-ui, sans-serif; --peso: 500; --caja: none; --tracking: -0.045em;
+  }
+  .tw-sitio [data-spec] { position: relative; }
+
+  .tw-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px clamp(16px, 4.5cqi, 44px);
+    border-bottom: 1px solid var(--linea);
+  }
+  .tw-logo { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+  .tw-logo-nombre {
+    overflow: hidden;
+    font-family: var(--display);
+    font-weight: var(--peso);
+    font-size: 18px;
+    letter-spacing: var(--tracking);
+    text-transform: var(--caja);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .tw-logo-marca {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: max(var(--r), 6px);
+    background: var(--acento);
+    font-family: var(--display);
+    font-weight: var(--peso);
+    font-size: 17px;
+    line-height: 1;
+    color: var(--sobre-acento);
+  }
+  .tw-editorial .tw-logo-marca { border-radius: 999px; background: transparent; box-shadow: inset 0 0 0 1px var(--ink); color: var(--ink); font-size: 19px; }
+  .tw-menu { display: flex; gap: clamp(14px, 2.6cqi, 26px); font-size: 14px; color: var(--muted); }
+  .tw-nav-btn {
+    padding: 9px 16px;
+    border-radius: var(--rb);
+    background: var(--ink);
+    font-size: 13px;
+    line-height: 1.2;
+    color: var(--bg);
+    white-space: nowrap;
+  }
+  .tw-hamburguesa { display: none; place-items: center; width: 36px; height: 36px; border-radius: var(--rb); box-shadow: inset 0 0 0 1px var(--linea); }
+  .tw-hamburguesa svg { width: 18px; height: 18px; }
+
+  .tw-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+    align-items: center;
+    gap: clamp(20px, 4.5cqi, 48px);
+    padding: clamp(28px, 6.5cqi, 64px) clamp(16px, 4.5cqi, 44px);
+  }
+  .tw-kicker { font-size: 12px; line-height: 1.2; letter-spacing: .14em; text-transform: uppercase; color: var(--acento-texto); }
+  .tw-h1 {
+    margin-top: 14px;
+    font-family: var(--display);
+    font-weight: var(--peso);
+    font-size: clamp(36px, 7.6cqi, 78px);
+    line-height: .95;
+    letter-spacing: var(--tracking);
+    text-transform: var(--caja);
+    overflow-wrap: anywhere;
+  }
+  .tw-editorial .tw-h1 { font-size: clamp(42px, 9cqi, 92px); line-height: .9; }
+  .tw-bajada { max-width: 38ch; margin-top: 16px; font-size: clamp(14px, 1.75cqi, 17px); line-height: 1.55; color: var(--muted); }
+  .tw-acciones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+  .tw-btn, .tw-btn-2 {
+    display: inline-flex;
+    align-items: center;
+    min-height: 46px;
+    padding: 0 22px;
+    border-radius: var(--rb);
+    font-size: 15px;
+    line-height: 1;
+  }
+  .tw-btn { background: var(--acento); color: var(--sobre-acento); }
+  .tw-btn-2 { box-shadow: inset 0 0 0 1px var(--linea); color: var(--ink); }
+  .tw-arte { aspect-ratio: 4 / 3; overflow: hidden; border-radius: var(--r); }
+  .tw-arte svg { display: block; width: 100%; height: 100%; }
+  .tw-tesela g { stroke-width: 0; }
+  .tw-tesela .tw-trazo { fill: none; stroke-width: 14; }
+  .tw-f1 { fill: var(--t1); stroke: var(--t1); }
+  .tw-f2 { fill: var(--t2); stroke: var(--t2); }
+  .tw-f3 { fill: var(--t3); stroke: var(--t3); }
+  .tw-f4 { fill: var(--t4); stroke: var(--t4); }
+  .tw-arte rect, .tw-arte path, .tw-arte circle { transition: fill .5s ease, stroke .5s ease; }
+
+  .tw-tarjetas {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    padding: 0 clamp(16px, 4.5cqi, 44px) clamp(24px, 4.5cqi, 44px);
+  }
+  .tw-tarjeta {
+    display: grid;
+    align-content: start;
+    gap: 8px;
+    padding: 20px;
+    border-radius: var(--r);
+    background: var(--superficie);
+    box-shadow: inset 0 0 0 1px var(--linea);
+  }
+  .tw-editorial .tw-tarjeta { padding: 18px 0 0; background: transparent; box-shadow: inset 0 1px 0 var(--ink); }
+  .tw-tarjeta svg { width: 22px; height: 22px; color: var(--acento-texto); }
+  .tw-tarjeta-t { font-family: var(--display); font-weight: var(--peso); font-size: 19px; line-height: 1.1; letter-spacing: var(--tracking); text-transform: var(--caja); }
+  .tw-tarjeta-d { font-size: 13.5px; line-height: 1.45; color: var(--muted); }
+  .tw-pie-sitio { padding: 16px clamp(16px, 4.5cqi, 44px); border-top: 1px solid var(--linea); font-size: 12px; color: var(--muted); }
+
+  /* La web de muestra, adaptable: lo que decide es el ancho de la
+     ventana, no el de la pantalla. */
+  @container tw (max-width: 640px) {
+    .tw-menu, .tw-nav-btn { display: none; }
+    .tw-hamburguesa { display: grid; }
+    .tw-hero { grid-template-columns: minmax(0, 1fr); }
+    .tw-arte { order: -1; aspect-ratio: 16 / 10; }
+    .tw-tarjetas { grid-template-columns: minmax(0, 1fr); }
+    .tw-plano .tw-sitio [data-spec-movil]::after { content: attr(data-spec-movil); }
+  }
+
+  /* ---------------- el plano ----------------
+     La misma web, dibujada en la tinta de la marca sobre papel
+     cuadriculado: contornos punteados y el nombre de cada pieza. Sólo
+     cambia color y suma rótulos (que flotan): ninguna medida, para que
+     la lupa caiga justo encima de lo que tapa. */
+  .tw-plano .tw-sitio {
+    --bg: #F7FAFE; --ink: #0036A5; --muted: #155BCD; --acento: transparent; --acento-texto: #155BCD; --sobre-acento: #0036A5;
+    --superficie: transparent; --linea: rgb(21 91 205 / .45);
+    background-color: #F7FAFE;
+    background-image:
+      linear-gradient(rgb(21 91 205 / .08) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(21 91 205 / .08) 1px, transparent 1px);
+    background-size: 8px 8px;
+    transition: none;
+  }
+  .tw-plano [data-spec] { outline: 1px dashed rgb(21 91 205 / .7); outline-offset: -1px; }
+  .tw-plano [data-spec]::after {
+    content: attr(data-spec);
+    position: absolute;
+    z-index: 2;
+    top: 3px;
+    left: 3px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #0036A5;
+    font: 500 10px/1.3 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    letter-spacing: 0;
+    text-transform: none;
+    color: #FFFFFF;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  /* La grilla rotula por encima de su borde: adentro se pisaba con el
+     rótulo de la primera tarjeta. */
+  .tw-plano .tw-tarjetas::after { top: auto; bottom: 100%; margin-bottom: 4px; }
+  .tw-plano .tw-btn,
+  .tw-plano .tw-nav-btn,
+  .tw-plano .tw-logo-marca { background: transparent; box-shadow: inset 0 0 0 1px #155BCD; color: #0036A5; }
+  .tw-plano .tw-arte {
+    background:
+      linear-gradient(to top right, transparent calc(50% - .5px), rgb(21 91 205 / .45) 50%, transparent calc(50% + .5px)),
+      linear-gradient(to bottom right, transparent calc(50% - .5px), rgb(21 91 205 / .45) 50%, transparent calc(50% + .5px));
+  }
+  .tw-plano .tw-arte rect,
+  .tw-plano .tw-arte path,
+  .tw-plano .tw-arte circle { fill: none; stroke: #155BCD; stroke-width: 1.2; vector-effect: non-scaling-stroke; transition: none; }
+
+  /* Cada tesela que cambia entra con un golpe corto, en orden. */
+  @media (prefers-reduced-motion: no-preference) {
+    .tw-tesela {
+      transform-box: fill-box;
+      transform-origin: 50% 50%;
+      animation: tw-golpe .55s var(--ease-out) both;
+      animation-delay: calc(var(--i, 0) * 22ms);
+    }
+  }
+  @keyframes tw-golpe {
+    from { opacity: 0; transform: scale(.55); }
+  }
+  @keyframes latido { 50% { opacity: .3; } }
+
 .work-open { display: block; width: 100%; border-radius: var(--radius-cards); }
 .work-open:focus-visible { outline: 2px solid var(--color-azul-medio); outline-offset: 4px; }
 }
@@ -2003,6 +2395,8 @@ footer :focus-visible { outline-color: var(--color-papel); }
   .siguiente:hover,
   .siguiente:hover .siguiente-imagen img { transform: none; scale: none; }
   .capitulos-indice button.is-actual { translate: none; }
+  .tuweb .eyebrow-n { animation: none; }
+  .tw-marco { transition: none; }
   .capitulos-indice button::before { left: -23.75px; }
 
   /* El metal se queda quieto pero sigue siendo metal: los anillos

@@ -557,6 +557,105 @@ export const works: Work[] = [
   },
 ];
 
+/* ============================================================
+   TU WEB, EN VIVO
+   La demo de la sección "En vivo": quien visita escribe el nombre de
+   su negocio, elige rubro y estilo, y ve una web armada al momento.
+   Los textos de cada rubro son de muestra, para un negocio cualquiera
+   de ese rubro: la sección aclara que la web real se hace a medida.
+   ============================================================ */
+export type RubroDemo = {
+  id: "gastronomia" | "indumentaria" | "salud" | "estudio";
+  label: string;
+  /* El nombre que se usa mientras el campo está vacío. */
+  ejemplo: string;
+  kicker: string;
+  bajada: string;
+  accion: string;
+  secundaria: string;
+  nav: [string, string, string];
+  tarjetas: [Tarjeta, Tarjeta, Tarjeta];
+};
+type Tarjeta = { titulo: string; detalle: string };
+
+export type EstiloDemo = {
+  id: "editorial" | "audaz" | "calido";
+  label: string;
+  detalle: string;
+  /* Tres colores de la paleta, para la muestra del selector. */
+  muestra: [string, string, string];
+};
+
+export const tuWeb = {
+  rubros: [
+    {
+      id: "gastronomia",
+      label: "Gastronomía",
+      ejemplo: "Café Ombú",
+      kicker: "Café de especialidad",
+      bajada: "Desayunos, almuerzos y meriendas. Pedí online y retirá sin esperar.",
+      accion: "Reservar mesa",
+      secundaria: "Ver la carta",
+      nav: ["Carta", "Reservas", "Nosotros"],
+      tarjetas: [
+        { titulo: "Desayunos", detalle: "Medialunas, tostados y café de filtro." },
+        { titulo: "Almuerzos", detalle: "Un menú del día que cambia cada semana." },
+        { titulo: "Para llevar", detalle: "Pedís online y retirás sin hacer fila." },
+      ],
+    },
+    {
+      id: "indumentaria",
+      label: "Indumentaria",
+      ejemplo: "Lúa Tienda",
+      kicker: "Nueva temporada",
+      bajada: "Prendas para todos los días, con envíos a todo el país y cambios sin vueltas.",
+      accion: "Ver colección",
+      secundaria: "Ofertas",
+      nav: ["Mujer", "Hombre", "Ofertas"],
+      tarjetas: [
+        { titulo: "Recién llegado", detalle: "Lo que entró esta semana." },
+        { titulo: "Ofertas", detalle: "Temporada pasada a mejor precio." },
+        { titulo: "Envíos", detalle: "A todo el país, con seguimiento." },
+      ],
+    },
+    {
+      id: "salud",
+      label: "Salud",
+      ejemplo: "Centro Raíz",
+      kicker: "Salud y bienestar",
+      bajada: "Kinesiología, nutrición y yoga en un mismo lugar. Sacá turno online en un minuto.",
+      accion: "Pedir turno",
+      secundaria: "Especialidades",
+      nav: ["Especialidades", "Equipo", "Turnos"],
+      tarjetas: [
+        { titulo: "Kinesiología", detalle: "Rehabilitación y deportiva." },
+        { titulo: "Nutrición", detalle: "Planes hechos a tu medida." },
+        { titulo: "Yoga", detalle: "Clases para todos los niveles." },
+      ],
+    },
+    {
+      id: "estudio",
+      label: "Estudio",
+      ejemplo: "Estudio Norte",
+      kicker: "Estudio contable",
+      bajada: "Impuestos, sueldos y sociedades para pymes y monotributistas, explicados claro.",
+      accion: "Agendar consulta",
+      secundaria: "Servicios",
+      nav: ["Servicios", "Equipo", "Contacto"],
+      tarjetas: [
+        { titulo: "Impuestos", detalle: "Liquidaciones al día, sin sorpresas." },
+        { titulo: "Sueldos", detalle: "Recibos y cargas sociales en orden." },
+        { titulo: "Sociedades", detalle: "Armado y gestión de SAS y SRL." },
+      ],
+    },
+  ] satisfies RubroDemo[],
+  estilos: [
+    { id: "editorial", label: "Editorial", detalle: "Serif fina y mucho aire", muestra: ["#F3EEE4", "#A3472A", "#1E1B16"] },
+    { id: "audaz", label: "Audaz", detalle: "Letra grande, contraste fuerte", muestra: ["#0F1012", "#D4FF3F", "#F4F4F0"] },
+    { id: "calido", label: "Cálido", detalle: "Formas suaves y colores amables", muestra: ["#FFF3EA", "#C2512F", "#FFC9A8"] },
+  ] satisfies EstiloDemo[],
+};
+
 export const steps = [
   {
     n: "01",

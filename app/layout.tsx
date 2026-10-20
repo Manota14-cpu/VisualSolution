@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans } from "next/font/google";
+import { DM_Sans, Instrument_Serif, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 /* La capa de experiencia va después: gana en los empates. */
 import "./experiencia.css";
@@ -18,6 +18,24 @@ const dmSans = DM_Sans({
   weight: ["500"],
   variable: "--font-dm-sans",
   display: "swap",
+});
+
+/* Las letras de los estilos de muestra de "Tu web, en vivo". No son
+   del sistema del sitio: muestran que una web puede tener otra voz.
+   Sin precarga: el navegador las pide recién cuando aparecen. */
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-instrument",
+  display: "swap",
+  preload: false,
+});
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: "700",
+  variable: "--font-space",
+  display: "swap",
+  preload: false,
 });
 
 
@@ -100,7 +118,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={dmSans.variable}>
+    <html lang="es" className={`${dmSans.variable} ${instrumentSerif.variable} ${spaceGrotesk.variable}`}>
       <body>
         <script
           type="application/ld+json"
