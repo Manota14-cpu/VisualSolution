@@ -152,9 +152,13 @@ export const perfiles: Perfil[] = [
     bio: "Estudiante de programación que usa la inteligencia artificial como herramienta de trabajo. Desarrollo sitios web con IA, edito video en After Effects y me encargo de crear y organizar el contenido de Instagram.",
     habilidades: [
       { grupo: "Inteligencia artificial", items: ["Herramientas de IA", "Programación asistida por IA"] },
-      { grupo: "Desarrollo web", items: ["Sitios web con IA"] },
-      { grupo: "Video", items: ["After Effects", "Edición", "Animación"] },
+      { grupo: "Desarrollo web", items: ["HTML", "CSS", "JavaScript", "Sitios web con IA"] },
+      { grupo: "Video e imagen", items: ["After Effects", "Edición de video", "Animación", "Edición de imágenes"] },
       { grupo: "Redes sociales", items: ["Contenido para Instagram", "Planificación de publicaciones"] },
+      {
+        grupo: "Forma de trabajo",
+        items: ["Resolución de problemas", "Atención al cliente", "Trabajo en equipo", "Aprendizaje continuo"],
+      },
     ],
     enlaces: [{ label: "Instagram", url: "https://www.instagram.com/_mateoorojass/" }],
   },
