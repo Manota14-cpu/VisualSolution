@@ -2361,6 +2361,122 @@ footer :focus-visible { outline-color: var(--color-papel); }
 }
 
 /* ==========================================================
+   EL MANIFIESTO
+   Sin soporte para atar animaciones al scroll, o con movimiento
+   reducido, es un bloque de texto grande y nada más. Con soporte, la
+   sección se estira (240vh), la frase queda fija en el medio y cada
+   palabra se entinta en su tramo del recorrido.
+   ========================================================== */
+.manifiesto { position: relative; padding-block: clamp(64px, 9vw, 120px); }
+.manifiesto-texto {
+  max-width: 23ch;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(32px, 5.6vw, 80px);
+  line-height: 1.04;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+  color: var(--color-azul);
+}
+.manifiesto-texto .acento { color: var(--color-azul-medio); }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .manifiesto { height: 240vh; padding-block: 0; view-timeline: --manifiesto block; }
+    .manifiesto-fijo { position: sticky; top: 0; display: grid; align-items: center; height: 100vh; height: 100svh; }
+    .manifiesto .palabra {
+      opacity: .14;
+      animation: palabra-tinta linear both;
+      animation-timeline: --manifiesto;
+      animation-range: contain calc(var(--a) * 1%) contain calc(var(--b) * 1%);
+    }
+  }
+}
+@keyframes palabra-tinta { to { opacity: 1; } }
+
+/* La cinta se inclina con la velocidad del scroll (--sesgo lo escribe
+   la marquesina en Hero.tsx; vuelve sola a 0). */
+.marquee-band .row { transform: skewX(calc(min(var(--sesgo, 0), 2.5) * -3deg)); }
+
+/* ==========================================================
+   MÁS ENTRADAS ATADAS AL SCROLL
+   Cada una mueve una propiedad propia (translate, rotate, scale,
+   opacity) para no pisar los transform de los hovers. Sin soporte,
+   todo queda quieto en su lugar.
+   ========================================================== */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* "Trabajos" cruza la pantalla de costado mientras se baja. */
+    .titulo-con-cuenta .display-xl {
+      animation: titulo-cruza linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+    /* Las fotos de Servicios se corren dentro de su marco. */
+    .pliego-foto img {
+      scale: 1.16;
+      animation: foto-deriva linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+    /* Las fichas del equipo llegan desde abajo y, con las dos lado a
+       lado, desde los costados. En una columna no: corrida y girada,
+       la ficha de afuera se salía de la pantalla del teléfono. */
+    .perfiles > * .perfil {
+      animation: llega-abajo linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 32%;
+    }
+    @media (min-width: 768px) {
+      .perfiles > :nth-child(odd) .perfil { animation-name: llega-izq; }
+      .perfiles > :nth-child(even) .perfil { animation-name: llega-der; }
+    }
+    /* Las preguntas entran de a una. */
+    .faq-row {
+      animation: fila-entra linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+    /* El formulario se asienta como una hoja que cae en su lugar. */
+    .contacto-tarjeta {
+      animation: asienta linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+    /* En la ficha de un trabajo: los datos suben de a uno y el cierre
+       azul se agranda mientras llega, como el de la página. */
+    .caso-datos dd {
+      animation: fila-entra linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 25%;
+    }
+    .caso-cierre {
+      animation: acercarse linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+    /* La firma del pie sube desde el borde. */
+    .pie-firma {
+      animation: firma-sube linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+  }
+}
+@keyframes titulo-cruza { from { translate: 5% 0; } to { translate: -4% 0; } }
+@keyframes foto-deriva { from { translate: 0 -6%; } to { translate: 0 6%; } }
+/* La ficha que llega desde el costado arranca afuera de la pantalla en
+   una tablet: la sección recorta lo que asoma de lado (clip no arma un
+   contenedor de scroll, así lo fijo y las sombras siguen andando). */
+#equipo { overflow-x: clip; }
+@keyframes llega-abajo { from { translate: 0 56px; opacity: .35; } }
+@keyframes llega-izq { from { translate: -40px 64px; rotate: -2.5deg; opacity: .35; } }
+@keyframes llega-der { from { translate: 40px 64px; rotate: 2.5deg; opacity: .35; } }
+@keyframes fila-entra { from { translate: -28px 0; opacity: 0; } }
+@keyframes asienta { from { scale: .94; rotate: -1.2deg; opacity: .4; } }
+@keyframes firma-sube { from { translate: 0 45%; opacity: .2; } }
+
+
+/* ==========================================================
    MOVIMIENTO REDUCIDO
    Menos movimiento y más suave, no la ausencia de movimiento: si se
    apaga todo, también se apaga la señal de que algo pasó. Se van los

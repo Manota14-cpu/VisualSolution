@@ -656,6 +656,20 @@ export const tuWeb = {
   ] satisfies EstiloDemo[],
 };
 
+/* ============================================================
+   EL MANIFIESTO
+   La frase que se pinta palabra por palabra con el scroll, entre la
+   marquesina y Servicios. Sólo repite lo que el sitio ya promete en
+   otras secciones (hero, Proceso y Preguntas). Los tramos con acento
+   van en la segunda fuerza de la tinta.
+   ============================================================ */
+export const manifiesto: { texto: string; acento?: boolean }[] = [
+  { texto: "Hacemos webs, tiendas online y video para marcas que quieren" },
+  { texto: "vender mejor.", acento: true },
+  { texto: "Un solo equipo de la idea al lanzamiento: ves el diseño completo antes de programar, con fechas cerradas y todo" },
+  { texto: "a tu nombre.", acento: true },
+];
+
 export const steps = [
   {
     n: "01",

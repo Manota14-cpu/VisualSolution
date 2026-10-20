@@ -268,7 +268,7 @@ export function Contact() {
 
         <Reveal delay={1}>
           {sent ? (
-            <div className="superficie rounded-cards bg-papel p-6 sm:p-8" role="status">
+            <div className="contacto-tarjeta superficie rounded-cards bg-papel p-6 sm:p-8" role="status">
               <h3 className="display display-sm">Mensaje listo para enviar</h3>
               <p className="mt-2 max-w-[44ch] text-base leading-relaxed text-azul/85">{sent}</p>
               {waUrl && (
@@ -293,7 +293,7 @@ export function Contact() {
               </button>
             </div>
           ) : (
-            <form className="superficie es-alta grid gap-4 rounded-cards bg-papel p-5 sm:p-6 lg:p-8" onSubmit={onSubmit} noValidate>
+            <form className="contacto-tarjeta superficie es-alta grid gap-4 rounded-cards bg-papel p-5 sm:p-6 lg:p-8" onSubmit={onSubmit} noValidate>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className={`grid gap-2 ${errors.nombre ? "has-error" : ""}`}>
                   <div className="fl">

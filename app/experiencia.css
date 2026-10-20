@@ -107,7 +107,19 @@ html.lite .ambiente i { animation: none; }
   text-transform: uppercase;
   color: rgb(0 54 165 / .82);
 }
-.eyebrow-n { color: var(--color-azul-medio); font-variant-numeric: tabular-nums; letter-spacing: .08em; }
+.eyebrow-n { display: inline-flex; color: var(--color-azul-medio); font-variant-numeric: tabular-nums; letter-spacing: .08em; }
+/* El número gira como un cuentakilómetros: cada cifra es una columna
+   del 0 al 9 que sube hasta la suya cuando el bloque entra (--d es la
+   cifra, --k su lugar: la segunda arranca un poco después). */
+.cifra { display: inline-block; height: 1.2em; overflow: hidden; }
+.cifra > span {
+  display: flex;
+  flex-direction: column;
+  transition: transform 1.2s var(--ease-out);
+  transition-delay: calc(.2s + var(--k, 0) * 110ms);
+}
+.cifra > span > span { height: 1.2em; line-height: 1.2em; }
+.in .cifra > span { transform: translateY(calc(var(--d, 0) * -1.2em)); }
 .eyebrow-l {
   width: 34px;
   height: 1.5px;
@@ -1238,6 +1250,7 @@ html.lite .hero-titulo { filter: none; }
 @media (prefers-reduced-motion: reduce) {
   .ambiente i { animation: none; }
   .eyebrow-l { transform: scaleX(1); }
+  .cifra > span { transform: translateY(calc(var(--d, 0) * -1.2em)); transition: none; }
   .stack-logos li:hover svg,
   .contacto-fila:hover .contacto-icono,
   .contacto-fila:hover .contacto-flecha,

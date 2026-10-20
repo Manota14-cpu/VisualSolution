@@ -298,8 +298,8 @@ export function Hero() {
 
 /* La marquesina azul a sangre, pegada al borde de la página: es la
    bisagra entre el hero y el resto.
-   Responde al scroll: cuanto más rápido se baja, más corre la cinta, y
-   vuelve sola a su paso. Se toca la velocidad de la animación CSS que ya
+   Responde al scroll: cuanto más rápido se baja, más corre la cinta y
+   más se inclinan las palabras (--sesgo), y vuelve sola a su paso. Se toca la velocidad de la animación CSS que ya
    existe (playbackRate conserva la posición: no hay saltos), no se
    reescribe en JavaScript. */
 export function Marquee() {
@@ -319,11 +319,13 @@ export function Marquee() {
       if (impulso < 0.02) {
         impulso = 0;
         anim.playbackRate = 1;
+        el.style.setProperty("--sesgo", "0");
         quitar?.();
         quitar = null;
         return;
       }
       anim.playbackRate = 1 + impulso;
+      el.style.setProperty("--sesgo", impulso.toFixed(3));
     };
     const soltar = onScroll((v) => {
       const d = Math.abs(v - ultimo);

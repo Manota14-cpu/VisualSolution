@@ -1,5 +1,6 @@
 import { Nav } from "@/components/site/Nav";
 import { Hero, Marquee } from "@/components/site/Hero";
+import { Manifiesto } from "@/components/site/Manifiesto";
 import { Services } from "@/components/site/Services";
 import { Works } from "@/components/site/Works";
 import { TuWeb } from "@/components/site/TuWeb";
@@ -19,6 +20,7 @@ export default function Page() {
       <main id="main">
         <Hero />
         <Marquee />
+        <Manifiesto />
         <Services />
         <Works />
         <TuWeb />
